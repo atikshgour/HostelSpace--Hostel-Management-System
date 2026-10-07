@@ -123,3 +123,6 @@ At a high level, HostelSpace follows this structure:
 				  |    SQL Database  |
 				  +------------------+
 ```
+## Maintenance Complaints
+
+Students can submit maintenance complaints, and authorized staff can update their status.
