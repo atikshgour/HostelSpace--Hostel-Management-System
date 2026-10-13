@@ -26,6 +26,27 @@ Hostel staff will use the same system according to their roles. Wardens will pro
 | Development | Git and GitHub |
 | Project Planning | Jira |
 
+## Project Board
+
+| Sprint | ID | User story | Owner | Req | Test | Est | Acceptance |
+|---|---|---|---|---|---|---:|---|
+| 1 | US-20 | As a developer, I want the monorepo, Docker Compose (PostgreSQL 16), and a GitHub Actions CI (lint, security scan, tests, build) so every PR is verified | ATIKSH | NFR-05 | TC-CICD-01 | 6 | Compose starts frontend, API and DB; PRs run all checks with no secrets; failing test blocks merge; main is protected |
+| 1 | US-01 | As a user, I want to sign in and out with my role and see the correct dashboard so I access only permitted pages | ANVI | FR-01, SEC-01, SEC-02 | TC-FR01-01, TC-FR01-02 | 9 | Invalid/inactive login denied without revealing which field failed; logout invalidates session; CSRF enforced; role/ownership checks on every protected request |
+| 1 | US-02 | As a student, I want to view my profile and update my phone number only | ANVI | FR-01, SEC-03 | TC-FR01-01 | 3 | One profile per student; unique SRN; other fields return 403 |
+| 1 | US-04 | As the Hostel Director, I want to create users, activate/deactivate them and assign roles (reports come in Sprint 5) | ANVI | FR-11, BR-01 | TC-FR11-01 | 4 | Director-only; second active Chief Warden rejected (409) |
+| 1 | US-21 | As any user, I want clear labelled forms, field errors and status/empty states | ANVI | NFR-02 | TC-NFR02-01 | 2 | Every field labelled; errors actionable; empty states say "No records" or "Not assigned" |
+| 2 | US-03 | As staff, I want to manage notices, contacts and rules, and as a student, I want to see only active ones | ANVI | FR-02 | TC-FR02-01 | 5 | Invalid dates rejected; student cannot write; referenced rules deactivated, not deleted |
+| 2 | US-09 | As authorized staff, I want to set the study room Open/Closed with an optional message so students see its status (no booking) | ARYAN | FR-03, BR-02 | TC-FR03-01 | 3 | Latest status shown; unauthorized write 403; no booking action in UI/API |
+| 2 | US-10 | As Laundry Staff, I want to assign a laundry day so the student sees it (students cannot choose or change it) | ARYAN | FR-04, BR-03 | TC-FR04-01 | 4 | One current allocation per student; student write 403; "Not assigned" empty state |
+| 3 | US-11 | As Laundry Staff, I want to record clothes received and collected so the handover is tracked | ARYAN | FR-04, BR-04 | TC-FR04-01 | 4 | Positive item count; collection blocked without earlier Received record; repeat collect idempotent |
+| 3 | US-12 | As a student, I want to see my laundry status and history (read-only) | ARYAN | FR-04, SEC-03 | TC-FR04-01 | 2 | Own records only; cross-student read denied |
+| 3 | US-05 | As a student, I want to submit leave dates and a reason and track the status | ARIN | FR-05 | TC-FR05-01 | 6 | Valid request gets ID and Pending; end < start rejected; each student has an assigned warden |
+| 3 | US-06 | As a warden, I want to approve, reject or escalate my assigned students' leave, and as Chief Warden, to decide escalations | ARIN | FR-05, BR-01 | TC-FR05-01 | 8 | Only the assigned warden decides; Chief decides escalated only; final decision immutable (409); actor/time stored |
+
+Priority:
+- **High:** FR-01, FR-05, and security-related rows
+- **Medium:** All remaining rows
+
 ## Team Members
 
 | Name | USN | Primary Responsibilities |
