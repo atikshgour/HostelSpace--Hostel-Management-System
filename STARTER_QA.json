@@ -1,0 +1,22 @@
+{
+  "scope": "Starter structure and instructions only; NO application tests executed",
+  "planned_files": 275,
+  "planned_files_present": 275,
+  "missing_planned_paths": [],
+  "all_planned_files_nonempty": true,
+  "owner_path_story_prompt_css_history_checks": "passed",
+  "python_syntax": "parsed only; no runtime validation",
+  "json_syntax": "parsed; placeholder lockfiles are NOT generated npm locks",
+  "application_tests": "Not Run \u2014 application not implemented",
+  "included_source_pdfs": [
+    "SRS_SAD_STP_ SE_Deliverable_2_3_4.pdf",
+    "HotelSpace_Development_Plan.pdf",
+    "HostelSpace_Synopsis_Project_Proposal_Team11.pdf"
+  ],
+  "by_owner": {
+    "Anvi Srinivas": 110,
+    "Arin Singh": 67,
+    "Aryan Singh": 49,
+    "Atiksh Gour": 49
+  }
+}

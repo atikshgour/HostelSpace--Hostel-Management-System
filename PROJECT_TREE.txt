@@ -1,0 +1,381 @@
+hostelspace/
+├── .github/
+│   ├── workflows/
+│   │   ├── ci.yml
+│   │   └── release.yml
+│   ├── CODEOWNERS
+│   └── pull_request_template.md
+├── backend/
+│   ├── apps/
+│   │   ├── accounts/
+│   │   │   ├── management/
+│   │   │   │   ├── commands/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   └── seed_demo.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── migrations/
+│   │   │   │   ├── 0001_initial.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── tests/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── test_api.py
+│   │   │   │   └── test_services.py
+│   │   │   ├── README.md
+│   │   │   ├── __init__.py
+│   │   │   ├── admin.py
+│   │   │   ├── apps.py
+│   │   │   ├── models.py
+│   │   │   ├── permissions.py
+│   │   │   ├── queries.py
+│   │   │   ├── serializers.py
+│   │   │   ├── services.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── director_dashboard/
+│   │   │   ├── tests/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── test_api.py
+│   │   │   │   └── test_services.py
+│   │   │   ├── README.md
+│   │   │   ├── __init__.py
+│   │   │   ├── apps.py
+│   │   │   ├── permissions.py
+│   │   │   ├── queries.py
+│   │   │   ├── serializers.py
+│   │   │   ├── services.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── facilities/
+│   │   │   ├── migrations/
+│   │   │   │   ├── 0001_initial.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── tests/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── test_api.py
+│   │   │   │   └── test_services.py
+│   │   │   ├── README.md
+│   │   │   ├── __init__.py
+│   │   │   ├── admin.py
+│   │   │   ├── apps.py
+│   │   │   ├── models.py
+│   │   │   ├── permissions.py
+│   │   │   ├── queries.py
+│   │   │   ├── serializers.py
+│   │   │   ├── services.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── information/
+│   │   │   ├── migrations/
+│   │   │   │   ├── 0001_initial.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── tests/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── test_api.py
+│   │   │   │   └── test_services.py
+│   │   │   ├── README.md
+│   │   │   ├── __init__.py
+│   │   │   ├── admin.py
+│   │   │   ├── apps.py
+│   │   │   ├── models.py
+│   │   │   ├── permissions.py
+│   │   │   ├── queries.py
+│   │   │   ├── serializers.py
+│   │   │   ├── services.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── leave_attendance/
+│   │   │   ├── migrations/
+│   │   │   │   ├── 0001_initial.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── tests/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── test_api.py
+│   │   │   │   └── test_services.py
+│   │   │   ├── README.md
+│   │   │   ├── __init__.py
+│   │   │   ├── admin.py
+│   │   │   ├── apps.py
+│   │   │   ├── location.py
+│   │   │   ├── models.py
+│   │   │   ├── permissions.py
+│   │   │   ├── queries.py
+│   │   │   ├── serializers.py
+│   │   │   ├── services.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── student_services/
+│   │   │   ├── migrations/
+│   │   │   │   ├── 0001_initial.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── tests/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── test_api.py
+│   │   │   │   ├── test_payments.py
+│   │   │   │   └── test_services.py
+│   │   │   ├── README.md
+│   │   │   ├── __init__.py
+│   │   │   ├── admin.py
+│   │   │   ├── apps.py
+│   │   │   ├── models.py
+│   │   │   ├── payments.py
+│   │   │   ├── permissions.py
+│   │   │   ├── queries.py
+│   │   │   ├── serializers.py
+│   │   │   ├── services.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   └── __init__.py
+│   ├── config/
+│   │   ├── settings/
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   ├── ci.py
+│   │   │   ├── local.py
+│   │   │   └── production.py
+│   │   ├── __init__.py
+│   │   ├── asgi.py
+│   │   ├── exceptions.py
+│   │   ├── health.py
+│   │   ├── logging.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── .dockerignore
+│   ├── .env.example
+│   ├── Dockerfile
+│   ├── conftest.py
+│   ├── manage.py
+│   ├── pyproject.toml
+│   ├── requirements-dev.txt
+│   └── requirements.txt
+├── docs/
+│   ├── 03-architecture/
+│   │   └── architecture.md
+│   ├── 04-design/
+│   │   ├── api-contract.md
+│   │   ├── role-permissions.md
+│   │   └── schema.md
+│   ├── 05-validation/
+│   │   ├── cases.md
+│   │   ├── execution-log.md
+│   │   └── rtm.md
+│   ├── 06-testing/
+│   │   └── test-summary.md
+│   ├── 07-maintenance/
+│   │   └── runbook.md
+│   ├── 08-final-report/
+│   │   └── report.md
+│   ├── 09-presentation/
+│   │   └── demo-script.md
+│   ├── decisions/
+│   │   └── baseline.md
+│   ├── prompts/
+│   │   ├── anvi/
+│   │   │   └── prompt-log.md
+│   │   ├── arin/
+│   │   │   └── prompt-log.md
+│   │   ├── aryan/
+│   │   │   └── prompt-log.md
+│   │   └── atiksh/
+│   │       └── prompt-log.md
+│   ├── sources/
+│   │   ├── HostelSpace_Synopsis_Project_Proposal_Team11.pdf
+│   │   ├── HotelSpace_Development_Plan.pdf
+│   │   └── SRS_SAD_STP_ SE_Deliverable_2_3_4.pdf
+│   └── ui/
+│       └── design-system.md
+├── evidence/
+│   └── README.md
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── (auth)/
+│   │   │   │   └── login/
+│   │   │   │       └── page.js
+│   │   │   ├── (portal)/
+│   │   │   │   ├── attendance/
+│   │   │   │   │   ├── manage/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── complaints/
+│   │   │   │   │   ├── [id]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   ├── manage/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── deviations/
+│   │   │   │   │   ├── manage/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── director/
+│   │   │   │   │   ├── settings/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   ├── users/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── fees/
+│   │   │   │   │   ├── result/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── information/
+│   │   │   │   │   ├── manage/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── laundry/
+│   │   │   │   │   ├── handover/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   ├── manage/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── leave/
+│   │   │   │   │   ├── [id]/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   ├── review/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── mess/
+│   │   │   │   │   ├── manage/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── profile/
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── study-room/
+│   │   │   │   │   ├── manage/
+│   │   │   │   │   │   └── page.js
+│   │   │   │   │   └── page.js
+│   │   │   │   ├── error.js
+│   │   │   │   ├── layout.js
+│   │   │   │   └── loading.js
+│   │   │   ├── globals.css
+│   │   │   ├── layout.js
+│   │   │   ├── not-found.js
+│   │   │   └── page.js
+│   │   ├── components/
+│   │   │   └── ui/
+│   │   │       ├── AppShell.jsx
+│   │   │       ├── Button.jsx
+│   │   │       ├── Card.jsx
+│   │   │       ├── ConfirmDialog.jsx
+│   │   │       ├── DataTable.jsx
+│   │   │       ├── EmptyState.jsx
+│   │   │       ├── FormField.jsx
+│   │   │       ├── HistoryTimeline.jsx
+│   │   │       ├── PageHeader.jsx
+│   │   │       ├── StatusBadge.jsx
+│   │   │       └── ui.test.jsx
+│   │   ├── features/
+│   │   │   ├── attendance/
+│   │   │   │   ├── AttendanceHistory.jsx
+│   │   │   │   ├── AttendanceSessionForm.jsx
+│   │   │   │   ├── AttendanceSubmit.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── attendance.test.jsx
+│   │   │   ├── complaints/
+│   │   │   │   ├── ComplaintForm.jsx
+│   │   │   │   ├── ComplaintList.jsx
+│   │   │   │   ├── ComplaintManagePanel.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── complaints.test.jsx
+│   │   │   ├── deviations/
+│   │   │   │   ├── DeviationForm.jsx
+│   │   │   │   ├── DeviationPanel.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── deviations.test.jsx
+│   │   │   ├── director/
+│   │   │   │   ├── DirectorPanel.jsx
+│   │   │   │   ├── SettingsForm.jsx
+│   │   │   │   ├── UserManagement.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── director.test.jsx
+│   │   │   ├── fees/
+│   │   │   │   ├── FeesPanel.jsx
+│   │   │   │   ├── PaymentHistory.jsx
+│   │   │   │   ├── PaymentResult.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── fees.test.jsx
+│   │   │   ├── information/
+│   │   │   │   ├── ContentEditor.jsx
+│   │   │   │   ├── InformationTabs.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── information.test.jsx
+│   │   │   ├── laundry/
+│   │   │   │   ├── LaundryAllocationForm.jsx
+│   │   │   │   ├── LaundryCollectionPanel.jsx
+│   │   │   │   ├── LaundryHandoverForm.jsx
+│   │   │   │   ├── LaundryPanel.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── laundry.test.jsx
+│   │   │   ├── leave/
+│   │   │   │   ├── LeaveForm.jsx
+│   │   │   │   ├── LeaveHistory.jsx
+│   │   │   │   ├── LeaveList.jsx
+│   │   │   │   ├── LeaveReviewPanel.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── leave.test.jsx
+│   │   │   ├── login/
+│   │   │   │   ├── LoginForm.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── login.test.jsx
+│   │   │   ├── mess/
+│   │   │   │   ├── MessManageForm.jsx
+│   │   │   │   ├── MessPanel.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── mess.test.jsx
+│   │   │   ├── profile/
+│   │   │   │   ├── ProfilePanel.jsx
+│   │   │   │   ├── api.js
+│   │   │   │   └── profile.test.jsx
+│   │   │   └── study-room/
+│   │   │       ├── StudyRoomCard.jsx
+│   │   │       ├── StudyRoomEditor.jsx
+│   │   │       ├── api.js
+│   │   │       └── study-room.test.jsx
+│   │   └── lib/
+│   │       ├── api.js
+│   │       ├── format.js
+│   │       └── roles.js
+│   ├── .dockerignore
+│   ├── .env.example
+│   ├── Dockerfile
+│   ├── eslint.config.mjs
+│   ├── jest.config.mjs
+│   ├── jest.setup.js
+│   ├── jsconfig.json
+│   ├── next.config.mjs
+│   ├── package-lock.json
+│   ├── package.json
+│   └── postcss.config.mjs
+├── reference/
+│   └── HostelSpace_Build_Guide.html
+├── scripts/
+│   ├── backup.sh
+│   ├── deploy.sh
+│   ├── restore-test.sh
+│   ├── rollback.sh
+│   └── smoke.sh
+├── tests/
+│   ├── e2e/
+│   │   ├── critical-flows.spec.js
+│   │   └── privacy.spec.js
+│   ├── security/
+│   │   └── README.md
+│   ├── system/
+│   │   ├── performance.spec.js
+│   │   └── usability-checklist.md
+│   ├── package-lock.json
+│   ├── package.json
+│   └── playwright.config.js
+├── .dockerignore
+├── .gitignore
+├── AGENTS.md
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── FILE_MANIFEST.json
+├── HISTORY.md
+├── PROJECT_TREE.txt
+├── README.md
+├── STARTER_QA.json
+├── START_HERE.md
+├── STORIES.json
+└── compose.yaml

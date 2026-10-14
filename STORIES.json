@@ -1,0 +1,364 @@
+{
+  "US-01": {
+    "id": "US-01",
+    "title": "Sign in, sign out and open the correct dashboard",
+    "owner": "Anvi Srinivas",
+    "dev": "1",
+    "srs": "1",
+    "fr": "FR-01; SEC-01–03",
+    "deps": "US-17, US-18",
+    "criteria": [
+      "Active users reach the correct role dashboard; invalid/inactive users are denied with a generic message.",
+      "Protected APIs check active sessions and roles even on direct requests.",
+      "Logout invalidates the session and subsequent protected requests fail.",
+      "Use Django sessions; deployment session cookies are HttpOnly, Secure and host-only; login and writes require CSRF."
+    ]
+  },
+  "US-02": {
+    "id": "US-02",
+    "title": "View and update my student profile",
+    "owner": "Anvi Srinivas",
+    "dev": "2",
+    "srs": "1",
+    "fr": "FR-01; SEC-03–04",
+    "deps": "US-01",
+    "criteria": [
+      "Only the signed-in student can read/update their own profile.",
+      "Valid phone changes persist after refresh; reject empty/malformed input with field messages.",
+      "Phone-only student edits are the proposed baseline pending confirmation; reject protected-field updates to name, SRN, hostel, room and role."
+    ]
+  },
+  "US-03": {
+    "id": "US-03",
+    "title": "Publish and read notices, contacts, information and rules",
+    "owner": "Anvi Srinivas",
+    "dev": "2",
+    "srs": "2",
+    "fr": "FR-02",
+    "deps": "US-01, US-18",
+    "criteria": [
+      "Students see active notices in the current active window, hostel information, contacts and rules.",
+      "Only the Director and explicitly authorized content staff create/edit/deactivate content.",
+      "Reject missing titles and invalid active ranges.",
+      "Keep stable rule IDs; deactivate referenced rules instead of deleting them."
+    ]
+  },
+  "US-04": {
+    "id": "US-04",
+    "title": "Manage authorized users, settings and Director summaries",
+    "owner": "Anvi Srinivas",
+    "dev": "3; summaries after source modules",
+    "srs": "5; setup from 1",
+    "fr": "FR-11; BR-01",
+    "deps": "US-01; US-06, US-07, US-14, US-16 for summaries",
+    "criteria": [
+      "Director-only management endpoints activate/deactivate accounts, assign permitted roles and maintain approved settings.",
+      "Deactivated accounts lose access, including existing sessions on subsequent requests.",
+      "Permit only one active Chief Warden; support that Chief supervising multiple wardens and student-to-warden assignment.",
+      "Counts for pending leave, attendance by session, open complaints and unpaid fees match owning-module records; empty sets return zero; do not edit source records through reports."
+    ]
+  },
+  "US-05": {
+    "id": "US-05",
+    "title": "Submit and track a leave request",
+    "owner": "Arin Singh",
+    "dev": "2",
+    "srs": "3",
+    "fr": "FR-05; SEC-03–04",
+    "deps": "US-01, US-18",
+    "criteria": [
+      "Valid dates and non-empty reason create a Pending request with ID and submission time.",
+      "Reject end before start and missing input.",
+      "Derive student identity and assigned warden on the server; show assigned requests to that warden.",
+      "Students see only their own request history."
+    ]
+  },
+  "US-06": {
+    "id": "US-06",
+    "title": "Review leave and escalate to the Chief Warden",
+    "owner": "Arin Singh",
+    "dev": "2",
+    "srs": "3",
+    "fr": "FR-05; BR-01",
+    "deps": "US-05",
+    "criteria": [
+      "Only the assigned Warden decides Pending: Approve, Reject or Escalate.",
+      "Only Chief Warden finalizes Escalated requests.",
+      "Approved/Rejected are final and immutable; concurrent/repeated decisions cannot overwrite them.",
+      "Append actor, server timestamp, previous/new status and remarks for each transition; student sees status and decision history."
+    ]
+  },
+  "US-07": {
+    "id": "US-07",
+    "title": "Configure attendance sessions and submit one-time location attendance",
+    "owner": "Arin Singh",
+    "dev": "3",
+    "srs": "4",
+    "fr": "FR-06; NFR-03; SEC-05; BR-05",
+    "deps": "US-01, US-18; approved attendance policy",
+    "criteria": [
+      "Authorized wardens configure start/end, centre and positive radius; end follows start.",
+      "Server validates inclusive time window, distance and approved accuracy threshold; valid in-range submissions yield one accepted record.",
+      "Closed/outside-range/denied/unavailable/low-accuracy cases do not create accepted attendance.",
+      "PostgreSQL uniqueness and atomic handling prevent concurrent or retry duplicate accepted records per student/session.",
+      "Request one geolocation sample only after Submit; no watchPosition, background polling or retained raw student coordinates in DB/logs/history. Retain time and check result only; browser location is not tamper-proof."
+    ]
+  },
+  "US-08": {
+    "id": "US-08",
+    "title": "Record deviations and calculate active weightage",
+    "owner": "Arin Singh",
+    "dev": "3",
+    "srs": "4",
+    "fr": "FR-10; BR-07",
+    "deps": "US-01, US-03",
+    "criteria": [
+      "Authorized wardens record student, existing rule, copied rule weightage, remarks, actor and server time; students cannot write.",
+      "Sum active entries only, excluding deactivated entries.",
+      "Changing the source rule must not rewrite historical copied weightage.",
+      "Student read-only history is owner-scoped; staff reads are authorization-scoped."
+    ]
+  },
+  "US-09": {
+    "id": "US-09",
+    "title": "Display and update study-room Open/Closed status",
+    "owner": "Aryan Singh",
+    "dev": "2",
+    "srs": "2",
+    "fr": "FR-03; BR-02",
+    "deps": "US-01; approved updater permissions",
+    "criteria": [
+      "Accept only Open or Closed.",
+      "Show latest status, optional timings/message and update time.",
+      "Only Director or explicitly permitted staff update; record updating user.",
+      "No booking, seats, reservation API or student edit action. Preserve legacy UC-02; UC-11 is a proposed controlled correction, not an approved change."
+    ]
+  },
+  "US-10": {
+    "id": "US-10",
+    "title": "Assign and view allocated laundry day",
+    "owner": "Aryan Singh",
+    "dev": "2",
+    "srs": "2",
+    "fr": "FR-04; BR-03",
+    "deps": "US-01, US-18",
+    "criteria": [
+      "Laundry Staff assigns one valid current weekday per student.",
+      "Student sees read-only allocated day or Not assigned.",
+      "Students cannot select/reserve/modify a day through UI or API.",
+      "Future allocation changes preserve historical handover/collection details."
+    ]
+  },
+  "US-11": {
+    "id": "US-11",
+    "title": "Record clothes received by laundry",
+    "owner": "Aryan Singh",
+    "dev": "3",
+    "srs": "3",
+    "fr": "FR-04; SEC-03–04",
+    "deps": "US-10",
+    "criteria": [
+      "Laundry Staff records valid student, non-empty item details and positive whole-number count.",
+      "Create Received state with server time and receiving actor.",
+      "Reject missing fields, fractional, zero and negative counts.",
+      "Student reads only personal records; store historical allocation context so changes do not rewrite the past."
+    ]
+  },
+  "US-12": {
+    "id": "US-12",
+    "title": "Record collection and retain laundry history",
+    "owner": "Aryan Singh",
+    "dev": "3",
+    "srs": "3",
+    "fr": "FR-04; BR-04",
+    "deps": "US-11",
+    "criteria": [
+      "Only existing Received records can become Collected.",
+      "Keep original item details, handover time/actor and append collection time/actor.",
+      "Repeated collection is idempotent: no new record and no overwriting original completion time.",
+      "Student cannot change status or read another student history."
+    ]
+  },
+  "US-13": {
+    "id": "US-13",
+    "title": "Submit and track maintenance complaint",
+    "owner": "Atiksh Gour",
+    "dev": "2",
+    "srs": "4",
+    "fr": "FR-07; SEC-03–04",
+    "deps": "US-01, US-18",
+    "criteria": [
+      "Use server student profile room plus valid category and non-empty description.",
+      "Create Open complaint with ID; invalid input yields field errors and no record.",
+      "Own list/detail persists after refresh.",
+      "No cross-student reads or modifications."
+    ]
+  },
+  "US-14": {
+    "id": "US-14",
+    "title": "Assign complaints and update progress",
+    "owner": "Atiksh Gour",
+    "dev": "2",
+    "srs": "4",
+    "fr": "FR-07; SEC-01",
+    "deps": "US-13",
+    "criteria": [
+      "Director assigns to active Maintenance Staff.",
+      "Only assigned staff or Director perform permitted transitions Open → In Progress → Resolved.",
+      "Append actor, server time and remarks per transition; no silent revert of resolved complaint.",
+      "Student sees current status and history but cannot edit assignment or staff remarks."
+    ]
+  },
+  "US-15": {
+    "id": "US-15",
+    "title": "Manage mess allocation and active coupons",
+    "owner": "Atiksh Gour",
+    "dev": "3",
+    "srs": "5",
+    "fr": "FR-08; SEC-03–04",
+    "deps": "US-01, US-18",
+    "criteria": [
+      "Only Mess Staff creates/updates allocations and coupons.",
+      "Student sees current personal assigned mess and active currently valid coupons.",
+      "Reject invalid date range and missing coupon code.",
+      "No cross-student access or student writes; no ordering, QR redemption or billing."
+    ]
+  },
+  "US-16": {
+    "id": "US-16",
+    "title": "View fees and verify test payment results",
+    "owner": "Atiksh Gour",
+    "dev": "3",
+    "srs": "5",
+    "fr": "FR-09; NFR-03; SEC-06; BR-06",
+    "deps": "US-01, US-18; sandbox provider access",
+    "criteria": [
+      "Separate FeeDue and PaymentAttempt; fixed-precision amount/currency; initiate for server-calculated amount.",
+      "Only verified server-side matching fee/order/amount/currency success marks fee Paid.",
+      "Failed/cancelled attempts leave Unpaid; unverified result stays Pending.",
+      "Unique provider reference plus atomic update prevents duplicate success even on concurrent callbacks/retries.",
+      "Keep failure/cancellation/pending attempt history; no credentials, card/UPI PINs or real funds; provider-hosted test checkout only. Simulation requires faculty approval and explicit labeling."
+    ]
+  },
+  "US-17": {
+    "id": "US-17",
+    "title": "Baseline architecture and scaffold monorepo",
+    "owner": "Anvi Srinivas",
+    "dev": "1",
+    "srs": "1",
+    "fr": "All FRs; architecture",
+    "deps": "None",
+    "criteria": [
+      "Working Next.js and Django/DRF skeletons with health response.",
+      "Architecture/deployment diagrams show browser → Next.js → Django → PostgreSQL, external payment/location and separate CI path.",
+      "Record stack revision and duplicate UC correction proposal without changing FR IDs.",
+      "All four members review and can run the skeleton."
+    ]
+  },
+  "US-18": {
+    "id": "US-18",
+    "title": "Agree models, permissions and API contracts",
+    "owner": "Arin Singh",
+    "dev": "1",
+    "srs": "1",
+    "fr": "All FRs; SEC-01–06",
+    "deps": "US-17",
+    "criteria": [
+      "Reviewed data design covers all profile/information/study/laundry/leave/attendance/complaint/mess/fee/deviation entities.",
+      "Specify endpoint inputs, outputs, roles, ownership and errors; choose custom user model before initial migrations.",
+      "Each owner supplies portable migrations; clean SQLite quick-mode and PostgreSQL runs; prove attendance/payment uniqueness on PostgreSQL.",
+      "All four owners approve shared schema and permission matrix."
+    ]
+  },
+  "US-19": {
+    "id": "US-19",
+    "title": "Provide reproducible Docker environment and demo data",
+    "owner": "Aryan Singh",
+    "dev": "1",
+    "srs": "1",
+    "fr": "Containerization; SEC-02–03",
+    "deps": "US-17, US-18",
+    "criteria": [
+      "Clean clone starts frontend/API/PostgreSQL from README via Compose.",
+      "Named PostgreSQL volume preserves data across recreation.",
+      "Exclude secrets, SQLite, dependencies and build outputs from Git and every Docker context.",
+      "Fictional demo accounts for all seven roles; seeding refuses production by default; every member verifies login."
+    ]
+  },
+  "US-20": {
+    "id": "US-20",
+    "title": "Gate PRs and deploy reviewed releases",
+    "owner": "Atiksh Gour",
+    "dev": "1 setup; 3 promotion completion",
+    "srs": "1 setup; 6 final evidence",
+    "fr": "CI/CD; NFR-05",
+    "deps": "US-17, US-18, US-19",
+    "criteria": [
+      "PRs run lint/scanners/PostgreSQL backend tests/frontend tests/builds without deployment secrets.",
+      "Branch protection and independent review block failed required checks; empty tests are not success.",
+      "Trusted successful main push deploys staging for the same source SHA; wait for readiness/version and smoke success.",
+      "Only approved production promotion of the same reviewed SHA; document manual approval alternative if plan lacks reviewers.",
+      "Preserve real CI/coverage/scanner artifacts including failures; no queued-deploy-as-success or host auto-deploy bypass."
+    ]
+  },
+  "US-21": {
+    "id": "US-21",
+    "title": "Validate usability and assemble final handoff",
+    "owner": "Anvi Srinivas",
+    "dev": "4–6",
+    "srs": "6",
+    "fr": "NFR-02, NFR-04; handoff",
+    "deps": "US-01–16; US-22–24 for sign-off",
+    "criteria": [
+      "Chrome/Edge/Firefox checks cover labels, actionable errors, keyboard and phone/tablet/desktop usability.",
+      "Final report traces every FR to actual stories, PRs, tests and evidence.",
+      "15-minute presentation/rehearsal includes each member explaining and demonstrating owned functionality.",
+      "List unfinished work/defects honestly; never label unbuilt stories implemented."
+    ]
+  },
+  "US-22": {
+    "id": "US-22",
+    "title": "Maintain validation and verify access rules",
+    "owner": "Arin Singh",
+    "dev": "1 design; 4–6 execution",
+    "srs": "1 design; 6 final validation",
+    "fr": "All FR/NFR/SEC/BR",
+    "deps": "US-18; feature slices for execution",
+    "criteria": [
+      "Every FR, NFR, SEC and BR has cases with preconditions/input/expected result.",
+      "Seeded role, session, CSRF and ownership checks cover all personal modules, only against own local/staging app.",
+      "Attendance boundary/retry cases on PostgreSQL; no retained raw location.",
+      "Fill actual results only after execution; link failed cases to observed bugs and rerun. Tests remain Not Run initially."
+    ]
+  },
+  "US-23": {
+    "id": "US-23",
+    "title": "Run integrated workflows and reliability checks",
+    "owner": "Aryan Singh",
+    "dev": "4–6",
+    "srs": "6",
+    "fr": "All FRs; NFR-01,03–05",
+    "deps": "US-19, US-20; US-01–16 for regression",
+    "criteria": [
+      "Critical Playwright login/leave/laundry/complaint flows across integrated app.",
+      "PostgreSQL tests prove attendance/payment retries and concurrency produce no duplicate accepted/success records.",
+      "Performance baseline proposed: 20 signed-in synthetic users, 100 warm visits, p95 navigation-to-usable ≤3s; approval required before target is binding.",
+      "Record browser/env/dataset/SHA/time/observations and failures; cover mess/payment/deviation with repeatable manual cases where appropriate."
+    ]
+  },
+  "US-24": {
+    "id": "US-24",
+    "title": "Verify recovery and complete maintenance guidance",
+    "owner": "Atiksh Gour",
+    "dev": "5–6",
+    "srs": "6",
+    "fr": "FR-09; NFR-03; SEC-06; recovery",
+    "deps": "US-16, US-20; US-23 before release",
+    "criteria": [
+      "Restore synthetic PostgreSQL backup into separate database and verify expected counts.",
+      "Record/test known-good frontend/API rollback after checking schema compatibility; app rollback does not reverse migrations.",
+      "Retest sandbox success/failure/pending/duplicate payment acceptance with no real funds/data.",
+      "Name maintainers, weekly dependency review, backups, incident/bug triage and recovery steps; no dumps/secrets in repository."
+    ]
+  }
+}
