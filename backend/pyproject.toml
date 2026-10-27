@@ -1,10 +1,10 @@
 # Owner: Atiksh | US-20 | Sprint 1
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.ci"
-testpaths = ["tests"]
+testpaths = ["tests", "apps/student_services/tests"]
 addopts = "--strict-markers"
 [tool.ruff]
 target-version = "py313"
-include = ["config/health.py", "config/urls.py", "config/wsgi.py", "config/settings/base.py", "config/settings/local.py", "config/settings/ci.py", "manage.py", "tests/test_health.py"]
+include = ["config/health.py", "config/urls.py", "config/wsgi.py", "config/exceptions.py", "config/settings/base.py", "config/settings/local.py", "config/settings/ci.py", "manage.py", "tests/test_health.py", "apps/accounts/apps.py", "apps/accounts/models.py", "apps/student_services/*.py", "apps/student_services/tests/*.py"]
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I"]

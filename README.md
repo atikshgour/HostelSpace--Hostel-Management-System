@@ -1,5 +1,10 @@
 # HostelSpace
 
+> US-13 backend update (Atiksh, 2026-10-27): complaint submission and owned-record
+> tracking are implemented, with the user-approved minimal User/Profile dependency.
+> See the [API/setup contract](backend/apps/student_services/README.md) and
+> [actual PostgreSQL test results](evidence/us13-backend-validation.md).
+
 > US-20 update (Atiksh, 2026-10-27): the minimal frontend/API foundation,
 > PostgreSQL 16 Compose stack and PR CI are now implemented. Feature modules below
 > remain starter placeholders. See [local setup and CI](docs/07-maintenance/ci-setup.md)

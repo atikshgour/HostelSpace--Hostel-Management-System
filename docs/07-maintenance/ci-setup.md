@@ -23,7 +23,10 @@ No SQLite fallback, production migration or deployment is included.
 6. Run `docker compose down` to stop. The named database volume is retained.
 
 Only frontend/API ports bind to loopback. Database is internal. Startup does not
-seed data or apply migrations. Domain models and their migrations are not enabled.
+seed data or apply migrations. US-13 now enables minimal account/profile and complaint
+models; see the [module setup contract](../../backend/apps/student_services/README.md)
+for explicit migration steps on a fresh local synthetic database. Existing databases
+need review.
 
 ## Checks
 

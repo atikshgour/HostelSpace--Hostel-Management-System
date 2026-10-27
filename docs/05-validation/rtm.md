@@ -1,5 +1,11 @@
 # Live requirement/story/file/test/evidence matrix
 
+## US-13 backend evidence — 2026-10-27 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-07, SEC-03; SEC-01/04 supporting checks | US-13 / Atiksh Gour, user-selected Sprint 4; reviewer Anvi Srinivas pending | TC-FR07-01 (student submission/tracking portion) | [Actual local results](../../evidence/us13-backend-validation.md), [API tests](../../backend/apps/student_services/tests/test_complaints.py), [module contract](../../backend/apps/student_services/README.md) | Backend slice verified on isolated PostgreSQL 15.19; 57 tests passed including the three baseline health tests. PostgreSQL 16/remote CI and independent review remain pending. FR-07 staff updates belong to US-14 and are not claimed complete. |
+
 ## US-20 implementation evidence — 2026-10-27 (review pending)
 
 | Requirement | Story / owner | Test | Evidence | Status |

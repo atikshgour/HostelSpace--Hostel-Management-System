@@ -1,96 +1,103 @@
-# Module integration and ownership handoff
+<!-- Owner: Atiksh Gour | US-13 | Sprint 4 (prior proposed development mapping: 2) -->
+<!-- Reviewer: Anvi Srinivas; account dependency review: Anvi Srinivas / Arin Singh; pending -->
+# Student complaint submission and tracking
 
-```text
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: backend/apps/student_services/README.md
-ACCOUNTABLE OWNER: Atiksh Gour
-INDEPENDENT REVIEWER: Anvi Srinivas
-USER STORIES: US-13, US-14, US-15, US-16
-DEVELOPMENT PLAN SPRINT(S): 2; 3 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 4; 5 (preserved baseline mapping)
-REQUIREMENTS: FR-07; SEC-03–04; FR-07; SEC-01; FR-08; SEC-03–04; FR-09; NFR-03; SEC-06; BR-06
-FILE PURPOSE: Module integration and ownership handoff
+Implemented scope: US-13, FR-07 student portion, SEC-03; TC-FR07-01.
+The user selected Sprint 4, consistent with the original SRS mapping. The starter's
+proposed development-plan Sprint 2 mapping remains a proposal, not an approval.
+Staff assignment/status updates (US-14), mess and payments remain unimplemented.
 
-WHAT TO IMPLEMENT IN THIS FILE
-Complaint/ComplaintTransition, MessAllocation/Coupon, FeeDue/PaymentAttempt; room server-derived; validity; Decimal amounts and unique provider reference. Director assigns active Maintenance; assigned staff Open→In Progress→Resolved. Mess Staff writes, students active-own reads. Verified sandbox payments only, transaction-safe Paid update and attempt history. Document actual endpoints, model relationships, test commands, pending policies, consuming modules and operational history.
+## API
 
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
+All endpoints require a Django session for an active user with role `student`.
+No Basic/JWT authentication, signup, login or staff API is added by this slice.
+US-01 must supply the session login/logout flow, including explicit login CSRF.
+The minimal custom User/Profile dependency was explicitly authorized by the user.
 
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
+| Method | Path | Result |
+| --- | --- | --- |
+| GET | `/api/complaint-categories/` | Paginated active categories; sets CSRF cookie |
+| GET | `/api/complaints/` | Paginated own records, newest first |
+| POST | `/api/complaints/` | 201 persisted Open complaint and its creation history |
+| GET | `/api/complaints/{id}/` | Own current record and chronological history |
 
-OWNER: Atiksh Gour | REVIEWER: Anvi Srinivas
-TARGET FILE: backend/apps/student_services/README.md
-DEVELOPMENT-PLAN SPRINT: 2; 3
-ORIGINAL SRS SPRINT: 4; 5
-STORY: US-13, US-14, US-15, US-16
-REQUIREMENTS: FR-07; SEC-03–04; FR-07; SEC-01; FR-08; SEC-03–04; FR-09; NFR-03; SEC-06; BR-06
-RESPONSIBILITY: Module integration and ownership handoff
-FILE TASK: Complaint/ComplaintTransition, MessAllocation/Coupon, FeeDue/PaymentAttempt; room server-derived; validity; Decimal amounts and unique provider reference. Director assigns active Maintenance; assigned staff Open→In Progress→Resolved. Mess Staff writes, students active-own reads. Verified sandbox payments only, transaction-safe Paid update and attempt history. Document actual endpoints, model relationships, test commands, pending policies, consuming modules and operational history.
+Pagination: 20 results per page, `?page=2`; envelope
+`{count,next,previous,results}`. All responses, including errors, use `no-store`.
+Client category choice comes from the categories endpoint; no category vocabulary
+was defined by the sources, so categories are server-managed database rows.
+No production categories or policy seed is supplied. Provision reviewed categories
+through controlled maintenance tooling; there is no student category-write endpoint.
 
-US-13 — Submit and track maintenance complaint
-Dependencies: US-01, US-18
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Use server student profile room plus valid category and non-empty description.
-- Create Open complaint with ID; invalid input yields field errors and no record.
-- Own list/detail persists after refresh.
-- No cross-student reads or modifications.
-
-US-14 — Assign complaints and update progress
-Dependencies: US-13
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Director assigns to active Maintenance Staff.
-- Only assigned staff or Director perform permitted transitions Open → In Progress → Resolved.
-- Append actor, server time and remarks per transition; no silent revert of resolved complaint.
-- Student sees current status and history but cannot edit assignment or staff remarks.
-
-US-15 — Manage mess allocation and active coupons
-Dependencies: US-01, US-18
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Only Mess Staff creates/updates allocations and coupons.
-- Student sees current personal assigned mess and active currently valid coupons.
-- Reject invalid date range and missing coupon code.
-- No cross-student access or student writes; no ordering, QR redemption or billing.
-
-US-16 — View fees and verify test payment results
-Dependencies: US-01, US-18; sandbox provider access
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Separate FeeDue and PaymentAttempt; fixed-precision amount/currency; initiate for server-calculated amount.
-- Only verified server-side matching fee/order/amount/currency success marks fee Paid.
-- Failed/cancelled attempts leave Unpaid; unverified result stays Pending.
-- Unique provider reference plus atomic update prevents duplicate success even on concurrent callbacks/retries.
-- Keep failure/cancellation/pending attempt history; no credentials, card/UPI PINs or real funds; provider-hosted test checkout only. Simulation requires faculty approval and explicit labeling.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
+POST body:
+```json
+{"category": 1, "description": "Synthetic example: room light needs repair"}
 ```
+Here `1` is illustrative; clients must use an ID returned by the categories API.
+Description must be a string containing 1–2000 characters after trimming.
+Category must identify an existing active category. Unknown/protected fields
+(including room, student, status, assignment and history) are rejected with 400.
+
+Response fields: `id`, `room`, `category` (ID), `category_code`, `category_name`,
+`description`, `status`, `created_at`, `history`.
+Each history item contains `id,actor,created_at,old_status,new_status,remarks`.
+Creation derives the student from the session and snapshots the assigned room
+from StudentProfile; it never accepts a client room. Missing profile/room is 400.
+Initial status is exactly `Open`. Initial history has empty old status, new
+status Open, the student actor, server timestamp and fixed submission remarks.
+
+The transactional service reloads/locks the user, profile and category. Failure
+to insert history rolls back the complaint. Query scoping precedes detail lookup,
+so a foreign complaint is indistinguishable from a nonexistent one. All student
+update/delete methods are rejected; superusers and every staff role are also denied.
+The detail GET returns persisted current state, including later staff updates.
+
+## Sessions, CSRF and errors
+
+After US-01 has established a session, GET categories to obtain the CSRF cookie,
+then send it as `X-CSRFToken` on POST along with the session cookie. The API uses
+DRF SessionAuthentication with an explicit `Session` challenge so unauthenticated
+requests return 401. Session creation/login is deliberately not exposed here.
+Never copy cookie/token values into logs, evidence or prompt files.
+
+Errors use `{code,message,fields}`: 400 `validation_error` or `parse_error`,
+401 `not_authenticated`, 403 `permission_denied` (including failed CSRF),
+404 `not_found`, 405 `method_not_allowed`. Unexpected failures return sanitized
+500 `server_error` with no exception details. Validation creates no complaint/history.
+
+## Storage and integration
+
+Models: accounts.User/StudentProfile, ComplaintCategory, Complaint, ComplaintTransition.
+Generated initial migrations and their ownership are listed in
+[the migration sidecar](../../../docs/07-maintenance/us13-migration-manifest.json).
+Only untouched placeholder migrations were replaced. No production DB was changed.
+Switching an existing database from default auth.User needs a reviewed conversion
+plan; never reset data or fake migrations to install this change.
+
+Backend settings now enable auth, sessions and these two apps. Django middleware
+and DRF enforce active sessions/CSRF. URLs mount the module under `/api/`.
+Docker includes the app source. For a **fresh local synthetic database only**,
+review `python manage.py migrate --plan`, then run `python manage.py migrate`
+under the local PostgreSQL configuration before using accounts/complaints.
+Compose equivalent: `docker compose exec api python manage.py migrate --plan`
+and then `docker compose exec api python manage.py migrate`.
+Startup does not apply migrations automatically.
+
+## Verification and handoff
+
+From backend with a disposable PostgreSQL database configured:
+```text
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python -m ruff check .
+python -m pytest
+```
+Tests create/drop Django's isolated test database; use a dedicated synthetic test
+server/user with database-creation privileges, never a production connection.
+CI discovers US-13 tests alongside health tests and runs on PostgreSQL 16.
+See [actual commands/results and remaining gaps](../../../evidence/us13-backend-validation.md).
+No frontend files, commits, pushes or human review records are claimed here.
+After human review, append the truthful HISTORY and owner prompt-log handoff.
+
+Source basis: supplied SRS PDF pp. 3–5 (profile/complaint fields, FR-07) and the
+repository's US-13 file instructions. API choices above implement the placeholder
+contract for independent review; they do not imply prior team approval.

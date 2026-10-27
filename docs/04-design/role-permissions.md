@@ -1,5 +1,18 @@
 # Role/assignment authorization matrix
 
+## US-13 implemented permissions (2026-10-27; review pending)
+
+| Principal | Categories | Create complaint | List/detail | Update/delete |
+| --- | --- | --- | --- | --- |
+| Active Student | Active categories | Own identity and profile room only, with CSRF | Own complaints only | Denied |
+| Inactive or unauthenticated user | Denied | Denied | Denied | Denied |
+| Any staff role, including superusers | Denied in this student API slice | Denied | Denied | Denied |
+
+Ownership is applied in the database query before detail lookup. Session roles
+are loaded on each request; stale role objects do not authorize service writes.
+US-14 staff assignments/transitions remain separate, unimplemented work. No Django
+superuser bypass or account/profile editing endpoints are introduced here.
+
 ```text
 HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
 STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
