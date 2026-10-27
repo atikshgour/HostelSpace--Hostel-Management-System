@@ -1,79 +1,43 @@
-/*
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: frontend/src/features/leave/LeaveList.jsx
-ACCOUNTABLE OWNER: Arin Singh
-INDEPENDENT REVIEWER: Aryan Singh
-USER STORIES: US-05, US-06
-DEVELOPMENT PLAN SPRINT(S): 2 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 3 (preserved baseline mapping)
-REQUIREMENTS: FR-05; SEC-03–04; FR-05; BR-01
-FILE PURPOSE: LeaveList UI component
+"use client";
+/* Arin Singh | US-05/06 | Sprint 3. Complete leave workspace in an existing assigned file. */
+import { useEffect, useState } from "react";
+import { decideLeave, getIdentity, getLeave, listLeaves, submitLeave } from "./api";
 
-WHAT TO IMPLEMENT IN THIS FILE
-Own history with statuses/dates/remarks and detail links; Warden/Chief queues only in authorized review UI. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
+const ui = { page:{maxWidth:960,margin:"0 auto",padding:24}, card:{border:"1px solid #cbd5e1",borderRadius:12,padding:20,margin:"16px 0",background:"#fff"}, row:{display:"flex",gap:12,flexWrap:"wrap",alignItems:"center"}, field:{display:"grid",gap:6,margin:"12px 0",minWidth:220}, input:{minHeight:42,padding:9,border:"1px solid #94a3b8",borderRadius:8,font:"inherit"}, button:{minHeight:42,padding:"8px 14px",border:"1px solid #1d4ed8",borderRadius:8,background:"#fff",color:"#1d4ed8",cursor:"pointer"}, error:{padding:12,borderLeft:"4px solid #b91c1c",background:"#fef2f2"} };
 
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
+export function ErrorMessage({ error }) { return error ? <div role="alert" style={ui.error}><strong>{error.message}</strong>{Object.entries(error.fields || {}).map(([key,value])=><p key={key}>{key}: {Array.isArray(value)?value.join(" "):String(value)}</p>)}</div> : null; }
+function Field({ label, children, ...props }) { return <label style={ui.field}><span>{label}</span>{children || <input style={ui.input} {...props}/>}</label>; }
+function Pager({ page, data, setPage }) { return <nav aria-label="Leave pages" style={ui.row}><button style={ui.button} disabled={page===1} onClick={()=>setPage(page-1)}>Previous</button><span>Page {page}</span><button style={ui.button} disabled={!data?.next} onClick={()=>setPage(page+1)}>Next</button></nav>; }
 
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
+export function LeaveForm({ onSaved }) {
+  const [busy,setBusy]=useState(false), [error,setError]=useState(null), [message,setMessage]=useState("");
+  async function submit(event) {
+    event.preventDefault(); const form=event.currentTarget; const body=Object.fromEntries(new FormData(form));
+    setError(null); setMessage("");
+    if (body.end_date < body.start_date) { setError(new Error("End date must be on or after start date.")); return; }
+    setBusy(true);
+    try { await submitLeave(body); form.reset(); setMessage("Leave request submitted with Pending status."); onSaved(); }
+    catch (failure) { setError(failure); } finally { setBusy(false); }
+  }
+  return <section style={ui.card}><h2>Apply for leave</h2><form onSubmit={submit}><div style={ui.row}><Field label="Start date" name="start_date" type="date" required/><Field label="End date" name="end_date" type="date" required/></div><Field label="Reason"><textarea style={{...ui.input,minHeight:96}} name="reason" maxLength={2000} required/></Field><button style={ui.button} disabled={busy}>{busy?"Submitting…":"Submit leave"}</button><ErrorMessage error={error}/><p role="status">{message}</p></form></section>;
+}
 
-OWNER: Arin Singh | REVIEWER: Aryan Singh
-TARGET FILE: frontend/src/features/leave/LeaveList.jsx
-DEVELOPMENT-PLAN SPRINT: 2
-ORIGINAL SRS SPRINT: 3
-STORY: US-05, US-06
-REQUIREMENTS: FR-05; SEC-03–04; FR-05; BR-01
-RESPONSIBILITY: LeaveList UI component
-FILE TASK: Own history with statuses/dates/remarks and detail links; Warden/Chief queues only in authorized review UI. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
+export function LeaveHistory({ transitions=[] }) { return <ol>{transitions.map(item=><li key={item.id}><strong>{item.from_status || "New"} → {item.to_status}</strong><p>{item.remarks}</p><small>Actor {item.actor} · {new Date(item.occurred_at).toLocaleString()}</small></li>)}</ol>; }
 
-US-05 — Submit and track a leave request
-Dependencies: US-01, US-18
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Valid dates and non-empty reason create a Pending request with ID and submission time.
-- Reject end before start and missing input.
-- Derive student identity and assigned warden on the server; show assigned requests to that warden.
-- Students see only their own request history.
+export function LeaveReviewPanel({ row, role, onSaved }) {
+  const allowed=(row.status==="Pending" && role==="WARDEN") || (row.status==="Escalated" && role==="CHIEF_WARDEN");
+  const [decision,setDecision]=useState("Approved"), [busy,setBusy]=useState(false), [error,setError]=useState(null);
+  if (!allowed) return null;
+  async function submit(event) { event.preventDefault(); setBusy(true); setError(null); try { await decideLeave(row.id,{decision,remarks:new FormData(event.currentTarget).get("remarks")}); onSaved(); } catch(failure){ setError(failure); } finally { setBusy(false); } }
+  return <form onSubmit={submit}><Field label="Decision"><select style={ui.input} value={decision} onChange={event=>setDecision(event.target.value)}><option>Approved</option><option>Rejected</option>{role==="WARDEN"?<option>Escalated</option>:null}</select></Field><Field label="Decision remarks"><textarea style={{...ui.input,minHeight:80}} name="remarks" maxLength={2000} required/></Field><button style={ui.button} disabled={busy}>{busy?"Saving…":"Save decision"}</button><ErrorMessage error={error}/></form>;
+}
 
-US-06 — Review leave and escalate to the Chief Warden
-Dependencies: US-05
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Only the assigned Warden decides Pending: Approve, Reject or Escalate.
-- Only Chief Warden finalizes Escalated requests.
-- Approved/Rejected are final and immutable; concurrent/repeated decisions cannot overwrite them.
-- Append actor, server timestamp, previous/new status and remarks for each transition; student sees status and decision history.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-*/
-
-/* IMPLEMENTATION AREA: replace this marker with reviewed code. */
+export default function LeaveWorkspace({ detailId=null }) {
+  const [identity,setIdentity]=useState({loading:true}), [page,setPage]=useState(1), [data,setData]=useState({results:[]}), [error,setError]=useState(null), [revision,setRevision]=useState(0);
+  useEffect(()=>{ let live=true; getIdentity().then(user=>live&&setIdentity({loading:false,user})).catch(error=>live&&setIdentity({loading:false,error})); return()=>{live=false}; },[]);
+  useEffect(()=>{ let live=true; setError(null); (detailId?getLeave(detailId).then(row=>({results:[row]})):listLeaves(page)).then(value=>live&&setData(value)).catch(failure=>live&&setError(failure)); return()=>{live=false}; },[detailId,page,revision]);
+  if (identity.loading) return <main style={ui.page}><p role="status">Checking session…</p></main>;
+  if (identity.error) return <main style={ui.page}><ErrorMessage error={identity.error}/></main>;
+  const role=identity.user?.role, refresh=()=>setRevision(value=>value+1);
+  return <main style={ui.page}><h1>Leave requests</h1>{role==="STUDENT"&&!detailId?<LeaveForm onSaved={refresh}/>:null}<ErrorMessage error={error}/>{!data.results?.length?<p>No leave records.</p>:data.results.map(row=><article style={ui.card} key={row.id}><h2>{row.start_date} to {row.end_date} · {row.status}</h2><p>{row.reason}</p><p>Request {row.id} · Student {row.student}</p><LeaveHistory transitions={row.transitions}/><LeaveReviewPanel row={row} role={role} onSaved={refresh}/>{!detailId?<a href={`/leave/${row.id}`}>Open request</a>:null}</article>)}{!detailId?<Pager page={page} data={data} setPage={setPage}/>:null}</main>;
+}

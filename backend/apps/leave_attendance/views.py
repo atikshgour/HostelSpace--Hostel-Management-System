@@ -1,94 +1,133 @@
-# HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-# STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-# TARGET FILE: backend/apps/leave_attendance/views.py
-# ACCOUNTABLE OWNER: Arin Singh
-# INDEPENDENT REVIEWER: Aryan Singh
-# USER STORIES: US-05, US-06, US-07, US-08
-# DEVELOPMENT PLAN SPRINT(S): 2; 3 (proposed working mapping; team approval required)
-# ORIGINAL SRS SPRINT(S): 3; 4 (preserved baseline mapping)
-# REQUIREMENTS: FR-05; SEC-03–04; FR-05; BR-01; FR-06; NFR-03; SEC-05; BR-05; FR-10; BR-07
-# FILE PURPOSE: Authenticated scoped HTTP endpoints
-#
-# WHAT TO IMPLEMENT IN THIS FILE
-# Pending→Approved/Rejected/Escalated; Chief finalizes Escalated; final immutable. Attendance time/radius/accuracy; active deviation sum only; personal and staff scopes. Authenticate active session; scoped get_queryset/object checks on reads and writes; call services for transitions, not free-form PATCH status.
-#
-# BEFORE STARTING
-# 1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-# 2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-# 3. Resolve blocked dependencies before inventing interfaces or missing policies.
-# 4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-# 5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-#
-# COPY-READY AI IMPLEMENTATION PROMPT
-# You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-# Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-# Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-# Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-# Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-# Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-#
-# OWNER: Arin Singh | REVIEWER: Aryan Singh
-# TARGET FILE: backend/apps/leave_attendance/views.py
-# DEVELOPMENT-PLAN SPRINT: 2; 3
-# ORIGINAL SRS SPRINT: 3; 4
-# STORY: US-05, US-06, US-07, US-08
-# REQUIREMENTS: FR-05; SEC-03–04; FR-05; BR-01; FR-06; NFR-03; SEC-05; BR-05; FR-10; BR-07
-# RESPONSIBILITY: Authenticated scoped HTTP endpoints
-# FILE TASK: Pending→Approved/Rejected/Escalated; Chief finalizes Escalated; final immutable. Attendance time/radius/accuracy; active deviation sum only; personal and staff scopes. Authenticate active session; scoped get_queryset/object checks on reads and writes; call services for transitions, not free-form PATCH status.
-#
-# US-05 — Submit and track a leave request
-# Dependencies: US-01, US-18
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Valid dates and non-empty reason create a Pending request with ID and submission time.
-# - Reject end before start and missing input.
-# - Derive student identity and assigned warden on the server; show assigned requests to that warden.
-# - Students see only their own request history.
-#
-# US-06 — Review leave and escalate to the Chief Warden
-# Dependencies: US-05
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Only the assigned Warden decides Pending: Approve, Reject or Escalate.
-# - Only Chief Warden finalizes Escalated requests.
-# - Approved/Rejected are final and immutable; concurrent/repeated decisions cannot overwrite them.
-# - Append actor, server timestamp, previous/new status and remarks for each transition; student sees status and decision history.
-#
-# US-07 — Configure attendance sessions and submit one-time location attendance
-# Dependencies: US-01, US-18; approved attendance policy
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Authorized wardens configure start/end, centre and positive radius; end follows start.
-# - Server validates inclusive time window, distance and approved accuracy threshold; valid in-range submissions yield one accepted record.
-# - Closed/outside-range/denied/unavailable/low-accuracy cases do not create accepted attendance.
-# - PostgreSQL uniqueness and atomic handling prevent concurrent or retry duplicate accepted records per student/session.
-# - Request one geolocation sample only after Submit; no watchPosition, background polling or retained raw student coordinates in DB/logs/history. Retain time and check result only; browser location is not tamper-proof.
-#
-# US-08 — Record deviations and calculate active weightage
-# Dependencies: US-01, US-03
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Authorized wardens record student, existing rule, copied rule weightage, remarks, actor and server time; students cannot write.
-# - Sum active entries only, excluding deactivated entries.
-# - Changing the source rule must not rewrite historical copied weightage.
-# - Student read-only history is owner-scoped; staff reads are authorization-scoped.
-#
-# OWNER'S REVIEW / HANDOFF CHECKLIST
-# [ ] This file contains a real, understood implementation rather than this instruction placeholder.
-# [ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-# [ ] Only this file's responsibility is implemented; related changes are listed for review.
-# [ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-# [ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-# [ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-# [ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-# [ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-# [ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-# [ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-# [ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-# [ ] No live payments, production data changes, deployments, commits or pushes without approval.
-#
-# IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-# Actual Jira key: Not created
-# Implementation status: Not implemented
-# Changed paths: Not recorded
-# Commands and observed results: Not Run
-# Unresolved decisions / limitations: Record before implementation
-# PR / reviewer / evidence: Not available
+"""Arin | US-05–08. Session-only APIs, scoped querysets, bounded pagination, no private-response caching."""
+from decimal import Decimal
+from django.apps import apps
+from django.conf import settings
+from django.db.models import Sum
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from . import permissions as access, services
+from .permissions import WorkflowRole
+from .models import LeaveRequest, AttendanceSession, Attendance, Deviation
+from .serializers import *
 
-# IMPLEMENTATION AREA: replace this marker with reviewed content.
+class Paging(PageNumberPagination):
+    page_size = 25
+
+class ProtectedView(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated, WorkflowRole]
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        response['Cache-Control'] = 'no-store, private'
+        response['Vary'] = 'Cookie'
+        return response
+    def rows(self, queryset, serializer, request):
+        pager = Paging()
+        return pager.get_paginated_response(serializer(pager.paginate_queryset(queryset, request), many=True).data)
+    def validated(self, cls, request):
+        s = cls(data=request.data)
+        s.is_valid(raise_exception=True)
+        return s.validated_data
+
+class Leaves(ProtectedView):
+    def get(self, request):
+        access.require(request.user, access.STUDENT, access.WARDEN, access.CHIEF)
+        return self.rows(access.leave_scope(request.user, LeaveRequest.objects.prefetch_related('transitions')).distinct(), LeaveOutput, request)
+    def post(self, request):
+        access.require(request.user, access.STUDENT)
+        return Response(LeaveOutput(services.submit_leave(request.user, self.validated(LeaveInput, request))).data, status=201)
+
+class LeaveDetail(ProtectedView):
+    def get(self, request, pk):
+        access.require(request.user, access.STUDENT, access.WARDEN, access.CHIEF)
+        obj = get_object_or_404(access.leave_scope(request.user, LeaveRequest.objects.prefetch_related('transitions')).distinct(), pk=pk)
+        return Response(LeaveOutput(obj).data)
+
+class LeaveDecision(ProtectedView):
+    def post(self, request, pk):
+        access.require(request.user, access.WARDEN, access.CHIEF)
+        data = self.validated(DecisionInput, request)
+        return Response(LeaveOutput(services.decide_leave(request.user, pk, **data)).data)
+
+class Sessions(ProtectedView):
+    def get(self, request):
+        access.require(request.user, access.STUDENT, access.WARDEN, access.CHIEF)
+        return self.rows(access.session_scope(request.user, AttendanceSession.objects.all()), SessionOutput, request)
+    def post(self, request):
+        access.require(request.user, access.WARDEN)
+        return Response(SessionOutput(services.create_session(request.user, self.validated(SessionInput, request))).data, status=201)
+
+class AttendanceSubmit(ProtectedView):
+    def post(self, request):
+        access.require(request.user, access.STUDENT)
+        data = self.validated(AttendanceInput, request)
+        session_id = data.pop('session')
+        record = services.submit_attendance(request.user, session_id, data)
+        return Response(AttendanceOutput(record).data, status=201)
+
+class AttendanceHistory(ProtectedView):
+    def get(self, request):
+        access.require(request.user, access.STUDENT, access.WARDEN, access.CHIEF)
+        return self.rows(access.personal_scope(request.user, Attendance.objects.all()), AttendanceOutput, request)
+
+class Deviations(ProtectedView):
+    def get(self, request):
+        access.require(request.user, access.STUDENT, access.WARDEN, access.CHIEF)
+        queryset = access.personal_scope(request.user, Deviation.objects.all())
+        sid = request.query_params.get('student')
+        if sid:
+            queryset = queryset.filter(student_id=access.student_key(sid))
+        return self.rows(queryset, DeviationOutput, request)
+    def post(self, request):
+        access.require(request.user, access.WARDEN, access.CHIEF)
+        data = self.validated(DeviationInput, request)
+        record = services.record_deviation(request.user, data['student'], data['rule'], data['remarks'])
+        return Response(DeviationOutput(record).data, status=201)
+
+class DeviationTotals(ProtectedView):
+    def get(self, request):
+        access.require(request.user, access.STUDENT, access.WARDEN, access.CHIEF)
+        if access.role(request.user) == access.STUDENT:
+            student = request.user
+        else:
+            sid = request.query_params.get('student')
+            if not sid:
+                from rest_framework.exceptions import ValidationError
+                raise ValidationError({'student': 'Select a student.'})
+            student = get_object_or_404(access.students_for(request.user), pk=access.student_key(sid))
+        total = Deviation.objects.filter(student=student, active=True).aggregate(value=Sum('weightage_snapshot'))['value'] or Decimal('0')
+        return Response({'student': str(student.pk), 'active_total': format(total, '.2f')})
+
+class DeviationDeactivate(ProtectedView):
+    def post(self, request, pk):
+        access.require(request.user, access.WARDEN, access.CHIEF)
+        data = self.validated(DeactivateInput, request)
+        return Response(DeviationOutput(services.deactivate_deviation(request.user, pk, data['reason'])).data)
+
+class StudentChoices(ProtectedView):
+    def get(self, request):
+        access.require(request.user, access.WARDEN, access.CHIEF)
+        # Only the necessary identifiers for assigned students, not the shared profile API.
+        return self.rows(access.students_for(request.user).order_by('pk'), StudentChoiceOutput, request)
+
+from rest_framework import serializers
+class StudentChoiceOutput(serializers.Serializer):
+    id = serializers.CharField(source='pk')
+    name = serializers.SerializerMethodField()
+    def get_name(self, obj):
+        return obj.get_full_name() or obj.get_username()
+
+class RuleChoices(ProtectedView):
+    def get(self, request):
+        access.require(request.user, access.WARDEN, access.CHIEF)
+        model = apps.get_model(getattr(settings, 'HOSTELSPACE_RULE_MODEL', 'information.Rule'))
+        return self.rows(model.objects.filter(active=True).order_by('pk'), RuleChoiceOutput, request)
+
+class RuleChoiceOutput(serializers.Serializer):
+    id = serializers.CharField(source='pk')
+    title = serializers.CharField()
+    weightage = serializers.DecimalField(max_digits=10, decimal_places=2)
