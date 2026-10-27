@@ -1,94 +1,160 @@
-# HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-# STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-# TARGET FILE: backend/apps/leave_attendance/tests/test_services.py
-# ACCOUNTABLE OWNER: Arin Singh
-# INDEPENDENT REVIEWER: Aryan Singh
-# USER STORIES: US-05, US-06, US-07, US-08
-# DEVELOPMENT PLAN SPRINT(S): 2; 3 (proposed working mapping; team approval required)
-# ORIGINAL SRS SPRINT(S): 3; 4 (preserved baseline mapping)
-# REQUIREMENTS: FR-05; SEC-03–04; FR-05; BR-01; FR-06; NFR-03; SEC-05; BR-05; FR-10; BR-07
-# FILE PURPOSE: State, validation and invariant tests
-#
-# WHAT TO IMPLEMENT IN THIS FILE
-# LeaveRequest/LeaveTransition, AttendanceSession/Attendance, DeviationRecord. Server timestamps; assigned warden; unique accepted student/session; copied deviation weight; no raw student coordinates. Pending→Approved/Rejected/Escalated; Chief finalizes Escalated; final immutable. Attendance time/radius/accuracy; active deviation sum only; personal and staff scopes. Test boundaries, immutable history and invalid transitions; run critical constraints/concurrency on PostgreSQL.
-#
-# BEFORE STARTING
-# 1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-# 2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-# 3. Resolve blocked dependencies before inventing interfaces or missing policies.
-# 4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-# 5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-#
-# COPY-READY AI IMPLEMENTATION PROMPT
-# You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-# Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-# Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-# Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-# Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-# Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-#
-# OWNER: Arin Singh | REVIEWER: Aryan Singh
-# TARGET FILE: backend/apps/leave_attendance/tests/test_services.py
-# DEVELOPMENT-PLAN SPRINT: 2; 3
-# ORIGINAL SRS SPRINT: 3; 4
-# STORY: US-05, US-06, US-07, US-08
-# REQUIREMENTS: FR-05; SEC-03–04; FR-05; BR-01; FR-06; NFR-03; SEC-05; BR-05; FR-10; BR-07
-# RESPONSIBILITY: State, validation and invariant tests
-# FILE TASK: LeaveRequest/LeaveTransition, AttendanceSession/Attendance, DeviationRecord. Server timestamps; assigned warden; unique accepted student/session; copied deviation weight; no raw student coordinates. Pending→Approved/Rejected/Escalated; Chief finalizes Escalated; final immutable. Attendance time/radius/accuracy; active deviation sum only; personal and staff scopes. Test boundaries, immutable history and invalid transitions; run critical constraints/concurrency on PostgreSQL.
-#
-# US-05 — Submit and track a leave request
-# Dependencies: US-01, US-18
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Valid dates and non-empty reason create a Pending request with ID and submission time.
-# - Reject end before start and missing input.
-# - Derive student identity and assigned warden on the server; show assigned requests to that warden.
-# - Students see only their own request history.
-#
-# US-06 — Review leave and escalate to the Chief Warden
-# Dependencies: US-05
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Only the assigned Warden decides Pending: Approve, Reject or Escalate.
-# - Only Chief Warden finalizes Escalated requests.
-# - Approved/Rejected are final and immutable; concurrent/repeated decisions cannot overwrite them.
-# - Append actor, server timestamp, previous/new status and remarks for each transition; student sees status and decision history.
-#
-# US-07 — Configure attendance sessions and submit one-time location attendance
-# Dependencies: US-01, US-18; approved attendance policy
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Authorized wardens configure start/end, centre and positive radius; end follows start.
-# - Server validates inclusive time window, distance and approved accuracy threshold; valid in-range submissions yield one accepted record.
-# - Closed/outside-range/denied/unavailable/low-accuracy cases do not create accepted attendance.
-# - PostgreSQL uniqueness and atomic handling prevent concurrent or retry duplicate accepted records per student/session.
-# - Request one geolocation sample only after Submit; no watchPosition, background polling or retained raw student coordinates in DB/logs/history. Retain time and check result only; browser location is not tamper-proof.
-#
-# US-08 — Record deviations and calculate active weightage
-# Dependencies: US-01, US-03
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Authorized wardens record student, existing rule, copied rule weightage, remarks, actor and server time; students cannot write.
-# - Sum active entries only, excluding deactivated entries.
-# - Changing the source rule must not rewrite historical copied weightage.
-# - Student read-only history is owner-scoped; staff reads are authorization-scoped.
-#
-# OWNER'S REVIEW / HANDOFF CHECKLIST
-# [ ] This file contains a real, understood implementation rather than this instruction placeholder.
-# [ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-# [ ] Only this file's responsibility is implemented; related changes are listed for review.
-# [ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-# [ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-# [ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-# [ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-# [ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-# [ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-# [ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-# [ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-# [ ] No live payments, production data changes, deployments, commits or pushes without approval.
-#
-# IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-# Actual Jira key: Not created
-# Implementation status: Not implemented
-# Changed paths: Not recorded
-# Commands and observed results: Not Run
-# Unresolved decisions / limitations: Record before implementation
-# PR / reviewer / evidence: Not available
+"""Arin Singh | US-05–08 and US-22 service/constraint tests.
 
-# IMPLEMENTATION AREA: replace this marker with reviewed content.
+These tests intentionally use the shared accounts.User, StudentProfile and
+information.Rule contracts. They become executable after those owner modules
+replace their starter placeholders.
+"""
+from concurrent.futures import ThreadPoolExecutor
+from datetime import timedelta
+from decimal import Decimal
+from threading import Barrier
+from unittest import skipUnless
+
+from django.apps import apps
+from django.contrib.auth import get_user_model
+from django.db import IntegrityError, close_old_connections, connection, transaction
+from django.test import TestCase, TransactionTestCase
+from django.utils import timezone
+from rest_framework.exceptions import PermissionDenied
+
+from apps.leave_attendance import services
+from apps.leave_attendance.location import check_sample, distance_m
+from apps.leave_attendance.models import Attendance, AttendanceSession
+
+
+def build_fixtures(case):
+    User = get_user_model()
+    Profile = apps.get_model("accounts", "StudentProfile")
+    Rule = apps.get_model("information", "Rule")
+    case.chief = User.objects.create_user(username="chief", role="CHIEF_WARDEN")
+    case.warden = User.objects.create_user(username="warden", role="WARDEN", chief_warden=case.chief)
+    case.other = User.objects.create_user(username="other", role="WARDEN", chief_warden=case.chief)
+    case.student = User.objects.create_user(username="student", role="STUDENT")
+    case.stranger = User.objects.create_user(username="stranger", role="STUDENT")
+    Profile.objects.create(user=case.student, srn="TEST-001", room="T-1", assigned_warden=case.warden)
+    Profile.objects.create(user=case.stranger, srn="TEST-002", room="T-2", assigned_warden=case.other)
+    case.rule = Rule.objects.create(title="Test rule", weightage=Decimal("2.50"), active=True)
+    now = timezone.now()
+    case.session = AttendanceSession.objects.create(
+        title="Test session", warden=case.warden,
+        opens_at=now-timedelta(minutes=5), closes_at=now+timedelta(minutes=5),
+        centre_latitude=12.0, centre_longitude=77.0, radius_m=100,
+        max_accuracy_m=50, max_sample_age_seconds=60,
+    )
+    case.sample = {"latitude": 12.0, "longitude": 77.0, "accuracy_m": 5, "sampled_at": now}
+    case.leave_data = {"start_date": now.date(), "end_date": now.date()+timedelta(days=1), "reason": "Family visit"}
+
+
+class ServiceTests(TestCase):
+    def setUp(self):
+        build_fixtures(self)
+
+    def test_leave_submission_records_actor_and_assignment(self):
+        row = services.submit_leave(self.student, self.leave_data)
+        self.assertEqual(row.status, "Pending")
+        self.assertEqual(row.assigned_warden, self.warden)
+        self.assertEqual(row.transitions.get().actor, self.student)
+
+    def test_only_student_submits(self):
+        with self.assertRaises(PermissionDenied):
+            services.submit_leave(self.warden, self.leave_data)
+
+    def test_escalation_then_chief_finalization(self):
+        row = services.submit_leave(self.student, self.leave_data)
+        services.decide_leave(self.warden, row.pk, "Escalated", "Review required")
+        services.decide_leave(self.chief, row.pk, "Approved", "Reviewed")
+        row.refresh_from_db()
+        self.assertEqual(row.status, "Approved")
+        self.assertEqual(row.transitions.count(), 3)
+
+    def test_final_decision_is_immutable(self):
+        row = services.submit_leave(self.student, self.leave_data)
+        services.decide_leave(self.warden, row.pk, "Rejected", "Not permitted")
+        with self.assertRaises(services.Conflict):
+            services.decide_leave(self.warden, row.pk, "Approved", "Changed")
+        self.assertEqual(row.transitions.count(), 2)
+
+    def test_warden_cannot_finalize_escalated_request(self):
+        row = services.submit_leave(self.student, self.leave_data)
+        services.decide_leave(self.warden, row.pk, "Escalated", "Review")
+        with self.assertRaises(PermissionDenied):
+            services.decide_leave(self.warden, row.pk, "Approved", "Changed")
+
+    def test_one_accepted_attendance_and_rejected_retry(self):
+        rejected = services.submit_attendance(self.student, self.session.pk, {**self.sample, "accuracy_m": 100})
+        self.assertEqual(rejected.reason_code, "LOW_ACCURACY")
+        services.submit_attendance(self.student, self.session.pk, self.sample)
+        with self.assertRaises(services.Conflict):
+            services.submit_attendance(self.student, self.session.pk, self.sample)
+        self.assertEqual(Attendance.objects.filter(result="Accepted").count(), 1)
+
+    def test_database_prevents_second_acceptance(self):
+        Attendance.objects.create(student=self.student, session=self.session, result="Accepted", reason_code="WITHIN_POLICY")
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Attendance.objects.create(student=self.student, session=self.session, result="Accepted", reason_code="WITHIN_POLICY")
+
+    def test_raw_student_sample_is_not_persisted(self):
+        fields = {field.name for field in Attendance._meta.get_fields()}
+        self.assertFalse(fields & {"latitude", "longitude", "accuracy_m", "distance", "sampled_at"})
+
+    def test_location_boundaries(self):
+        for now in (self.session.opens_at, self.session.closes_at):
+            sample = {**self.sample, "sampled_at": now, "accuracy_m": self.session.max_accuracy_m}
+            self.assertEqual(check_sample(self.session, sample, now), (True, "WITHIN_POLICY"))
+        now = timezone.now()
+        stale = {**self.sample, "sampled_at": now-timedelta(seconds=61)}
+        self.assertEqual(check_sample(self.session, stale, now), (False, "STALE_SAMPLE"))
+        outside = {**self.sample, "latitude": 13}
+        self.assertEqual(check_sample(self.session, outside, now), (False, "OUTSIDE_RADIUS"))
+        self.assertAlmostEqual(distance_m(0, 0, 0, 1), 111195, delta=5)
+
+    def test_deviation_snapshot_and_deactivation_history(self):
+        row = services.record_deviation(self.warden, self.student.pk, self.rule, "Observed")
+        self.rule.weightage = Decimal("99")
+        self.rule.save()
+        row.refresh_from_db()
+        self.assertEqual(row.weightage_snapshot, Decimal("2.50"))
+        services.deactivate_deviation(self.warden, row.pk, "Correction")
+        row.refresh_from_db()
+        self.assertFalse(row.active)
+        self.assertEqual(row.deactivated_by, self.warden)
+        with self.assertRaises(services.Conflict):
+            services.deactivate_deviation(self.warden, row.pk, "Again")
+
+
+@skipUnless(connection.vendor == "postgresql", "Requires PostgreSQL row locking and partial uniqueness.")
+class ConcurrentTests(TransactionTestCase):
+    reset_sequences = True
+
+    def setUp(self):
+        build_fixtures(self)
+
+    def race(self, operation):
+        barrier = Barrier(2)
+        def worker():
+            close_old_connections()
+            try:
+                barrier.wait(timeout=10)
+                try:
+                    operation()
+                    return "ok"
+                except services.Conflict:
+                    return "conflict"
+            finally:
+                close_old_connections()
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(lambda _: worker(), range(2)))
+        self.assertCountEqual(results, ["ok", "conflict"])
+
+    def test_concurrent_attendance_accepts_once(self):
+        User = get_user_model()
+        self.race(lambda: services.submit_attendance(User.objects.get(pk=self.student.pk), self.session.pk, self.sample))
+        self.assertEqual(Attendance.objects.filter(result="Accepted").count(), 1)
+
+    def test_concurrent_leave_finalizes_once(self):
+        User = get_user_model()
+        row = services.submit_leave(self.student, self.leave_data)
+        self.race(lambda: services.decide_leave(User.objects.get(pk=self.warden.pk), row.pk, "Approved", "Reviewed"))
+        row.refresh_from_db()
+        self.assertEqual(row.status, "Approved")
+        self.assertEqual(row.transitions.count(), 2)
