@@ -1,5 +1,11 @@
 # HostelSpace
 
+> US-20 update (Atiksh, 2026-10-27): the minimal frontend/API foundation,
+> PostgreSQL 16 Compose stack and PR CI are now implemented. Feature modules below
+> remain starter placeholders. See [local setup and CI](docs/07-maintenance/ci-setup.md)
+> and [actual verification results](evidence/ci-local-validation.md).
+> Remote CI and main branch protection still need verification; no deployment is included.
+
 ## Hostel Management System
 
 HostelSpace is a browser-based hostel management system developed for the **UE24CS341A - Software Engineering** course at **PES University, Bangalore**.

@@ -1,5 +1,14 @@
 # Live requirement/story/file/test/evidence matrix
 
+## US-20 implementation evidence — 2026-10-27 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| NFR-05 | US-20 / Atiksh Gour; reviewer Anvi Srinivas pending | TC-CICD-01 | [Local commands and actual outcomes](../../evidence/ci-local-validation.md), [CI configuration](../../.github/workflows/ci.yml), [Compose and protection setup](../07-maintenance/ci-setup.md) | Partially verified. Local checks pass; PostgreSQL 16/Compose, remote PR, deliberate failed-test merge block and main protection remain pending. No CI/PR/Jira reference yet. |
+
+The instruction register below is preserved; this entry claims evidence only for
+the delivery foundation, not for unimplemented functional or validation rules.
+
 ```text
 HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
 STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
