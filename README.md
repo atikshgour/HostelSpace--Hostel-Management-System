@@ -1,5 +1,11 @@
 # HostelSpace
 
+> US-15 update (Atiksh, 2026-10-29): student mess allocation/valid coupon viewing
+> and Mess Staff-only management are implemented at `/mess` and `/mess/manage`.
+> See the [mess API contract](backend/apps/student_services/MESS_API.md) and
+> [actual verification](evidence/us15-validation.md). Independent review and the
+> separate US-01 sign-in flow remain pending.
+
 > US-14 update (Atiksh, 2026-10-29): Director complaint assignment and authorized
 > progress updates are implemented, including `/complaints/manage`, retained
 > assignment/status history and a generated additive migration. See the

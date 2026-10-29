@@ -1,5 +1,15 @@
 # Entity keys, constraints and relationships
 
+## US-15 mess schema (2026-10-29; review pending)
+
+MessAllocation has one protected Student reference, mess_name, validity dates and
+active status. Coupon belongs to an allocation with a code, its own validity and
+active status. Both retain last updater/server time and an incrementing version.
+Database constraints enforce unique allocation per student, ordered dates, nonblank
+name/code and unique code per allocation. This is mutable configuration, not an
+audit ledger. See the [contract](../../backend/apps/student_services/MESS_API.md)
+and [generated migration sidecar](../07-maintenance/us15-migration-manifest.json).
+
 ## US-14 additive assignment fields (2026-10-29; review pending)
 
 Complaint now has a nullable protected `assigned_to` User foreign key.

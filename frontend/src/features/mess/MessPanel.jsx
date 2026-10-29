@@ -1,71 +1,65 @@
-/*
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: frontend/src/features/mess/MessPanel.jsx
-ACCOUNTABLE OWNER: Atiksh Gour
-INDEPENDENT REVIEWER: Anvi Srinivas
-USER STORIES: US-15
-DEVELOPMENT PLAN SPRINT(S): 3 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 5 (preserved baseline mapping)
-REQUIREMENTS: FR-08; SEC-03–04
-FILE PURPOSE: MessPanel UI component
+'use client';
+// Owner: Atiksh Gour | US-15 | Sprint 5 | Reviewer: Anvi Srinivas
+import { useEffect, useState } from 'react';
+import { getMessManagement, getMyMess } from './api';
+import MessManageForm from './MessManageForm';
 
-WHAT TO IMPLEMENT IN THIS FILE
-Current personal mess and active valid coupons, expiry/Not assigned states; no meal orders or redemption. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-
-OWNER: Atiksh Gour | REVIEWER: Anvi Srinivas
-TARGET FILE: frontend/src/features/mess/MessPanel.jsx
-DEVELOPMENT-PLAN SPRINT: 3
-ORIGINAL SRS SPRINT: 5
-STORY: US-15
-REQUIREMENTS: FR-08; SEC-03–04
-RESPONSIBILITY: MessPanel UI component
-FILE TASK: Current personal mess and active valid coupons, expiry/Not assigned states; no meal orders or redemption. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-US-15 — Manage mess allocation and active coupons
-Dependencies: US-01, US-18
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Only Mess Staff creates/updates allocations and coupons.
-- Student sees current personal assigned mess and active currently valid coupons.
-- Reject invalid date range and missing coupon code.
-- No cross-student access or student writes; no ordering, QR redemption or billing.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-*/
-
-/* IMPLEMENTATION AREA: replace this marker with reviewed code. */
+export default function MessPanel({ management = false }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [revision, setRevision] = useState(0);
+  const [notice, setNotice] = useState('');
+  useEffect(() => {
+    let active = true;
+    (management ? getMessManagement() : getMyMess()).then((result) => {
+      if (active) { setData(result); setLoading(false); }
+    }).catch((err) => { if (active) { setError(err.message); setLoading(false); } });
+    return () => { active = false; };
+  }, [management, revision]);
+  function reload() {
+    setData(null); setError(''); setLoading(true); setNotice(''); setRevision((value) => value + 1);
+  }
+  function saved(kind, record) {
+    const key = kind === 'coupon' ? 'coupons' : 'allocations';
+    setData((current) => ({ ...current, [key]: current[key].some((item) => item.id === record.id)
+      ? current[key].map((item) => item.id === record.id ? record : item) : [...current[key], record] }));
+    setNotice(`${kind === 'coupon' ? 'Coupon' : 'Allocation'} saved.`);
+  }
+  return <main className="hs-container">
+    <h1>{management ? 'Manage mess allocations and coupons' : 'My mess and coupons'}</h1>
+    <p className="hs-muted">Validity dates include both endpoints and use Asia/Kolkata.</p>
+    <button onClick={reload} disabled={loading}>Reload records</button>
+    {loading && <p role="status">Loading mess records…</p>}
+    {error && <p role="alert">{error}</p>}
+    {notice && <p role="status">{notice}</p>}
+    {!loading && data && (management ? <>
+      {data.students.length === 0 && <p>No active students available.</p>}
+      <div className="hs-grid">
+        <MessManageForm kind="allocation" students={data.students} onSaved={saved} />
+        <MessManageForm kind="coupon" allocations={data.allocations} onSaved={saved} />
+      </div>
+      <h2>Existing allocations</h2>
+      {data.allocations.length === 0 && <p>No allocations recorded.</p>}
+      <div className="hs-grid">{data.allocations.map((item) => <MessManageForm key={`allocation-${item.id}-${item.version}`}
+        kind="allocation" record={item} onSaved={saved} />)}</div>
+      <h2>Existing coupons</h2>
+      {data.coupons.length === 0 && <p>No coupons recorded.</p>}
+      <div className="hs-grid">{data.coupons.map((item) => <MessManageForm key={`coupon-${item.id}-${item.version}`}
+        kind="coupon" record={item} onSaved={saved} />)}</div>
+    </> : <>
+      <p>Current as of {data.as_of} ({data.timezone}).</p>
+      <section className="hs-card"><h2>Assigned mess</h2>
+        {data.allocation ? <>
+          <p>{data.allocation.mess_name}</p>
+          <p>Valid {data.allocation.valid_from} through {data.allocation.valid_until}</p>
+        </> : <p>No current active mess allocation.</p>}
+      </section>
+      <section className="hs-card"><h2>Valid coupons</h2>
+        {data.coupons.length ? <ul>{data.coupons.map((coupon) => <li key={coupon.id}>
+          <strong>{coupon.code}</strong> — Valid {coupon.valid_from} through {coupon.valid_until}
+        </li>)}</ul> : <p>No currently valid coupons.</p>}
+      </section>
+    </>)}
+  </main>;
+}

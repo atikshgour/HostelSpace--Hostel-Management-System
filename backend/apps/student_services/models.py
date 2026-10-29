@@ -93,3 +93,41 @@ class ComplaintTransition(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError('Complaint history is append-only.')
+
+
+# Owner: Atiksh Gour | US-15 | Sprint 5 (development plan: 3) | Reviewer: Anvi Srinivas
+class MessRecord(models.Model):
+    valid_from = models.DateField()
+    valid_until = models.DateField()
+    is_active = models.BooleanField(default=True)
+    version = models.PositiveIntegerField(default=1)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='+')
+
+    class Meta:
+        abstract = True
+
+
+class MessAllocation(MessRecord):
+    student = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='mess_allocation')
+    mess_name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ['student_id', 'id']
+        constraints = [
+            models.CheckConstraint(condition=models.Q(valid_until__gte=models.F('valid_from')), name='mess_allocation_valid_dates'),
+            models.CheckConstraint(condition=~models.Q(mess_name__regex=r'^\s*$'), name='mess_name_not_blank'),
+        ]
+
+
+class Coupon(MessRecord):
+    allocation = models.ForeignKey(MessAllocation, on_delete=models.PROTECT, related_name='coupons')
+    code = models.CharField(max_length=80)
+
+    class Meta:
+        ordering = ['-valid_until', 'id']
+        constraints = [
+            models.CheckConstraint(condition=models.Q(valid_until__gte=models.F('valid_from')), name='mess_coupon_valid_dates'),
+            models.CheckConstraint(condition=~models.Q(code__regex=r'^\s*$'), name='mess_coupon_code_not_blank'),
+            models.UniqueConstraint(fields=['allocation', 'code'], name='mess_coupon_allocation_code_unique'),
+        ]

@@ -2,11 +2,15 @@
 <!-- Reviewer: Anvi Srinivas; account dependency review: Anvi Srinivas / Arin Singh; pending -->
 # Student complaint submission and tracking
 
+US-15 mess allocations and coupons are now implemented separately; see
+[the mess contract](MESS_API.md) for student/Mess Staff APIs, validity decisions,
+UI, migration setup and actual test evidence. Payment functionality remains a starter.
+
 Implemented scope: US-13, FR-07 student portion, SEC-03; TC-FR07-01.
 The user selected Sprint 4, consistent with the original SRS mapping. The starter's
 proposed development-plan Sprint 2 mapping remains a proposal, not an approval.
-US-14 staff assignment/status updates are now implemented below. Mess and payments
-remain unimplemented. Independent review is pending for both complaint slices.
+US-14 staff assignment/status updates are now implemented below. US-15 mess is
+documented separately above; payments remain unimplemented. Independent review is pending.
 
 ## US-14 management workflow (2026-10-29)
 

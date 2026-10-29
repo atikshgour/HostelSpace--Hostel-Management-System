@@ -1,5 +1,15 @@
 # Canonical endpoint contract
 
+## US-15 implemented extension (2026-10-29; review pending)
+
+See [the mess contract](../../backend/apps/student_services/MESS_API.md).
+`GET /api/mess/` returns only the active student's current allocation/valid coupons.
+Mess Staff alone can GET/POST `/api/mess/allocations/` and `/api/mess/coupons/`,
+GET/PATCH their ID details, and GET `/api/mess/students/`. Writes require CSRF;
+PATCH requires expected_version. Dates are inclusive in Asia/Kolkata. No ordering,
+redemption, Director bypass, or student writes are exposed. Existing error/no-cache
+contracts are preserved.
+
 ## US-14 implemented extension (2026-10-29; independent review pending)
 
 The [module contract](../../backend/apps/student_services/README.md)

@@ -1,71 +1,59 @@
-/*
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: frontend/src/features/mess/MessManageForm.jsx
-ACCOUNTABLE OWNER: Atiksh Gour
-INDEPENDENT REVIEWER: Anvi Srinivas
-USER STORIES: US-15
-DEVELOPMENT PLAN SPRINT(S): 3 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 5 (preserved baseline mapping)
-REQUIREMENTS: FR-08; SEC-03–04
-FILE PURPOSE: MessManageForm UI component
+'use client';
+// Owner: Atiksh Gour | US-15 | Sprint 5 | Reviewer: Anvi Srinivas
+import { useId, useState } from 'react';
+import { saveAllocation, saveCoupon } from './api';
 
-WHAT TO IMPLEMENT IN THIS FILE
-Mess Staff allocation/coupon create/update; validate code/validity and active status. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-
-OWNER: Atiksh Gour | REVIEWER: Anvi Srinivas
-TARGET FILE: frontend/src/features/mess/MessManageForm.jsx
-DEVELOPMENT-PLAN SPRINT: 3
-ORIGINAL SRS SPRINT: 5
-STORY: US-15
-REQUIREMENTS: FR-08; SEC-03–04
-RESPONSIBILITY: MessManageForm UI component
-FILE TASK: Mess Staff allocation/coupon create/update; validate code/validity and active status. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-US-15 — Manage mess allocation and active coupons
-Dependencies: US-01, US-18
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Only Mess Staff creates/updates allocations and coupons.
-- Student sees current personal assigned mess and active currently valid coupons.
-- Reject invalid date range and missing coupon code.
-- No cross-student access or student writes; no ordering, QR redemption or billing.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-*/
-
-/* IMPLEMENTATION AREA: replace this marker with reviewed code. */
+export default function MessManageForm({ kind, record, students = [], allocations = [], onSaved }) {
+  const id = useId();
+  const isCoupon = kind === 'coupon';
+  const [target, setTarget] = useState('');
+  const [name, setName] = useState(record?.[isCoupon ? 'code' : 'mess_name'] || '');
+  const [from, setFrom] = useState(record?.valid_from || '');
+  const [until, setUntil] = useState(record?.valid_until || '');
+  const [active, setActive] = useState(record?.is_active ?? true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const label = isCoupon ? 'Coupon' : 'Allocation';
+  async function submit(event) {
+    event.preventDefault();
+    setError(''); setSuccess('');
+    if (until < from) { setError('Valid until must be on or after valid from.'); return; }
+    if (!name.trim()) { setError(isCoupon ? 'Enter a coupon code.' : 'Enter a mess name.'); return; }
+    setBusy(true);
+    try {
+      const data = { [isCoupon ? 'code' : 'mess_name']: name.trim(), valid_from: from, valid_until: until, is_active: active,
+        ...(record ? { expected_version: record.version } : { [isCoupon ? 'allocation' : 'student']: Number(target) }) };
+      const result = await (isCoupon ? saveCoupon : saveAllocation)(record?.id, data);
+      onSaved(kind, result); setSuccess(`${label} saved.`);
+      if (!record) { setName(''); setTarget(''); setFrom(''); setUntil(''); setActive(true); }
+    } catch (err) { setError(`${err.message} Reload records if another staff member changed this record.`); }
+    finally { setBusy(false); }
+  }
+  return <form className="hs-card" onSubmit={submit} aria-label={record ? `Edit ${label.toLowerCase()} ${record.id}` : `Create ${label.toLowerCase()}`}>
+    <h2>{record ? `${label} #${record.id}` : `Create ${label.toLowerCase()}`}</h2>
+    {record && <p>{isCoupon ? `Allocation #${record.allocation}` : `Student #${record.student}`} · Version {record.version}</p>}
+    <fieldset disabled={busy}>
+      <legend>{label} details</legend>
+      {!record && <p><label htmlFor={`${id}-target`}>{isCoupon ? 'Allocation' : 'Student'} </label>
+        <select id={`${id}-target`} required value={target} onChange={(event) => setTarget(event.target.value)}>
+          <option value="">Select {isCoupon ? 'allocation' : 'student'}</option>
+          {isCoupon ? allocations.map((item) => <option key={item.id} value={item.id}>
+            #{item.id}: {item.mess_name} — Student #{item.student}
+          </option>) : students.map((item) => <option key={item.id} value={item.id}>
+            {item.username} {[item.first_name, item.last_name].filter(Boolean).join(' ')}
+          </option>)}
+        </select></p>}
+      <p><label htmlFor={`${id}-name`}>{isCoupon ? 'Coupon code' : 'Mess name'} </label>
+        <input id={`${id}-name`} required maxLength={isCoupon ? 80 : 100} value={name} onChange={(event) => setName(event.target.value)} /></p>
+      <p><label htmlFor={`${id}-from`}>Valid from </label>
+        <input id={`${id}-from`} type="date" required value={from} onChange={(event) => setFrom(event.target.value)} /></p>
+      <p><label htmlFor={`${id}-until`}>Valid until </label>
+        <input id={`${id}-until`} type="date" required min={from} value={until} onChange={(event) => setUntil(event.target.value)} /></p>
+      <p><label><input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} /> Active</label></p>
+      <button type="submit">{busy ? 'Saving…' : `Save ${label.toLowerCase()}`}</button>
+    </fieldset>
+    {error && <p role="alert">{error}</p>}
+    {success && <p role="status">{success}</p>}
+  </form>;
+}

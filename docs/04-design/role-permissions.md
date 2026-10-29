@@ -1,5 +1,18 @@
 # Role/assignment authorization matrix
 
+## US-15 mess permissions (2026-10-29; review pending)
+
+| Principal | Student mess view | Management lists/details | Create/update |
+| --- | --- | --- | --- |
+| Active Student | Own active/current allocation and coupons only | Denied | Denied |
+| Active Mess Staff | Denied | All mess records; active student directory | Allowed with CSRF and validation |
+| Other roles, including Director/superusers without Mess Staff role | Denied | Denied | Denied |
+| Inactive/anonymous | Denied | Denied | Denied |
+
+Ownership comes from the session; request parameters cannot switch student identity.
+The write services lock/reload authoritative actor roles; no superuser bypass.
+See [the complete contract](../../backend/apps/student_services/MESS_API.md).
+
 ## US-14 staff extension (2026-10-29; independent review pending)
 
 | Principal | Management list | Staff directory | Assignment | Progress |

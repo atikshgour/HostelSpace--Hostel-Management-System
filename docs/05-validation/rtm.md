@@ -1,5 +1,11 @@
 # Live requirement/story/file/test/evidence matrix
 
+## US-15 evidence — 2026-10-29 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-08, SEC-03; SEC-01/04 supporting checks | US-15 / Atiksh Gour / Sprint 5; reviewer Anvi Srinivas pending | TC-FR08-01 | [Actual results](../../evidence/us15-validation.md), [API/constraint/concurrency tests](../../backend/apps/student_services/tests/test_mess.py), [browser workflow](../../frontend/e2e/us15-browser.mjs), [contract](../../backend/apps/student_services/MESS_API.md) | 148 backend tests, 17 frontend tests, one US-15 Playwright workflow passed locally on PostgreSQL 15.19. Human review, PostgreSQL 16, Docker and remote CI pending. |
+
 ## US-14 evidence — 2026-10-29 (review pending)
 
 | Requirement | Story / owner | Test | Evidence | Status |
