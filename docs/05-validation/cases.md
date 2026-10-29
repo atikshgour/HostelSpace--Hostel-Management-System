@@ -1,71 +1,54 @@
-# Full expected test case register
+# Validation case register
 
-```text
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: docs/05-validation/cases.md
-ACCOUNTABLE OWNER: Arin Singh
-INDEPENDENT REVIEWER: Aryan Singh
-USER STORIES: US-22
-DEVELOPMENT PLAN SPRINT(S): 1 design; 4–6 execution (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 1 design; 6 final validation (preserved baseline mapping)
-REQUIREMENTS: All FR/NFR/SEC/BR
-FILE PURPOSE: Full expected test case register
+Prepared from the original SRS requirements and existing starter test-register IDs. Legacy SRS RTM uses TC-01…TC-11; retain those aliases for FR-01…FR-11 rather than claiming a different source naming scheme. This pack preserves the starter’s expanded `TC-FR…`, `TC-NFR…`, `TC-SEC…`, CI and release IDs. These are case specifications, not fabricated test executions.
 
-WHAT TO IMPLEMENT IN THIS FILE
-Retain STP IDs TC-FR01-01/02 and TC-FR02-01 through TC-FR11-01, TC-NFR01–05-01, TC-SEC01/02/04/05/06-01, TC-CICD-01 and TC-REL-01. Add trace for every BR and SEC-03 under SEC01. Initial status Not Run.
+All cases started **Not Run**. Status below distinguishes actual local evidence from untested full-team acceptance. “Local pass” is not production sign-off. Prerequisites and inputs are fictional/local unless specifically approved otherwise. Story links for teammate modules are planning references and must be reconciled with the actual board before updates.
 
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
+| Case | Requirements | Story | Owner | Preconditions | Steps/inputs | Expected | Current evidence/status |
+|---|---|---|---|---|---|---|---|
+| TC-FR01-01 | FR-01 | US-01 | Anvi | Active fictional user/session | Sign in/out; invalid credentials; inactive user | Correct dashboard/session; signed-out access denied | Local login/session/CSRF flow passed; real dashboard/profile NOT RUN |
+| TC-FR01-02 | FR-01 | US-02 | Anvi | Student profile and two students | Read/update permitted profile fields; submit protected fields | Only own permitted fields change | NOT RUN — teammate module |
+| TC-FR02-01 | FR-02 | US-03 | Anvi | Authorized content staff and student | Create/update/deactivate notice/contact/rule; read as student | Staff maintenance only; active content visible | NOT RUN — teammate content CRUD; Arin rule-choice boundary tested |
+| TC-FR03-01 | FR-03; BR-02 | US-04 | Aryan | Current study-room status | Staff sets Open/Closed and optional timings/message; student reads | Latest status; no booking workflow | NOT RUN — teammate module |
+| TC-FR04-01 | FR-04; BR-03; BR-04 | US-09; US-10 | Aryan | Allocated laundry day, staff/student | Attempt student reassignment; collect before received; valid handover/collection | No self-selection; receipt precedes collection; history retained | NOT RUN — teammate module |
+| TC-FR05-01 | FR-05; BR-01 | US-05; US-06 | Arin | Two assignments, warden, Chief | Valid/invalid leave; scoped reads; escalation/finalization/repeated decision | Pending with server owner; correct staff only; final immutable; timeline retained | LOCAL PASS; PostgreSQL concurrent finalization gate pending |
+| TC-FR06-01 | FR-06; BR-05 | US-07 | Arin | Assigned session and approved synthetic policy | Open/close/distance/accuracy/age boundaries; denied location; retry/parallel accept | Only valid in-policy samples accepted; one accepted record; raw sample discarded | LOCAL PASS; PostgreSQL race and real-policy approval pending |
+| TC-FR07-01 | FR-07 | US-11; US-12 | Atiksh | Two students and assigned staff | Submit/track complaint; update status; wrong owner read | Valid ID/history; authorized updates; own student only | NOT RUN — teammate module |
+| TC-FR08-01 | FR-08 | US-13 | Atiksh | Mess staff and allocated students | Maintain allocation/coupons; read as unrelated student | Only authorized staff write; student sees own active allocation/coupons | NOT RUN — teammate module |
+| TC-FR09-01 | FR-09; BR-06 | US-14; US-15 | Atiksh | Fictional provider sandbox only | Payment success/failure; retry/parallel callback | One success reference; failure leaves unpaid; no stored credentials | NOT RUN — teammate module |
+| TC-FR10-01 | FR-10; BR-07 | US-08 | Arin | Active rule with 2.50 weight and assigned student | Record; change rule; deactivate; recompute; wrong-role/owner reads | Immutable copied weight; sum active only; retained audit and correct scope | LOCAL PASS; real shared Rule integration pending |
+| TC-FR11-01 | FR-11 | US-16 | Anvi | Director and non-Director users | Authorized user/settings/report operations; unauthorized attempt | Only Director management; scoped summaries not personal-record leakage | NOT RUN — teammate module |
+| TC-NFR01-01 | NFR-01 | US-22 | All | Agreed target environment/load/dataset | Measure normal-page navigation under agreed test load | Each agreed normal page <3 seconds | NOT RUN — no approved load/performance run |
+| TC-NFR02-01 | NFR-02 | US-22 | All | Desktop/mobile keyboard/browser | Read form labels; invalid submit; focus correction | Clear labels/errors and usable controls | PARTIAL — Arin Chromium UI labels/errors/responsive checks passed; full manual accessibility pending |
+| TC-NFR03-01 | NFR-03; BR-05 | US-07; US-15 | Arin/Atiksh | PostgreSQL, concurrent clients | Parallel/retry attendance and payment success | No duplicate accepted attendance/successful payment | PARTIAL — local attendance uniqueness/retry passed; PostgreSQL/payment pending |
+| TC-NFR04-01 | NFR-04 | US-22 | All | Current Chrome, Edge, Firefox and mobile viewport | Repeat agreed workflows in each browser | Consistent behavior and maintainable independent modules | PARTIAL — Chromium desktop/390px only; Edge/Firefox NOT RUN |
+| TC-NFR05-01 | NFR-05 | US-22 | All | Installed automated test environment | Run validation/calculation tests and inspect evidence | Important rules have genuine automated checks | PARTIAL — Arin suite passed; full-team coverage not claimed |
+| TC-SEC01-01 | SEC-01; SEC-03 | US-22 | All | Two students/assignments, roles, active/expired sessions | Anonymous/wrong-role/wrong-owner/other-warden requests; UI URL direct navigation | Every protected server request checks active role/session/object scope | PARTIAL — Arin local server cases passed; all teammate modules and production-session policy pending |
+| TC-SEC02-01 | SEC-02 | US-01; US-22 | Anvi | Shared real authentication model | Inspect saved password representation and authentication behavior | Secure authentication hashing; no plaintext credential storage/logging | NOT RUN for shared auth — demo uses Django hashing only |
+| TC-SEC04-01 | SEC-04 | US-22 | All | Known schema and server allowlists | Bad dates/nonfinite/out-of-range coordinates/nonobject/actor/snapshot fields | Reject invalid/unauthorized input before storage; safe errors | PARTIAL — Arin backend cases passed; teammate modules pending |
+| TC-SEC05-01 | SEC-05 | US-07; US-22 | Arin | Fictional location, instrumented browser, DB and logs | Enter page; click submit; deny permission; inspect persistence/background calls | No pre-click/background location; one sample; no raw sample retention | PARTIAL — browser/model/error checks passed; production proxy/APM audit pending |
+| TC-SEC06-01 | SEC-06 | US-15; US-22 | Atiksh | Payment sandbox, schemas and logs | Run provider success/failure; inspect data and logs | No card/payment credentials persisted or logged | NOT RUN — teammate payment module |
+| TC-CICD-01 | NFR-05; SEC-01; SEC-04 | US-22 | All | Team CI pipeline and reviewed PR | Run clean install/build/test/migration checks in CI | Required checks and review pass with real links | NOT RUN — local commands are not a CI run |
+| TC-REL-01 | All FR/NFR/SEC/BR | US-22 | All | Merged app, all owner approvals, deployment staging | Complete regression, backup/migration/rollback and demo checklist | No open release blockers; truthful reviewed traceability | NOT RUN — no release/deployment performed |
 
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
+## Arin focused subcases (automated)
 
-OWNER: Arin Singh | REVIEWER: Aryan Singh
-TARGET FILE: docs/05-validation/cases.md
-DEVELOPMENT-PLAN SPRINT: 1 design; 4–6 execution
-ORIGINAL SRS SPRINT: 1 design; 6 final validation
-STORY: US-22
-REQUIREMENTS: All FR/NFR/SEC/BR
-RESPONSIBILITY: Full expected test case register
-FILE TASK: Retain STP IDs TC-FR01-01/02 and TC-FR02-01 through TC-FR11-01, TC-NFR01–05-01, TC-SEC01/02/04/05/06-01, TC-CICD-01 and TC-REL-01. Add trace for every BR and SEC-03 under SEC01. Initial status Not Run.
+- US-05: create Pending and server assignment; end-before-start; empty/missing/unknown fields; own history; unknown UUID; pagination.
+- US-06: assigned warden only; Chief cannot view Pending; escalation→Chief approval; final repeated decision is 409; immutable transition history; PostgreSQL double-finalization test (skips on SQLite).
+- US-07: valid sample; one accepted result; rejected low-accuracy attempt can retry; inclusive opening/closing/radius/accuracy/age boundaries; stale/future/outside-window/outside-radius; nonfinite/out-of-range; unassigned session; denied/unavailable browser sample; no location before click; no stored sample fields; PostgreSQL concurrent acceptance test (skips on SQLite).
+- US-08: staff-only writes; assignment scope; active rule only; caller weight rejected; copied rule weight unchanged after source update; deactivation retained and repeated deactivation conflict; active-only sum; student cannot expand own total with a query ID.
+- US-18/22: coarse roles + scoped server objects, inactive role helper, session CSRF and login CSRF, no-store cache, safe validation fields, malformed student IDs and nonobject payloads.
 
-US-22 — Maintain validation and verify access rules
-Dependencies: US-18; feature slices for execution
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Every FR, NFR, SEC and BR has cases with preconditions/input/expected result.
-- Seeded role, session, CSRF and ownership checks cover all personal modules, only against own local/staging app.
-- Attendance boundary/retry cases on PostgreSQL; no retained raw location.
-- Fill actual results only after execution; link failed cases to observed bugs and rerun. Tests remain Not Run initially.
+## Full business-rule trace (none omitted)
 
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
+| Rule | Case | Local/full status |
+|---|---|---|
+| BR-01 one Chief supervises multiple wardens | TC-FR05-01; TC-SEC01-01 | Local harness models one active Chief and supervised flows; real shared account constraint pending |
+| BR-02 no study-room booking | TC-FR03-01 | Not Run — Aryan |
+| BR-03 no student laundry-day selection | TC-FR04-01 | Not Run — Aryan |
+| BR-04 received before collected | TC-FR04-01 | Not Run — Aryan |
+| BR-05 one accepted attendance per session/student | TC-FR06-01; TC-NFR03-01 | Local uniqueness/retry pass; PostgreSQL race pending |
+| BR-06 failed payment leaves unpaid | TC-FR09-01 | Not Run — Atiksh |
+| BR-07 active deviations sum | TC-FR10-01 | Local backend and live lifecycle pass |
 
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-```
+SEC-03 is explicitly traced under TC-SEC01-01 and each personal-record functional case. No full-project security requirement is marked complete from Arin-only evidence.
