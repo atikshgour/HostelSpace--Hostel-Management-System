@@ -6,7 +6,7 @@
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
-    "lint": "eslint app next.config.mjs eslint.config.mjs jest.config.mjs jest.setup.js postcss.config.mjs --max-warnings=0",
+    "lint": "eslint --no-ignore app src/features/complaints/api.js src/features/complaints/ComplaintManagePanel.jsx next.config.mjs eslint.config.mjs jest.config.mjs jest.setup.js postcss.config.mjs --max-warnings=0",
     "test:ci": "jest --ci --coverage"
   },
   "dependencies": {
@@ -15,6 +15,7 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "@tailwindcss/postcss": "4.3.3",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",

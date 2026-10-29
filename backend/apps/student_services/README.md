@@ -5,7 +5,75 @@
 Implemented scope: US-13, FR-07 student portion, SEC-03; TC-FR07-01.
 The user selected Sprint 4, consistent with the original SRS mapping. The starter's
 proposed development-plan Sprint 2 mapping remains a proposal, not an approval.
-Staff assignment/status updates (US-14), mess and payments remain unimplemented.
+US-14 staff assignment/status updates are now implemented below. Mess and payments
+remain unimplemented. Independent review is pending for both complaint slices.
+
+## US-14 management workflow (2026-10-29)
+
+Owner: Atiksh Gour; reviewer: Anvi Srinivas (pending). GitHub issue #19,
+Sprint 4; proposed development-plan mapping remains Sprint 2. FR-07, SEC-01;
+TC-FR07-01 staff portion.
+
+The management page is `/complaints/manage`. It consumes existing Django sessions;
+US-01 still owns login/logout. There is no public account creation or invented
+session login. Active Director and Maintenance Staff sessions can read the paginated
+`GET /api/complaints/manage/` list. Directors see all complaints; Maintenance Staff
+see only their own assignments. The response adds `can_assign` for UI controls;
+server permissions independently authorize every write. GET sets the CSRF cookie.
+
+| Method | Path | Authorized behavior |
+| --- | --- | --- |
+| GET | `/api/maintenance-staff/` | Director only; paginated active Maintenance Staff IDs/names/usernames |
+| POST | `/api/complaints/{id}/assign/` | Director only; assign/reassign active Maintenance Staff |
+| POST | `/api/complaints/{id}/progress/` | Director or currently assigned Maintenance Staff; advance one step |
+
+Assignment body: `{"assigned_to": 3, "remarks": "Synthetic assignment"}`.
+Progress body: `{"expected_status": "Open", "status": "In Progress", "remarks": "Synthetic work started"}`.
+IDs are illustrative; obtain them from the APIs. Remarks must be a string containing
+1–500 characters after trimming. Unknown/protected fields are rejected. Writes
+require CSRF and return 200 with the persisted complaint. All responses/errors are
+uncached and use the existing `{code,message,fields}` error contract.
+
+Only `Open → In Progress → Resolved` is accepted. Starting work requires an
+assignment. No skips, reversals, repeated transitions, duplicate assignments,
+unassignment, or reassignment after resolution are exposed. A stale expected status
+returns 400 with `expected_status`; reload before retrying. Foreign/unassigned
+maintenance IDs and missing IDs both return 404. No superuser bypass exists.
+An inactive/changed-role actor cannot write even through a stale service caller.
+
+Complaint responses now include nullable `assigned_to`. Every history entry also
+includes nullable `old_assigned_to` and `new_assigned_to`. Assignment events keep
+the status unchanged and snapshot both assignees. Progress events snapshot the
+current assignee and old/new status. Actor, server time and remarks are retained;
+old US-13 history remains untouched, with null assignment snapshots. Student
+read endpoints expose the same persisted status/history, with no write permission.
+
+Writes atomically lock authoritative users and the complaint, validate permissions,
+update current state, and append history. PostgreSQL user locks use NO KEY UPDATE:
+this blocks role/deactivation changes while allowing history foreign-key key-share
+locks. Failed history insertion rolls back the write. Routine ORM history guards
+remain in force; privileged direct SQL is outside their boundary.
+
+The generated additive migration is `0002_complaint_assigned_to_and_more.py`; see
+[its sidecar](../../../docs/07-maintenance/us14-migration-manifest.json). It preserves
+existing records. No production migration was run. Review a migration plan before
+applying it to an approved local database.
+
+Next.js proxies `/api/*` to Django. Direct local development defaults to
+`http://127.0.0.1:8000`; set `DJANGO_API_URL` **before building** to change it.
+Docker's build argument defaults to `http://api:8000`. The local Django settings
+trust only the two localhost port-3000 frontend origins. Production requires its
+reviewed HTTPS origin and session/CSRF cookie configuration; no production setup
+or deployment is claimed. The feature adapter supplies session/CSRF fetches because
+the shared `src/lib/api.js` remains another owner's unimplemented placeholder;
+consolidation with the US-01 client remains an integration task.
+
+Verification: [actual commands, results and limits](../../../evidence/us14-validation.md).
+The opt-in browser test runs from `backend` with the isolated PostgreSQL environment:
+`python -m pytest apps/student_services/tests/browser_us14.py -q`. It requires the
+frontend dependencies, local Chrome, Node and free localhost port 3314. It starts
+and stops its own Next.js process and Django test server; session values travel
+only through subprocess stdin and are not saved in browser traces/state files.
 
 ## API
 

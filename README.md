@@ -1,5 +1,12 @@
 # HostelSpace
 
+> US-14 update (Atiksh, 2026-10-29): Director complaint assignment and authorized
+> progress updates are implemented, including `/complaints/manage`, retained
+> assignment/status history and a generated additive migration. See the
+> [module contract](backend/apps/student_services/README.md) and
+> [verification evidence](evidence/us14-validation.md). Independent review and
+> the separate US-01 sign-in flow remain pending.
+
 > US-13 backend update (Atiksh, 2026-10-27): complaint submission and owned-record
 > tracking are implemented, with the user-approved minimal User/Profile dependency.
 > See the [API/setup contract](backend/apps/student_services/README.md) and

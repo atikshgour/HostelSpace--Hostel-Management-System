@@ -1,5 +1,14 @@
 # Entity keys, constraints and relationships
 
+## US-14 additive assignment fields (2026-10-29; review pending)
+
+Complaint now has a nullable protected `assigned_to` User foreign key.
+ComplaintTransition adds nullable protected `old_assigned_to`/`new_assigned_to`
+foreign keys. Assignment events preserve status and snapshot both assignees;
+progress events snapshot status and current assignee. Existing rows are preserved.
+See the [generated-migration sidecar](../07-maintenance/us14-migration-manifest.json)
+and [transaction/authorization contract](../../backend/apps/student_services/README.md).
+
 ## US-13 implemented foundation (2026-10-27; review pending)
 
 User-authorized dependency: `accounts.User` extends Django AbstractUser with an

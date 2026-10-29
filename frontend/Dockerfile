@@ -6,7 +6,10 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY app ./app
 COPY src/app/globals.css ./src/app/globals.css
+COPY src/features/complaints/api.js src/features/complaints/ComplaintManagePanel.jsx ./src/features/complaints/
 COPY next.config.mjs postcss.config.mjs jsconfig.json ./
+ARG DJANGO_API_URL=http://api:8000
+ENV DJANGO_API_URL=$DJANGO_API_URL
 RUN npm run build
 
 FROM node:22-bookworm-slim AS runtime

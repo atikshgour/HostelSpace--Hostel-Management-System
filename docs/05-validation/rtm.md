@@ -1,5 +1,11 @@
 # Live requirement/story/file/test/evidence matrix
 
+## US-14 evidence — 2026-10-29 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-07, SEC-01; SEC-03/04 supporting checks | US-14 / Atiksh Gour / Sprint 4; reviewer Anvi Srinivas pending | TC-FR07-01 staff assignment/progress | [Actual results](../../evidence/us14-validation.md), [API/service tests](../../backend/apps/student_services/tests/test_complaint_management.py), [browser test](../../frontend/e2e/us14-browser.mjs) | 93 backend tests, 8 frontend tests, and one full Playwright workflow passed locally; PostgreSQL 15.19. Independent review, PostgreSQL 16, Docker and remote CI pending. |
+
 ## US-13 backend evidence — 2026-10-27 (review pending)
 
 | Requirement | Story / owner | Test | Evidence | Status |

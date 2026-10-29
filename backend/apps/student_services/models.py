@@ -1,4 +1,4 @@
-# Owner: Atiksh Gour | US-13 | Sprint 4 (development plan: 2) | Reviewer: Anvi Srinivas
+# Owner: Atiksh Gour | US-13/14 | Sprint 4 (development plan: 2) | Reviewer: Anvi Srinivas
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -29,6 +29,10 @@ class Complaint(models.Model):
     category = models.ForeignKey(ComplaintCategory, on_delete=models.PROTECT)
     description = models.CharField(max_length=2000)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.OPEN)
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
+        related_name='assigned_complaints',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -68,6 +72,14 @@ class ComplaintTransition(models.Model):
     old_status = models.CharField(max_length=16, blank=True)
     new_status = models.CharField(max_length=16, choices=Complaint.Status.choices)
     remarks = models.CharField(max_length=500)
+    old_assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
+        related_name='+',
+    )
+    new_assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
+        related_name='+',
+    )
 
     objects = AppendOnlyTransitions.as_manager()
 

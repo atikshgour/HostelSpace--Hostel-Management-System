@@ -1,5 +1,15 @@
 # Canonical endpoint contract
 
+## US-14 implemented extension (2026-10-29; independent review pending)
+
+The [module contract](../../backend/apps/student_services/README.md)
+defines the new staff endpoints: `GET /api/complaints/manage/`,
+`GET /api/maintenance-staff/`, `POST /api/complaints/{id}/assign/`, and
+`POST /api/complaints/{id}/progress/`. Existing student endpoints remain scoped
+to their owner. Responses add assignment IDs and assignment snapshots in history.
+Progress requires an expected current status, a permitted next status and remarks.
+Sessions, CSRF, standardized errors and uncached responses apply throughout.
+
 ## US-13 implemented slice (2026-10-27; independent review pending)
 
 The [student-services module contract](../../backend/apps/student_services/README.md)

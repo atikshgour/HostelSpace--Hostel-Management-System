@@ -1,5 +1,19 @@
 # Role/assignment authorization matrix
 
+## US-14 staff extension (2026-10-29; independent review pending)
+
+| Principal | Management list | Staff directory | Assignment | Progress |
+| --- | --- | --- | --- | --- |
+| Active Hostel Director | All complaints | Active Maintenance Staff only | Active Maintenance Staff; unresolved complaints | One forward step on assigned complaints |
+| Active Maintenance Staff | Own assignments only | Denied | Denied | One forward step on own assignment |
+| All other roles, including unrelated superusers | Denied | Denied | Denied | Denied |
+| Inactive/anonymous | Denied | Denied | Denied | Denied |
+
+No superuser bypass. Foreign/unassigned maintenance complaint IDs return 404.
+The service reloads and locks current roles/assignment for every write. Students
+retain read-only access to their own current complaint and complete history.
+See [the full policy and API contract](../../backend/apps/student_services/README.md).
+
 ## US-13 implemented permissions (2026-10-27; review pending)
 
 | Principal | Categories | Create complaint | List/detail | Update/delete |

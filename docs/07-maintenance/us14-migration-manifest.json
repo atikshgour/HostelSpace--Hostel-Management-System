@@ -1,0 +1,21 @@
+{
+  "owner": "Atiksh Gour",
+  "reviewer": "Anvi Srinivas (pending)",
+  "story": "US-14",
+  "issue": 19,
+  "sprint": 4,
+  "original_srs_sprint": 4,
+  "proposed_development_plan_sprint": 2,
+  "generated_by": "Django 5.2.18 makemigrations student_services --no-header",
+  "other_generated_artifacts": {
+    "frontend/package-lock.json": "npm install --save-dev --save-exact @playwright/test@1.56.1",
+    "frontend/AGENTS.md": "Next.js 16.4.3 next dev generated framework guidance; retained without manual edits"
+  },
+  "paths": ["backend/apps/student_services/migrations/0002_complaint_assigned_to_and_more.py"],
+  "changes": [
+    "Nullable protected Complaint.assigned_to foreign key",
+    "Nullable protected ComplaintTransition.old_assigned_to/new_assigned_to foreign keys"
+  ],
+  "history": "Existing complaints and history are preserved; existing assignment values remain null.",
+  "production_migration": "Not Run"
+}
