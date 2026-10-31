@@ -131,3 +131,46 @@ class Coupon(MessRecord):
             models.CheckConstraint(condition=~models.Q(code__regex=r'^\s*$'), name='mess_coupon_code_not_blank'),
             models.UniqueConstraint(fields=['allocation', 'code'], name='mess_coupon_allocation_code_unique'),
         ]
+
+
+# Owner: Atiksh Gour | US-16 | Sprint 5 | Reviewer: Anvi Srinivas
+class FeeDue(models.Model):
+    class Status(models.TextChoices):
+        UNPAID = 'Unpaid', 'Unpaid'
+        PENDING = 'Pending', 'Pending'
+        PAID = 'Paid', 'Paid'
+
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='fee_dues')
+    description = models.CharField(max_length=200)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=3, default='INR')
+    status = models.CharField(max_length=8, choices=Status.choices, default=Status.UNPAID)
+    paid_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-id']
+        constraints = [
+            models.CheckConstraint(condition=models.Q(amount__gt=0), name='fee_positive_amount'),
+            models.CheckConstraint(condition=models.Q(currency='INR'), name='fee_inr_only'),
+        ]
+
+
+class PaymentAttempt(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'Pending', 'Pending'
+        SUCCEEDED = 'Succeeded', 'Succeeded'
+        FAILED = 'Failed', 'Failed'
+        CANCELLED = 'Cancelled', 'Cancelled'
+
+    fee = models.ForeignKey(FeeDue, on_delete=models.PROTECT, related_name='attempts')
+    provider_order_id = models.CharField(max_length=100, unique=True)
+    provider_reference = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=3)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at', '-id']
+        constraints = [models.CheckConstraint(condition=models.Q(amount__gt=0), name='attempt_positive_amount')]

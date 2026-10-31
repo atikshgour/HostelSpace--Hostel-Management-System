@@ -1,5 +1,11 @@
 # Live requirement/story/file/test/evidence matrix
 
+## US-16 evidence — 2026-10-31 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-09, BR-06, NFR-03, SEC-06 | US-16 / Atiksh Gour / Sprint 5; reviewer Anvi Srinivas pending | TC-FR09-01, TC-SEC06-01 (partial) | [Actual results](../../evidence/us16-validation.md), [backend tests](../../backend/apps/student_services/tests/test_payments.py), [UI tests](../../frontend/app/fees/page.test.jsx), [contract](../../backend/apps/student_services/FEES_API.md) | Three SQLite API tests and two Jest tests passed; Next.js build passed. PostgreSQL concurrency, provider sandbox checkout and human review Not Run. |
+
 ## US-15 evidence — 2026-10-29 (review pending)
 
 | Requirement | Story / owner | Test | Evidence | Status |

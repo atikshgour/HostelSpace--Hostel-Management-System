@@ -1,78 +1,86 @@
-# HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-# STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-# TARGET FILE: backend/apps/student_services/tests/test_payments.py
-# ACCOUNTABLE OWNER: Atiksh Gour
-# INDEPENDENT REVIEWER: Anvi Srinivas
-# USER STORIES: US-16, US-24
-# DEVELOPMENT PLAN SPRINT(S): 3; 5–6 (proposed working mapping; team approval required)
-# ORIGINAL SRS SPRINT(S): 5; 6 (preserved baseline mapping)
-# REQUIREMENTS: FR-09; NFR-03; SEC-06; BR-06; FR-09; NFR-03; SEC-06; recovery
-# FILE PURPOSE: Payment verification and retry tests
-#
-# WHAT TO IMPLEMENT IN THIS FILE
-# Synthetic mocked adapter plus documented sandbox acceptance; success/failure/cancel/pending/timeout/mismatch, duplicate callback and simultaneous success; never live payments.
-#
-# BEFORE STARTING
-# 1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-# 2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-# 3. Resolve blocked dependencies before inventing interfaces or missing policies.
-# 4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-# 5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-#
-# COPY-READY AI IMPLEMENTATION PROMPT
-# You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-# Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-# Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-# Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-# Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-# Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-#
-# OWNER: Atiksh Gour | REVIEWER: Anvi Srinivas
-# TARGET FILE: backend/apps/student_services/tests/test_payments.py
-# DEVELOPMENT-PLAN SPRINT: 3; 5–6
-# ORIGINAL SRS SPRINT: 5; 6
-# STORY: US-16, US-24
-# REQUIREMENTS: FR-09; NFR-03; SEC-06; BR-06; FR-09; NFR-03; SEC-06; recovery
-# RESPONSIBILITY: Payment verification and retry tests
-# FILE TASK: Synthetic mocked adapter plus documented sandbox acceptance; success/failure/cancel/pending/timeout/mismatch, duplicate callback and simultaneous success; never live payments.
-#
-# US-16 — View fees and verify test payment results
-# Dependencies: US-01, US-18; sandbox provider access
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Separate FeeDue and PaymentAttempt; fixed-precision amount/currency; initiate for server-calculated amount.
-# - Only verified server-side matching fee/order/amount/currency success marks fee Paid.
-# - Failed/cancelled attempts leave Unpaid; unverified result stays Pending.
-# - Unique provider reference plus atomic update prevents duplicate success even on concurrent callbacks/retries.
-# - Keep failure/cancellation/pending attempt history; no credentials, card/UPI PINs or real funds; provider-hosted test checkout only. Simulation requires faculty approval and explicit labeling.
-#
-# US-24 — Verify recovery and complete maintenance guidance
-# Dependencies: US-16, US-20; US-23 before release
-# Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-# - Restore synthetic PostgreSQL backup into separate database and verify expected counts.
-# - Record/test known-good frontend/API rollback after checking schema compatibility; app rollback does not reverse migrations.
-# - Retest sandbox success/failure/pending/duplicate payment acceptance with no real funds/data.
-# - Name maintainers, weekly dependency review, backups, incident/bug triage and recovery steps; no dumps/secrets in repository.
-#
-# OWNER'S REVIEW / HANDOFF CHECKLIST
-# [ ] This file contains a real, understood implementation rather than this instruction placeholder.
-# [ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-# [ ] Only this file's responsibility is implemented; related changes are listed for review.
-# [ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-# [ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-# [ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-# [ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-# [ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-# [ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-# [ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-# [ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-# [ ] No live payments, production data changes, deployments, commits or pushes without approval.
-#
-# IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-# Actual Jira key: Not created
-# Implementation status: Not implemented
-# Changed paths: Not recorded
-# Commands and observed results: Not Run
-# Unresolved decisions / limitations: Record before implementation
-# PR / reviewer / evidence: Not available
+# Owner: Atiksh Gour | US-16 | Sprint 5 | Reviewer: Anvi Srinivas
+from decimal import Decimal
+from unittest.mock import patch
 
-# IMPLEMENTATION AREA: replace this marker with reviewed content.
+import pytest
+from django.conf import settings
+from django.db import IntegrityError, transaction
+from rest_framework.test import APIClient
+
+from apps.accounts.models import User
+from apps.student_services.models import FeeDue, PaymentAttempt
+
+pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture
+def setup():
+    student = User.objects.create_user(username='synthetic-fee-student', role=User.Role.STUDENT)
+    other = User.objects.create_user(username='synthetic-fee-other', role=User.Role.STUDENT)
+    fee = FeeDue.objects.create(student=student, description='Synthetic hostel fee', amount=Decimal('125.50'))
+    client = APIClient(enforce_csrf_checks=True)
+    client.force_login(student)
+    assert client.get('/api/fees/').status_code == 200
+    client.credentials(HTTP_X_CSRFTOKEN=client.cookies[settings.CSRF_COOKIE_NAME].value)
+    return student, other, fee, client
+
+
+def test_owned_fee_and_verified_capture(setup):
+    student, other, fee, client = setup
+    FeeDue.objects.create(student=other, description='Other fee', amount=Decimal('5.00'))
+    assert len(client.get('/api/fees/').data['results']) == 1
+    with patch('apps.student_services.fee_services.create_order', return_value='order_test123'), \
+         patch('apps.student_services.fee_views.credentials', return_value=('rzp_test_example', 'secret')):
+        response = client.post(f'/api/fees/{fee.pk}/initiate/', {}, format='json')
+    assert response.status_code == 201
+    attempt_id = response.data['attempt_id']
+    fee.refresh_from_db()
+    assert fee.status == FeeDue.Status.PENDING
+    with patch('apps.student_services.fee_services.valid_checkout_signature', return_value=True), \
+         patch('apps.student_services.fee_services.fetch_payment', return_value={
+             'id': 'pay_test123', 'order_id': 'order_test123', 'amount': 12550,
+             'currency': 'INR', 'status': 'captured',
+         }):
+        response = client.post(f'/api/payment-attempts/{attempt_id}/verify/',
+                               {'payment_id': 'pay_test123', 'signature': 'signature'}, format='json')
+    assert response.status_code == 200
+    assert response.data['status'] == PaymentAttempt.Status.SUCCEEDED
+    fee.refresh_from_db()
+    assert fee.status == FeeDue.Status.PAID
+    assert client.post(f'/api/fees/{fee.pk}/initiate/', {}, format='json').status_code == 400
+    assert PaymentAttempt.objects.get(pk=attempt_id).provider_reference == 'pay_test123'
+    retry = client.post(f'/api/payment-attempts/{attempt_id}/verify/',
+                        {'payment_id': 'pay_test123', 'signature': 'signature'}, format='json')
+    assert retry.status_code == 200
+    assert retry.data['status'] == PaymentAttempt.Status.SUCCEEDED
+    assert PaymentAttempt.objects.filter(fee=fee).count() == 1
+
+
+def test_mismatch_stays_pending_and_cancelled_stays_unpaid(setup):
+    _, _, fee, client = setup
+    with patch('apps.student_services.fee_services.create_order', return_value='order_test456'), \
+         patch('apps.student_services.fee_views.credentials', return_value=('rzp_test_example', 'secret')):
+        attempt_id = client.post(f'/api/fees/{fee.pk}/initiate/', {}, format='json').data['attempt_id']
+    with patch('apps.student_services.fee_services.valid_checkout_signature', return_value=True), \
+         patch('apps.student_services.fee_services.fetch_payment', return_value={
+             'id': 'pay_test456', 'order_id': 'order_test456', 'amount': 1,
+             'currency': 'INR', 'status': 'captured',
+         }):
+        assert client.post(f'/api/payment-attempts/{attempt_id}/verify/',
+                           {'payment_id': 'pay_test456', 'signature': 'signature'}, format='json').status_code == 400
+    fee.refresh_from_db()
+    assert fee.status == FeeDue.Status.PENDING
+    with patch('apps.student_services.fee_services.fetch_order_payments', return_value=[]):
+        assert client.post(f'/api/payment-attempts/{attempt_id}/verify/',
+                           {'cancelled': True}, format='json').data['status'] == PaymentAttempt.Status.CANCELLED
+    fee.refresh_from_db()
+    assert fee.status == FeeDue.Status.UNPAID
+
+
+def test_unique_provider_reference(setup):
+    _, _, fee, _ = setup
+    PaymentAttempt.objects.create(fee=fee, provider_order_id='order_one',
+                                  provider_reference='pay_once', amount=fee.amount, currency='INR')
+    with pytest.raises(IntegrityError), transaction.atomic():
+        PaymentAttempt.objects.create(fee=fee, provider_order_id='order_two',
+                                      provider_reference='pay_once', amount=fee.amount, currency='INR')

@@ -1,6 +1,8 @@
 # Owner: Atiksh Gour | US-13/14 | Sprint 4 | Reviewer: Anvi Srinivas
 from django.urls import path
 
+from .fee_views import FeeInitiate, FeeList, FeeVerify
+
 from .mess_views import (
     AllocationDetail,
     AllocationList,
@@ -20,6 +22,9 @@ from .views import (
 )
 
 urlpatterns = [
+    path('fees/', FeeList.as_view(), name='fee-list'),
+    path('fees/<int:pk>/initiate/', FeeInitiate.as_view(), name='fee-initiate'),
+    path('payment-attempts/<int:pk>/verify/', FeeVerify.as_view(), name='payment-verify'),
     path('mess/', StudentMess.as_view(), name='student-mess'),
     path('mess/students/', MessStudentList.as_view(), name='mess-students'),
     path('mess/allocations/', AllocationList.as_view(), name='mess-allocations'),

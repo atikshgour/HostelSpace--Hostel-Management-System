@@ -1,5 +1,11 @@
 # HostelSpace
 
+> US-16 implementation (Atiksh, 2026-10-31): student fee listing and Razorpay
+> test-mode order/verification are wired at `/fees`, with server-side matching
+> and retained attempt results. See [fee API contract](backend/apps/student_services/FEES_API.md)
+> and [actual checks](evidence/us16-validation.md). Sandbox checkout, PostgreSQL
+> concurrency verification and independent review remain pending.
+
 > US-15 update (Atiksh, 2026-10-29): student mess allocation/valid coupon viewing
 > and Mess Staff-only management are implemented at `/mess` and `/mess/manage`.
 > See the [mess API contract](backend/apps/student_services/MESS_API.md) and
