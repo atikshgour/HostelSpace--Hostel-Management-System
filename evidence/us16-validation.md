@@ -17,3 +17,9 @@ Actual commands and outcomes:
 - PostgreSQL uniqueness/concurrency test: Not Run. Provider sandbox checkout: Not Run. Playwright complete flow: Not Run.
 
 Remaining dependency: configure valid Razorpay test credentials and a PostgreSQL test database, provision synthetic fee dues through an authorized staff flow, run sandbox checkout and independent review. This evidence does not claim those checks passed.
+
+## CI repair after commit `f8dd700` (2026-10-31)
+
+The frontend Dockerfile now copies the fee feature used by `/fees`. The URL import block was corrected for Ruff. The payment adapter now uses an HTTPS connection to a fixed provider host, addressing Bandit B310.
+
+Local results: `ruff check .` passed; `bandit -q -r config apps manage.py -x '*/tests/*'` passed; three focused payment API tests passed in explicit SQLite quick mode; `npm.cmd run build` passed and included `/fees` and `/fees/result`. `docker compose build frontend` was Not Run because the `docker` command is unavailable here. Remote CI rerun and PostgreSQL tests are pending.

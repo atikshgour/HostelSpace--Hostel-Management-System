@@ -2,7 +2,6 @@
 from django.urls import path
 
 from .fee_views import FeeInitiate, FeeList, FeeVerify
-
 from .mess_views import (
     AllocationDetail,
     AllocationList,

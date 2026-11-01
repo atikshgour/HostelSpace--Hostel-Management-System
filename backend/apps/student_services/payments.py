@@ -3,11 +3,10 @@
 import base64
 import hashlib
 import hmac
+import http.client
 import json
 import os
-import urllib.error
 import urllib.parse
-import urllib.request
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -27,17 +26,21 @@ def credentials():
 def _request(path, method='GET', payload=None):
     key, secret = credentials()
     encoded = base64.b64encode(f'{key}:{secret}'.encode()).decode()
-    request = urllib.request.Request(
-        f'https://api.razorpay.com/v1/{path}',
-        data=json.dumps(payload).encode() if payload is not None else None,
-        method=method,
-        headers={'Authorization': f'Basic {encoded}', 'Content-Type': 'application/json'},
-    )
+    connection = http.client.HTTPSConnection('api.razorpay.com', timeout=10)
     try:
-        with urllib.request.urlopen(request, timeout=10) as response:
-            return json.load(response)
-    except (urllib.error.URLError, TimeoutError, ValueError) as exc:
+        connection.request(
+            method, f'/v1/{path}',
+            body=json.dumps(payload).encode() if payload is not None else None,
+            headers={'Authorization': f'Basic {encoded}', 'Content-Type': 'application/json'},
+        )
+        response = connection.getresponse()
+        if response.status >= 400:
+            raise ProviderError('Test payment provider rejected the request.')
+        return json.loads(response.read())
+    except (OSError, TimeoutError, ValueError, http.client.HTTPException) as exc:
         raise ProviderError('Test payment provider is temporarily unavailable.') from exc
+    finally:
+        connection.close()
 
 
 def create_order(fee):
