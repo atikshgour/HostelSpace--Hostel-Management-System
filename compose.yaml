@@ -23,6 +23,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-hostelspace}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a local PostgreSQL password in .env}
       POSTGRES_HOST: db
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,api,testserver}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -37,7 +39,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "127.0.0.1:3000:3000"
+      - "${FRONTEND_BIND_ADDRESS:-127.0.0.1}:3000:3000"
     depends_on:
       api:
         condition: service_healthy
