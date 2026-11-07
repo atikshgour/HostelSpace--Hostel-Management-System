@@ -1,8 +1,7 @@
-from django.urls import include, path
-from .views import health
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path("api/health/", health),
-    path("api/auth/", include("accounts.urls")),
-      path("api/content/", include("content.urls")),
+    path("<str:kind>/", views.collection),
+    path("<str:kind>/<int:item_id>/", views.detail),
 ]

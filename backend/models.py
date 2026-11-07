@@ -1,21 +1,35 @@
-# Owner: Anvi Srinivas | Story: US-01 | Sprint: 1
-from django.contrib.auth.models import AbstractUser
+# Owner: Anvi Srinivas | Story: US-03 | Sprint: 2
+from django.conf import settings
 from django.db import models
 
 
-class Role(models.TextChoices):
-    STUDENT = "student", "Student"
-    WARDEN = "warden", "Warden"
-    CHIEF_WARDEN = "chief_warden", "Chief Warden"
-    DIRECTOR = "director", "Hostel Director"
-    MAINTENANCE = "maintenance", "Maintenance Staff"
-    MESS = "mess", "Mess Staff"
-    LAUNDRY = "laundry", "Laundry Staff"
+class ContentBase(models.Model):
+    """Shared fields. Items are deactivated, never hard-deleted."""
+    is_active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="+",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
 
 
-class User(AbstractUser):
-    """Single shared user model for all roles."""
-    role = models.CharField(max_length=20, choices=Role.choices, default=Role.STUDENT)
-    phone = models.CharField(max_length=15, blank=True)
-    usn = models.CharField(max_length=20, blank=True)
-    room_number = models.CharField(max_length=10, blank=True)
+class Notice(ContentBase):
+    title = models.CharField(max_length=200)
+    body = models.TextField(max_length=5000)
+
+
+class Contact(ContentBase):
+    name = models.CharField(max_length=100)
+    designation = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
+    email = models.EmailField(blank=True)
+
+
+class Rule(ContentBase):
+    title = models.CharField(max_length=200)
+    body = models.TextField(max_length=5000)
+    order = models.PositiveIntegerField(default=0)
