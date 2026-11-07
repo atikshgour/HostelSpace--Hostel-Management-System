@@ -1,5 +1,11 @@
 # Live requirement/story/file/test/evidence matrix
 
+## US-24 recovery guidance — 2026-11-07 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-09, NFR-03, SEC-06 | US-24 / Atiksh Gour / Sprint 6; reviewer Anvi Srinivas pending | TC-REL-01, TC-FR09-01 | [Actual results](../../evidence/us24-validation.md), [runbook](../07-maintenance/runbook.md), [backup](../../scripts/backup.sh), [restore](../../scripts/restore-test.sh) | Scripts and guidance implemented; `git diff --check` passed. Bash syntax, separate restore/count drill, rollback drill and external sandbox payment flows Not Run. |
+
 ## US-16 evidence — 2026-10-31 (review pending)
 
 | Requirement | Story / owner | Test | Evidence | Status |
