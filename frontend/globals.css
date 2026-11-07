@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Shared design tokens (US-21). Reuse these; do not invent new palettes. */
+:root {
+  --hs-primary: #1d4ed8;
+  --hs-primary-dark: #1e40af;
+  --hs-bg: #f8fafc;
+  --hs-surface: #ffffff;
+  --hs-text: #0f172a;
+  --hs-muted: #64748b;
+  --hs-border: #cbd5e1;
+  --hs-error: #b91c1c;
+  --hs-error-bg: #fef2f2;
+  --hs-success: #15803d;
+  --hs-success-bg: #f0fdf4;
+  --hs-warning: #b45309;
+  --hs-warning-bg: #fffbeb;
+}
+
+body {
+  background: var(--hs-bg);
+  color: var(--hs-text);
+}
+
+@layer components {
+  .hs-card { background: var(--hs-surface); border-radius: 0.5rem; box-shadow: 0 1px 3px rgb(0 0 0 / 0.1); padding: 1rem; }
+  .hs-label { display: block; font-weight: 500; }
+  .hs-input { width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hs-border); border-radius: 0.375rem; background: #fff; }
+  .hs-input:focus { outline: 2px solid var(--hs-primary); outline-offset: 1px; }
+  .hs-input[aria-invalid="true"] { border-color: var(--hs-error); }
+  .hs-field-error { margin-top: 0.25rem; font-size: 0.875rem; color: var(--hs-error); }
+  .hs-btn { padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; background: var(--hs-primary); color: #fff; }
+  .hs-btn:hover:not(:disabled) { background: var(--hs-primary-dark); }
+  .hs-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .hs-btn-secondary { background: transparent; color: var(--hs-text); border: 1px solid var(--hs-border); }
+  .hs-btn-secondary:hover:not(:disabled) { background: #f1f5f9; }
+  .hs-alert { padding: 0.75rem 1rem; border-radius: 0.375rem; border: 1px solid; }
+  .hs-alert-error { color: var(--hs-error); background: var(--hs-error-bg); border-color: var(--hs-error); }
+  .hs-alert-success { color: var(--hs-success); background: var(--hs-success-bg); border-color: var(--hs-success); }
+  .hs-alert-warning { color: var(--hs-warning); background: var(--hs-warning-bg); border-color: var(--hs-warning); }
+  .hs-badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+  .hs-badge-ok { color: var(--hs-success); background: var(--hs-success-bg); }
+  .hs-badge-warn { color: var(--hs-warning); background: var(--hs-warning-bg); }
+  .hs-badge-bad { color: var(--hs-error); background: var(--hs-error-bg); }
+  .hs-spinner { width: 1.25rem; height: 1.25rem; border: 2px solid var(--hs-border); border-top-color: var(--hs-primary); border-radius: 9999px; animation: hs-spin 0.8s linear infinite; }
+  @keyframes hs-spin { to { transform: rotate(360deg); } }
+}
