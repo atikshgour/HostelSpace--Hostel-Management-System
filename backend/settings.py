@@ -13,6 +13,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "rest_framework",
     "accounts",
+    "contents"
 ]
 
 MIDDLEWARE = [
