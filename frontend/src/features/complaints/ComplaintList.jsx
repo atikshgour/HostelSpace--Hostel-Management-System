@@ -1,6 +1,7 @@
 'use client';
 // Owner: Atiksh Gour | US-13/14 | Sprint 4 | Reviewer: Anvi Srinivas
 import { useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 import ComplaintForm from './ComplaintForm';
 
 export default function ComplaintList() {
@@ -10,12 +11,7 @@ export default function ComplaintList() {
   const [error, setError] = useState('');
   useEffect(() => {
     let active = true;
-    fetch(`/api/complaints/?page=${page}`, { credentials: 'same-origin', cache: 'no-store' })
-      .then(async (response) => {
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message || 'Unable to load complaints.');
-        return result;
-      }).then((result) => { if (active) setData(result); })
+    api(`/api/complaints/?page=${page}`).then((result) => { if (active) setData(result); })
       .catch((err) => { if (active) setError(err.message); });
     return () => { active = false; };
   }, [page, revision]);
@@ -34,12 +30,12 @@ export default function ComplaintList() {
       <div className="hs-grid">{data?.results.map((complaint) =>
         <article className="hs-card" key={complaint.id}>
           <h3>Complaint #{complaint.id} — {complaint.status}</h3>
-          <p>{complaint.category_name} · Room {complaint.room}</p>
+          <p>{complaint.category} · Room {complaint.room_snapshot}</p>
           <p>{complaint.description}</p>
-          <details><summary>History ({complaint.history.length})</summary>
-            <ol>{complaint.history.map((item) => <li key={item.id}>
-              <time dateTime={item.created_at}>{new Date(item.created_at).toLocaleString()}</time>
-              {' · '}{item.old_status || 'Created'} → {item.new_status}; {item.remarks}
+          <details><summary>History ({complaint.transitions.length})</summary>
+            <ol>{complaint.transitions.map((item) => <li key={item.id}>
+              <time dateTime={item.occurred_at}>{new Date(item.occurred_at).toLocaleString()}</time>
+              {' · '}{item.from_status || 'Created'} → {item.to_status}; {item.remarks}
             </li>)}</ol>
           </details>
         </article>)}</div>
