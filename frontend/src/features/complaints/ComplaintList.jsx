@@ -1,260 +1,79 @@
-"use client";
-import Link from "next/link";
-import { useState } from "react";
-import {
-  useResource,
-  useIdentity,
-  ErrorMessage,
-  ResourceForm,
-} from "@/components/ui/AppShell";
-import Card from "@/components/ui/Card";
-import PageHeader from "@/components/ui/PageHeader";
-import Button from "@/components/ui/Button";
-import StatusBadge from "@/components/ui/StatusBadge";
-import HistoryTimeline from "@/components/ui/HistoryTimeline";
-import { api } from "@/lib/api";
-import { dateTime } from "@/lib/format";
-import Dialog from "@/components/ui/Dialog";
-import DataTable from "@/components/ui/DataTable";
-export function ComplaintForm({ onSaved }) {
-  return (
-    <Card>
-      <ResourceForm
-        title="New maintenance complaint"
-        fields={[
-          {
-            name: "category",
-            label: "Category",
-            options: [
-              "Electrical",
-              "Plumbing",
-              "Furniture",
-              "Cleaning",
-              "Other",
-            ],
-          },
-          { name: "description", label: "Description", type: "textarea" },
-        ]}
-        button="Submit complaint"
-        onSave={async (body) => {
-          await api("/api/complaints/", { method: "POST", body });
-          onSaved();
-        }}
-      />
-    </Card>
-  );
-}
-function Manage({ row, onSaved, staff }) {
-  const user = useIdentity();
-  return (
-    <div className="hs-stack">
-      {["DIRECTOR", "WARDEN"].includes(user.role) &&
-      row.status !== "Resolved" ? (
-        <ResourceForm
-          title="Assign maintenance staff"
-          fields={[
-            {
-              name: "assigned_to",
-              label: "Maintenance staff",
-              options: staff.map((x) => ({ value: x.id, label: x.name })),
-            },
-          ]}
-          onSave={async (body) => {
-            await api(`/api/complaints/${row.id}/assign/`, {
-              method: "POST",
-              body,
-            });
-            onSaved();
-          }}
-        />
-      ) : null}
-      {row.status !== "Resolved" &&
-      row.assigned_to &&
-      ["DIRECTOR", "MAINTENANCE_STAFF"].includes(user.role) ? (
-        <ResourceForm
-          title="Update progress"
-          fields={[
-            {
-              name: "status",
-              label: "Next status",
-              options: [row.status === "Open" ? "In Progress" : "Resolved"],
-            },
-            {
-              name: "remarks",
-              label: "Progress remarks",
-              type: "textarea",
-              maxLength: 2000,
-            },
-          ]}
-          onSave={async (body) => {
-            await api(`/api/complaints/${row.id}/progress/`, {
-              method: "POST",
-              body,
-            });
-            onSaved();
-          }}
-        />
-      ) : null}
-    </div>
-  );
-}
-export default function ComplaintList({ detailId }) {
-  const user = useIdentity(),
-    student = user.role === "STUDENT";
-  const { data, error, refresh } = useResource([
-    "/api/complaints/",
-    ["DIRECTOR", "WARDEN"].includes(user.role)
-      ? "/api/choices/users/?role=MAINTENANCE_STAFF"
-      : null,
-  ]);
-  const [selected, setSelected] = useState(null);
-  const [open, setOpen] = useState(false),
-    [notice, setNotice] = useState(""),
-    [query, setQuery] = useState(""),
-    [status, setStatus] = useState("Active");
-  let rows = (data?.[0] || [])
-    .filter(
-      (x) =>
-        detailId ||
-        ((status === "All" ||
-          (status === "Active" && x.status !== "Resolved") ||
-          x.status === status) &&
-          `${x.student_name} ${x.description} ${x.category}`
-            .toLowerCase()
-            .includes(query.toLowerCase())),
-    )
-    .filter((x) => !detailId || String(x.id) === String(detailId));
-  return (
-    <>
-      <PageHeader
-        title={student ? "My complaints" : "Complaint management"}
-        description="Maintenance requests, assignment and progress history."
-      />
-      <ErrorMessage error={error} />
-      {notice ? (
-        <p className="hs-success" role="status">
-          {notice}
-        </p>
-      ) : null}
-      {!detailId ? (
-        <>
-          <div className="hs-toolbar">
-            <label>
-              Search complaints
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Student, issue or category"
-              />
-            </label>
-            <label>
-              Status
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                {["Active", "Open", "In Progress", "Resolved", "All"].map(
-                  (x) => (
-                    <option key={x}>{x}</option>
-                  ),
-                )}
-              </select>
-            </label>
-            {student ? (
-              <Button variant="primary" onClick={() => setOpen(true)}>
-                + New complaint
-              </Button>
-            ) : null}
-          </div>
-          <Card>
-            <DataTable
-              headers={[
-                "Issue",
-                "Student / room",
-                "Status",
-                "Assigned to",
-                "Action",
-              ]}
-              rows={rows.map((x) => [
-                <span key="issue">
-                  <strong>
-                    #{x.id} · {x.category}
-                  </strong>
-                  <small className="hs-cell-sub">{x.description}</small>
-                </span>,
-                `${x.student_name} · ${x.room_snapshot}`,
-                <StatusBadge key="status">{x.status}</StatusBadge>,
-                x.assigned_name || "Awaiting assignment",
-                <Link
-                  className="hs-button"
-                  key="view"
-                  href={`/complaints/${x.id}`}
-                >
-                  Open complaint
-                </Link>,
-              ])}
-            />
-          </Card>
-        </>
-      ) : null}
-      {open ? (
-        <Dialog title="Report an issue" onClose={() => setOpen(false)}>
-          <ComplaintForm
-            onSaved={() => {
-              setOpen(false);
-              setNotice(
-                "Complaint submitted. Your Warden can assign it for repair.",
-              );
-              refresh();
-            }}
-          />
-        </Dialog>
-      ) : null}
-      <div className="hs-stack">
-        {(detailId ? rows : []).map((x) => (
-          <Card key={x.id}>
-            <div className="hs-row">
-              <h2>
-                #{x.id} · {x.category}
-              </h2>
-              <StatusBadge>{x.status}</StatusBadge>
-            </div>
-            <p>{x.description}</p>
-            <p className="hs-muted">
-              Room: {x.room_snapshot} · {dateTime(x.created_at)}
-            </p>
-            <p className="hs-muted">
-              Assigned staff: {x.assigned_name || "Not assigned"}
-            </p>
-            {!detailId ? (
-              <div className="hs-actions">
-                <Link className="hs-button" href={`/complaints/${x.id}`}>
-                  Open complaint
-                </Link>
-                <Button
-                  onClick={() => setSelected(selected === x.id ? null : x.id)}
-                >
-                  {selected === x.id ? "Hide history" : "Show history"}
-                </Button>
-              </div>
-            ) : null}
-            {detailId || selected === x.id ? (
-              <>
-                <h3 style={{ marginTop: 20 }}>Activity</h3>
-                <HistoryTimeline items={x.transitions} />
-              </>
-            ) : null}
-            {!student ? (
-              <Manage row={x} staff={data?.[1] || []} onSaved={refresh} />
-            ) : null}
-          </Card>
-        ))}
-      </div>
-      {data && !rows.length ? (
-        <p className="hs-empty">No complaints found.</p>
-      ) : null}
-      {!data && !error ? <p role="status">Loading complaints…</p> : null}
-    </>
-  );
-}
+/*
+HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
+STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
+TARGET FILE: frontend/src/features/complaints/ComplaintList.jsx
+ACCOUNTABLE OWNER: Atiksh Gour
+INDEPENDENT REVIEWER: Anvi Srinivas
+USER STORIES: US-13, US-14
+DEVELOPMENT PLAN SPRINT(S): 2 (proposed working mapping; team approval required)
+ORIGINAL SRS SPRINT(S): 4 (preserved baseline mapping)
+REQUIREMENTS: FR-07; SEC-03–04; FR-07; SEC-01
+FILE PURPOSE: ComplaintList UI component
+
+WHAT TO IMPLEMENT IN THIS FILE
+Own list and detail status; HistoryTimeline events with remarks and timestamps. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
+
+BEFORE STARTING
+1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
+2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
+3. Resolve blocked dependencies before inventing interfaces or missing policies.
+4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
+5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
+
+COPY-READY AI IMPLEMENTATION PROMPT
+You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
+Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
+Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
+Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
+Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
+Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
+
+OWNER: Atiksh Gour | REVIEWER: Anvi Srinivas
+TARGET FILE: frontend/src/features/complaints/ComplaintList.jsx
+DEVELOPMENT-PLAN SPRINT: 2
+ORIGINAL SRS SPRINT: 4
+STORY: US-13, US-14
+REQUIREMENTS: FR-07; SEC-03–04; FR-07; SEC-01
+RESPONSIBILITY: ComplaintList UI component
+FILE TASK: Own list and detail status; HistoryTimeline events with remarks and timestamps. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
+
+US-13 — Submit and track maintenance complaint
+Dependencies: US-01, US-18
+Acceptance context (deliver only the part owned by this file, report remaining dependencies):
+- Use server student profile room plus valid category and non-empty description.
+- Create Open complaint with ID; invalid input yields field errors and no record.
+- Own list/detail persists after refresh.
+- No cross-student reads or modifications.
+
+US-14 — Assign complaints and update progress
+Dependencies: US-13
+Acceptance context (deliver only the part owned by this file, report remaining dependencies):
+- Director assigns to active Maintenance Staff.
+- Only assigned staff or Director perform permitted transitions Open → In Progress → Resolved.
+- Append actor, server time and remarks per transition; no silent revert of resolved complaint.
+- Student sees current status and history but cannot edit assignment or staff remarks.
+
+OWNER'S REVIEW / HANDOFF CHECKLIST
+[ ] This file contains a real, understood implementation rather than this instruction placeholder.
+[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
+[ ] Only this file's responsibility is implemented; related changes are listed for review.
+[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
+[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
+[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
+[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
+[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
+[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
+[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
+[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
+[ ] No live payments, production data changes, deployments, commits or pushes without approval.
+
+IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
+Actual Jira key: Not created
+Implementation status: Not implemented
+Changed paths: Not recorded
+Commands and observed results: Not Run
+Unresolved decisions / limitations: Record before implementation
+PR / reviewer / evidence: Not available
+*/
+
+/* IMPLEMENTATION AREA: replace this marker with reviewed code. */
