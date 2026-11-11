@@ -1,72 +1,9 @@
-/*
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: frontend/src/features/attendance/AttendanceHistory.jsx
-ACCOUNTABLE OWNER: Arin Singh
-INDEPENDENT REVIEWER: Aryan Singh
-USER STORIES: US-07
-DEVELOPMENT PLAN SPRINT(S): 3 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 4 (preserved baseline mapping)
-REQUIREMENTS: FR-06; NFR-03; SEC-05; BR-05
-FILE PURPOSE: AttendanceHistory UI component
-
-WHAT TO IMPLEMENT IN THIS FILE
-Personal accepted/rejected result/time/session display and authorized staff review; no coordinates, map trail or background tracking. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-
-OWNER: Arin Singh | REVIEWER: Aryan Singh
-TARGET FILE: frontend/src/features/attendance/AttendanceHistory.jsx
-DEVELOPMENT-PLAN SPRINT: 3
-ORIGINAL SRS SPRINT: 4
-STORY: US-07
-REQUIREMENTS: FR-06; NFR-03; SEC-05; BR-05
-RESPONSIBILITY: AttendanceHistory UI component
-FILE TASK: Personal accepted/rejected result/time/session display and authorized staff review; no coordinates, map trail or background tracking. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-US-07 — Configure attendance sessions and submit one-time location attendance
-Dependencies: US-01, US-18; approved attendance policy
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Authorized wardens configure start/end, centre and positive radius; end follows start.
-- Server validates inclusive time window, distance and approved accuracy threshold; valid in-range submissions yield one accepted record.
-- Closed/outside-range/denied/unavailable/low-accuracy cases do not create accepted attendance.
-- PostgreSQL uniqueness and atomic handling prevent concurrent or retry duplicate accepted records per student/session.
-- Request one geolocation sample only after Submit; no watchPosition, background polling or retained raw student coordinates in DB/logs/history. Retain time and check result only; browser location is not tamper-proof.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-*/
-
-/* IMPLEMENTATION AREA: replace this marker with reviewed code. */
+"use client";
+/* Arin Singh | US-07 | Sprint 4. One location sample is requested only after a click. */
+import { useEffect, useState } from "react";
+import { createSession, getIdentity, listAttendance, listSessions, submitAttendance } from "./api";
+const ui={page:{maxWidth:960,margin:"0 auto",padding:24},card:{border:"1px solid #cbd5e1",borderRadius:12,padding:20,margin:"16px 0",background:"#fff"},row:{display:"flex",gap:12,flexWrap:"wrap"},field:{display:"grid",gap:6,margin:"12px 0",minWidth:220},input:{minHeight:42,padding:9,border:"1px solid #94a3b8",borderRadius:8,font:"inherit"},button:{minHeight:42,padding:"8px 14px",border:"1px solid #1d4ed8",borderRadius:8,background:"#fff",color:"#1d4ed8"},error:{padding:12,borderLeft:"4px solid #b91c1c",background:"#fef2f2"}};
+function ErrorMessage({error}){return error?<div role="alert" style={ui.error}>{error.message}</div>:null;} function Field({label,...props}){return <label style={ui.field}><span>{label}</span><input style={ui.input}{...props}/></label>;}
+export function AttendanceSessionForm({onSaved}){const[busy,setBusy]=useState(false),[error,setError]=useState(null),[message,setMessage]=useState("");async function submit(event){event.preventDefault();const form=event.currentTarget,raw=Object.fromEntries(new FormData(form));if(new Date(raw.closes_at)<=new Date(raw.opens_at)){setError(new Error("Closing time must follow opening time."));return;}const body={...raw,opens_at:new Date(raw.opens_at).toISOString(),closes_at:new Date(raw.closes_at).toISOString()};for(const key of ["centre_latitude","centre_longitude","radius_m","max_accuracy_m","max_sample_age_seconds"])body[key]=Number(raw[key]);setBusy(true);setError(null);try{await createSession(body);form.reset();setMessage("Attendance session created.");onSaved();}catch(failure){setError(failure);}finally{setBusy(false);}}return <section style={ui.card}><h2>Create attendance session</h2><p>Use only the location policy approved by the team and faculty.</p><form onSubmit={submit}><Field label="Title" name="title" maxLength={120} required/><div style={ui.row}><Field label="Opens" name="opens_at" type="datetime-local" required/><Field label="Closes" name="closes_at" type="datetime-local" required/><Field label="Centre latitude" name="centre_latitude" type="number" step="any" min="-90" max="90" required/><Field label="Centre longitude" name="centre_longitude" type="number" step="any" min="-180" max="180" required/><Field label="Radius (m)" name="radius_m" type="number" step="any" min="0.01" required/><Field label="Maximum accuracy (m)" name="max_accuracy_m" type="number" step="any" min="0.01" required/><Field label="Maximum sample age (seconds)" name="max_sample_age_seconds" type="number" min="1" max="300" required/></div><button style={ui.button} disabled={busy}>{busy?"Saving…":"Create session"}</button><ErrorMessage error={error}/><p role="status">{message}</p></form></section>}
+export function AttendanceSubmit({session,onSaved}){const[busy,setBusy]=useState(false),[error,setError]=useState(null),[message,setMessage]=useState("");async function submit(){setError(null);setMessage("");if(!navigator.geolocation){setError(new Error("Location is unavailable; attendance was not accepted."));return;}setBusy(true);try{const sample=await new Promise((resolve,reject)=>navigator.geolocation.getCurrentPosition(resolve,()=>reject(new Error("Location was denied, unavailable, or timed out.")),{enableHighAccuracy:true,timeout:15000,maximumAge:0}));const result=await submitAttendance({session:session.id,latitude:sample.coords.latitude,longitude:sample.coords.longitude,accuracy_m:sample.coords.accuracy,sampled_at:new Date(sample.timestamp).toISOString()});setMessage(`${result.result} · ${result.reason_code}`);onSaved();}catch(failure){setError(failure);}finally{setBusy(false);}}return <div><p>Clicking requests one location sample. There is no background tracking.</p><button style={ui.button} disabled={busy} onClick={submit}>{busy?"Checking…":"Submit one-time location attendance"}</button><ErrorMessage error={error}/><p role="status">{message}</p></div>}
+export default function AttendanceWorkspace(){const[identity,setIdentity]=useState({loading:true}),[sessions,setSessions]=useState({results:[]}),[history,setHistory]=useState({results:[]}),[error,setError]=useState(null),[revision,setRevision]=useState(0);useEffect(()=>{getIdentity().then(user=>setIdentity({loading:false,user})).catch(error=>setIdentity({loading:false,error}));},[]);useEffect(()=>{Promise.all([listSessions(),listAttendance()]).then(([sessions,history])=>{setSessions(sessions);setHistory(history);}).catch(setError);},[revision]);if(identity.loading)return <main style={ui.page}>Checking session…</main>;if(identity.error)return <main style={ui.page}><ErrorMessage error={identity.error}/></main>;const role=identity.user?.role,refresh=()=>setRevision(value=>value+1);return <main style={ui.page}><h1>Attendance</h1>{role==="WARDEN"?<AttendanceSessionForm onSaved={refresh}/>:null}<ErrorMessage error={error}/><h2>Attendance sessions</h2>{sessions.results.map(session=><article style={ui.card} key={session.id}><h3>{session.title}</h3><p>{new Date(session.opens_at).toLocaleString()} — {new Date(session.closes_at).toLocaleString()}</p>{role==="STUDENT"?<AttendanceSubmit session={session} onSaved={refresh}/>:<p>Radius {session.radius_m} m · Accuracy {session.max_accuracy_m} m</p>}</article>)}{!sessions.results.length?<p>No assigned sessions.</p>:null}<h2>{role==="STUDENT"?"My attendance history":"Assigned attendance history"}</h2>{history.results.map(row=><article style={ui.card} key={row.id}><strong>{row.result} · {row.reason_code}</strong><p>Student {row.student} · Session {row.session}</p><p>{new Date(row.submitted_at).toLocaleString()}</p></article>)}{!history.results.length?<p>No attendance records.</p>:null}</main>}

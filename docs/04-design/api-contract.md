@@ -1,71 +1,37 @@
-# Canonical endpoint contract
+# Arin API contract — implementation reference, team approval pending
 
-```text
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: docs/04-design/api-contract.md
-ACCOUNTABLE OWNER: Arin Singh
-INDEPENDENT REVIEWER: Aryan Singh
-USER STORIES: US-18
-DEVELOPMENT PLAN SPRINT(S): 1 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 1 (preserved baseline mapping)
-REQUIREMENTS: All FRs; SEC-01–06
-FILE PURPOSE: Canonical endpoint contract
+All domain endpoints are prefixed `/api/`, use Django sessions, require an active authenticated user, and return `Cache-Control: no-store, private`. No bearer/JWT scheme. Every write must include an `X-CSRFToken` from the shared bootstrap. Anonymous session-auth DRF requests return 403; the local `/auth/me/` endpoint returns 401. Standard errors: `{code, message, fields}`. Normal validation 400; role/protected-field denial 403; out-of-scope or nonexistent object 404; final-state/duplicate-accepted conflict 409. List page size is 25, with `{count,next,previous,results}`. Timestamps are timezone-aware ISO strings; clients convert for display. Decimal values serialize as strings.
 
-WHAT TO IMPLEMENT IN THIS FILE
-All FR endpoints/methods, role/owner/assignment scoping, schemas, stable codes, list pagination; plural leaves; no unapproved extra APIs.
+| Method/path | Input | Output | Authorization |
+|---|---|---|---|
+| GET `/leaves/` | page | paginated LeaveOutput | Own student; assigned warden; Chief escalations or previously finalized-by-that-Chief requests in supervised scope |
+| POST `/leaves/` | start_date, end_date, reason | 201 LeaveOutput | Student; identity/assigned warden derived server-side |
+| GET `/leaves/{uuid}/` | — | LeaveOutput | Same record scope |
+| POST `/leaves/{uuid}/decision/` | decision: Approved/Rejected/Escalated; nonempty remarks | LeaveOutput | Assigned warden decides Pending; supervising Chief only finalizes Escalated |
+| GET `/attendance/sessions/` | page | paginated SessionOutput | Student’s assigned warden; own warden; Chief’s supervised wardens |
+| POST `/attendance/sessions/` | title, opens_at, closes_at, centre_latitude, centre_longitude, radius_m, max_accuracy_m, max_sample_age_seconds | 201 SessionOutput | Warden only |
+| POST `/attendance/submit/` | session UUID; latitude, longitude, accuracy_m, sampled_at | 201 AttendanceOutput (Accepted OR Rejected) | Student and assigned session; duplicate accepted result is 409 |
+| GET `/attendance/history/` | page | paginated AttendanceOutput | Own student; staff’s assigned/supervised students |
+| GET `/deviations/` | optional student; page | paginated DeviationOutput | Own student or assigned/supervised scope; student filter cannot expand scope |
+| POST `/deviations/` | student, active rule, nonempty remarks | 201 DeviationOutput | Assigned warden or supervising Chief; server copies rule title/weightage |
+| GET `/deviations/total/` | student required for staff, ignored for students | `{student,active_total}` | Own student or assigned/supervised selected student |
+| POST `/deviations/{uuid}/deactivate/` | nonempty reason | DeviationOutput | Authorized staff; repeated deactivation 409; no deletion |
+| GET `/arin/students/` | page | `{id,name}` choices | Warden/Chief assigned/supervised active students only |
+| GET `/arin/rules/` | page | `{id,title,weightage}` active rule choices | Warden/Chief only |
 
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
+## Output fields (exact definitions: serializers.py)
 
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
+- LeaveOutput: id, student, assigned_warden, start_date, end_date, reason, status, created_at, transitions. Transition: id, actor, from_status, to_status, remarks, occurred_at.
+- SessionOutput: id, title, warden, opens_at, closes_at, radius_m, max_accuracy_m, max_sample_age_seconds. Centre coordinates are not returned, even to staff, in this minimal reference; there is no edit-session UI.
+- AttendanceOutput: id, session, student, result, reason_code, submitted_at. No sample coordinates/accuracy/distance/sample timestamp.
+- DeviationOutput: id, student, rule, rule_title_snapshot, weightage_snapshot, remarks, recorded_by, recorded_at, active, deactivated_by, deactivated_at, deactivation_reason.
 
-OWNER: Arin Singh | REVIEWER: Aryan Singh
-TARGET FILE: docs/04-design/api-contract.md
-DEVELOPMENT-PLAN SPRINT: 1
-ORIGINAL SRS SPRINT: 1
-STORY: US-18
-REQUIREMENTS: All FRs; SEC-01–06
-RESPONSIBILITY: Canonical endpoint contract
-FILE TASK: All FR endpoints/methods, role/owner/assignment scoping, schemas, stable codes, list pagination; plural leaves; no unapproved extra APIs.
+## Input and policy notes
 
-US-18 — Agree models, permissions and API contracts
-Dependencies: US-17
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Reviewed data design covers all profile/information/study/laundry/leave/attendance/complaint/mess/fee/deviation entities.
-- Specify endpoint inputs, outputs, roles, ownership and errors; choose custom user model before initial migrations.
-- Each owner supplies portable migrations; clean SQLite quick-mode and PostgreSQL runs; prove attendance/payment uniqueness on PostgreSQL.
-- All four owners approve shared schema and permission matrix.
+Strict allowlists reject caller-supplied actor/status/snapshot/active/owner fields with 403. Non-object payloads and malformed IDs are 400. Date end must be on/after start. Session end must follow start. Coordinates must be finite, latitude ±90/longitude ±180. Radius and max accuracy are >0 to 100000; session sample-age bound is 1–300 seconds. These are technical limits, not faculty-approved attendance settings. Server checks inclusive opening/closing window, supplied accuracy <= configured threshold, age <= configured maximum (future tolerance 5 seconds), then Haversine distance <= radius. Rejection codes: OUTSIDE_WINDOW, LOW_ACCURACY, STALE_SAMPLE, OUTSIDE_RADIUS. Accepted code: WITHIN_POLICY. Invalid JSON/schema validation does not create a stored attendance attempt; valid but policy-rejected samples create only the derived rejected outcome.
 
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
+## Shared auth contract (Anvi owns production)
 
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-```
+Local harness implements GET `/api/auth/csrf/` → `{csrfToken}`, POST `/login/` → `{id,role}`, POST `/logout/` → `{signed_out:true}`, GET `/me/` → `{id,role}`. The frontend uses these exact paths. Both login/logout are explicitly CSRF-protected. Shared routes must provide equivalent semantics or adapt the client/identity hook in one place. Production login throttling, session policy and profile management are outside this pack. No role is accepted from the sign-in body.
+
+Internal `queries.py` aggregate functions are not public routes. Caller must authorize Director access before invoking them; do not expose personal querysets to Director by copying these helpers blindly.

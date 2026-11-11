@@ -1,71 +1,9 @@
-/*
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: frontend/src/features/deviations/DeviationPanel.jsx
-ACCOUNTABLE OWNER: Arin Singh
-INDEPENDENT REVIEWER: Aryan Singh
-USER STORIES: US-08
-DEVELOPMENT PLAN SPRINT(S): 3 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 4 (preserved baseline mapping)
-REQUIREMENTS: FR-10; BR-07
-FILE PURPOSE: DeviationPanel UI component
-
-WHAT TO IMPLEMENT IN THIS FILE
-Own read-only rule/weight/remarks/actor/time history and active-only total; no client-authoritative calculation. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-
-OWNER: Arin Singh | REVIEWER: Aryan Singh
-TARGET FILE: frontend/src/features/deviations/DeviationPanel.jsx
-DEVELOPMENT-PLAN SPRINT: 3
-ORIGINAL SRS SPRINT: 4
-STORY: US-08
-REQUIREMENTS: FR-10; BR-07
-RESPONSIBILITY: DeviationPanel UI component
-FILE TASK: Own read-only rule/weight/remarks/actor/time history and active-only total; no client-authoritative calculation. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-US-08 — Record deviations and calculate active weightage
-Dependencies: US-01, US-03
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Authorized wardens record student, existing rule, copied rule weightage, remarks, actor and server time; students cannot write.
-- Sum active entries only, excluding deactivated entries.
-- Changing the source rule must not rewrite historical copied weightage.
-- Student read-only history is owner-scoped; staff reads are authorization-scoped.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-*/
-
-/* IMPLEMENTATION AREA: replace this marker with reviewed code. */
+"use client";
+/* Arin Singh | US-08 | Sprint 4. Rule weights and totals always come from the server. */
+import { useEffect, useState } from "react";
+import { deactivateDeviation, getIdentity, getTotal, listDeviations, listRules, listStudents, recordDeviation } from "./api";
+const ui={page:{maxWidth:960,margin:"0 auto",padding:24},card:{border:"1px solid #cbd5e1",borderRadius:12,padding:20,margin:"16px 0",background:"#fff"},field:{display:"grid",gap:6,margin:"12px 0"},input:{minHeight:42,padding:9,border:"1px solid #94a3b8",borderRadius:8,font:"inherit"},button:{minHeight:42,padding:"8px 14px",border:"1px solid #1d4ed8",borderRadius:8,background:"#fff",color:"#1d4ed8"},error:{padding:12,borderLeft:"4px solid #b91c1c",background:"#fef2f2"},notice:{padding:14,background:"#eff6ff",borderRadius:8}};
+function ErrorMessage({error}){return error?<div role="alert" style={ui.error}>{error.message}</div>:null;}function Select({label,value,onChange,children}){return <label style={ui.field}><span>{label}</span><select style={ui.input} required value={value} onChange={event=>onChange(event.target.value)}><option value="">Select…</option>{children}</select></label>}
+export function DeviationForm({student,rules,onSaved}){const[rule,setRule]=useState(""),[remarks,setRemarks]=useState(""),[busy,setBusy]=useState(false),[error,setError]=useState(null);async function submit(event){event.preventDefault();setBusy(true);setError(null);try{await recordDeviation({student,rule,remarks});setRemarks("");onSaved();}catch(failure){setError(failure);}finally{setBusy(false);}}return <form style={ui.card} onSubmit={submit}><h2>Record deviation</h2><Select label="Active rule" value={rule} onChange={setRule}>{rules.map(item=><option key={item.id} value={item.id}>{item.title} · {item.weightage}</option>)}</Select><label style={ui.field}><span>Remarks</span><textarea style={{...ui.input,minHeight:90}} maxLength={2000} required value={remarks} onChange={event=>setRemarks(event.target.value)}/></label><button style={ui.button} disabled={busy||!student||!rule}>{busy?"Saving…":"Record deviation"}</button><ErrorMessage error={error}/></form>}
+function Deactivate({row,onSaved}){const[reason,setReason]=useState(""),[error,setError]=useState(null),[busy,setBusy]=useState(false);async function submit(event){event.preventDefault();setBusy(true);setError(null);try{await deactivateDeviation(row.id,reason);onSaved();}catch(failure){setError(failure);}finally{setBusy(false);}}return <form onSubmit={submit}><label style={ui.field}><span>Deactivation reason</span><textarea style={{...ui.input,minHeight:70}} required maxLength={2000} value={reason} onChange={event=>setReason(event.target.value)}/></label><button style={ui.button} disabled={busy}>{busy?"Saving…":"Deactivate and retain history"}</button><ErrorMessage error={error}/></form>}
+export default function DeviationPanel(){const[identity,setIdentity]=useState({loading:true}),[students,setStudents]=useState([]),[rules,setRules]=useState([]),[student,setStudent]=useState(""),[rows,setRows]=useState([]),[total,setTotal]=useState(null),[error,setError]=useState(null),[revision,setRevision]=useState(0);useEffect(()=>{getIdentity().then(user=>setIdentity({loading:false,user})).catch(error=>setIdentity({loading:false,error}));},[]);const role=identity.user?.role,staff=["WARDEN","CHIEF_WARDEN"].includes(role);useEffect(()=>{if(!staff)return;Promise.all([listStudents(),listRules()]).then(([students,rules])=>{setStudents(students.results);setRules(rules.results);}).catch(setError);},[staff]);useEffect(()=>{if(identity.loading||(staff&&!student))return;Promise.all([listDeviations(student),getTotal(student,staff)]).then(([data,total])=>{setRows(data.results);setTotal(total.active_total);}).catch(setError);},[identity.loading,staff,student,revision]);if(identity.loading)return <main style={ui.page}>Checking session…</main>;if(identity.error)return <main style={ui.page}><ErrorMessage error={identity.error}/></main>;const refresh=()=>setRevision(value=>value+1);return <main style={ui.page}><h1>Deviation records</h1>{staff?<><Select label="Assigned student" value={student} onChange={setStudent}>{students.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</Select>{student?<DeviationForm student={student} rules={rules} onSaved={refresh}/>:null}</>:null}<ErrorMessage error={error}/><p style={ui.notice}>Active weightage total: {total ?? (staff&&!student?"Select a student":"Loading…")}</p>{rows.map(row=><article style={ui.card} key={row.id}><h2>{row.rule_title_snapshot} · {row.weightage_snapshot}</h2><p>{row.active?"Active":"Inactive"} · Student {row.student}</p><p>{row.remarks}</p><p>Recorded by {row.recorded_by} · {new Date(row.recorded_at).toLocaleString()}</p>{row.active&&staff?<Deactivate row={row} onSaved={refresh}/>:null}{!row.active?<p>Deactivated by {row.deactivated_by} · {new Date(row.deactivated_at).toLocaleString()} · {row.deactivation_reason}</p>:null}</article>)}{!rows.length?<p>No deviation records.</p>:null}</main>}
