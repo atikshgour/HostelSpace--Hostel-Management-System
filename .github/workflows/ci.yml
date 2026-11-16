@@ -9,7 +9,9 @@ permissions:
   contents: read
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Keep every Arin-branch browser result so the required gate reports the
+  # actual outcome instead of converting a superseded run into a cancellation.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/arin' }}
 env:
   NEXT_TELEMETRY_DISABLED: "1"
 jobs:
