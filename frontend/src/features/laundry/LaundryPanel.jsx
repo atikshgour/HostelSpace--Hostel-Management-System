@@ -1,87 +1,358 @@
-/*
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: frontend/src/features/laundry/LaundryPanel.jsx
-ACCOUNTABLE OWNER: Aryan Singh
-INDEPENDENT REVIEWER: Atiksh Gour
-USER STORIES: US-10, US-11, US-12
-DEVELOPMENT PLAN SPRINT(S): 2; 3 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 2; 3 (preserved baseline mapping)
-REQUIREMENTS: FR-04; BR-03; FR-04; SEC-03–04; FR-04; BR-04
-FILE PURPOSE: LaundryPanel UI component
-
-WHAT TO IMPLEMENT IN THIS FILE
-Read-only allocated day/Not assigned, current records and full Received/Collected history; historical allocation context preserved. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-
-OWNER: Aryan Singh | REVIEWER: Atiksh Gour
-TARGET FILE: frontend/src/features/laundry/LaundryPanel.jsx
-DEVELOPMENT-PLAN SPRINT: 2; 3
-ORIGINAL SRS SPRINT: 2; 3
-STORY: US-10, US-11, US-12
-REQUIREMENTS: FR-04; BR-03; FR-04; SEC-03–04; FR-04; BR-04
-RESPONSIBILITY: LaundryPanel UI component
-FILE TASK: Read-only allocated day/Not assigned, current records and full Received/Collected history; historical allocation context preserved. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-US-10 — Assign and view allocated laundry day
-Dependencies: US-01, US-18
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Laundry Staff assigns one valid current weekday per student.
-- Student sees read-only allocated day or Not assigned.
-- Students cannot select/reserve/modify a day through UI or API.
-- Future allocation changes preserve historical handover/collection details.
-
-US-11 — Record clothes received by laundry
-Dependencies: US-10
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Laundry Staff records valid student, non-empty item details and positive whole-number count.
-- Create Received state with server time and receiving actor.
-- Reject missing fields, fractional, zero and negative counts.
-- Student reads only personal records; store historical allocation context so changes do not rewrite the past.
-
-US-12 — Record collection and retain laundry history
-Dependencies: US-11
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Only existing Received records can become Collected.
-- Keep original item details, handover time/actor and append collection time/actor.
-- Repeated collection is idempotent: no new record and no overwriting original completion time.
-- Student cannot change status or read another student history.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-*/
-
-/* IMPLEMENTATION AREA: replace this marker with reviewed code. */
+"use client";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import {
+  useResource,
+  useIdentity,
+  ErrorMessage,
+  ResourceForm,
+} from "@/components/ui/AppShell";
+import Card from "@/components/ui/Card";
+import PageHeader from "@/components/ui/PageHeader";
+import Button from "@/components/ui/Button";
+import DataTable from "@/components/ui/DataTable";
+import StatusBadge from "@/components/ui/StatusBadge";
+import Dialog from "@/components/ui/Dialog";
+import { api } from "@/lib/api";
+import { dateTime } from "@/lib/format";
+export default function LaundryPanel() {
+  const user = useIdentity(),
+    staff = user.role === "LAUNDRY_STAFF",
+    student = user.role === "STUDENT",
+    path = usePathname(),
+    scheduleView = (path || "").endsWith("/manage");
+  const { data, error, refresh } = useResource([
+    "/api/laundry/allocations/",
+    "/api/laundry/records/",
+    staff ? "/api/choices/users/" : null,
+    "/api/laundry/policy/",
+  ]);
+  const [failure, setFailure] = useState(null),
+    [busy, setBusy] = useState(null),
+    [open, setOpen] = useState(false),
+    [policyOpen, setPolicyOpen] = useState(false),
+    [query, setQuery] = useState(""),
+    [filter, setFilter] = useState("Active"),
+    [notice, setNotice] = useState("");
+  const plans = data?.[0] || [],
+    records = data?.[1] || [],
+    plan = plans[0];
+  const options = (data?.[2] || []).map((x) => ({
+    value: x.id,
+    label: `${x.name} · ${plans.find((p) => p.student === x.id)?.srn || x.id}`,
+  }));
+  async function transition(row, action) {
+    if (
+      action === "collect" &&
+      !window.confirm(
+        `Confirm ${row.student_name} has collected batch #${row.id}?`,
+      )
+    )
+      return;
+    setBusy(row.id);
+    setFailure(null);
+    try {
+      await api(`/api/laundry/records/${row.id}/${action}/`, {
+        method: "POST",
+        body: {},
+      });
+      setNotice(
+        action === "ready"
+          ? "Batch is ready. The student can see the update."
+          : "Collection confirmed. The receipt remains in history.",
+      );
+      refresh();
+    } catch (e) {
+      setFailure(e);
+    } finally {
+      setBusy(null);
+    }
+  }
+  const visible = records.filter(
+    (x) =>
+      (filter === "All" ||
+        (filter === "Active" && x.status !== "Collected") ||
+        x.status === filter) &&
+      `${x.student_name} ${x.item_details} ${x.id}`
+        .toLowerCase()
+        .includes(query.toLowerCase()),
+  );
+  return (
+    <>
+      <PageHeader
+        title={
+          student
+            ? "My laundry"
+            : scheduleView
+              ? "Laundry group schedule"
+              : "Laundry desk"
+        }
+        description="Automatic weekly groups with return dates set by your laundry team."
+      >
+        {staff && !scheduleView ? (
+          <Button variant="primary" onClick={() => setOpen(true)}>
+            + Receive clothes
+          </Button>
+        ) : null}
+      </PageHeader>
+      <ErrorMessage error={error || failure} />
+      {staff ? (
+        <div className="hs-policy-line">
+          <span>
+            Default return time:{" "}
+            <strong>{data?.[3]?.turnaround_days || 3} days</strong>
+          </span>
+          <Button onClick={() => setPolicyOpen(true)}>
+            Change return time
+          </Button>
+        </div>
+      ) : null}
+      {notice ? (
+        <p role="status" className="hs-success">
+          {notice}
+        </p>
+      ) : null}
+      {!data && !error ? <p role="status">Loading laundry…</p> : null}
+      {student ? (
+        <div className="hs-stats hs-three">
+          <Card>
+            <span className="hs-eyebrow">YOUR GROUP</span>
+            <p className="hs-stat">Group {plan?.group_number || "—"}</p>
+            <p>{plan?.weekday || "Loading…"} drop-off</p>
+          </Card>
+          <Card>
+            <span className="hs-eyebrow">NEXT DROP-OFF</span>
+            <p className="hs-stat hs-date-stat">
+              {plan?.next_dropoff_date || "—"}
+            </p>
+            <p className="hs-muted">
+              Bring your clothes to the laundry counter.
+            </p>
+          </Card>
+          <Card>
+            <span className="hs-eyebrow">SCHEDULED RETURN</span>
+            <p className="hs-stat hs-date-stat">
+              {plan?.next_return_date || "—"}
+            </p>
+            <p className="hs-muted">
+              Actual ready status is confirmed by staff.
+            </p>
+          </Card>
+        </div>
+      ) : (
+        <div className="hs-notice">
+          Groups are calculated from the numeric part of the student number:
+          (number − 1) modulo 7. Group 1 = Monday, through Group 7 = Sunday.
+          Staff may receive an off-day handover; its return date is always
+          receipt date + the return time selected by staff. Existing batches
+          keep their original expected return dates.
+        </div>
+      )}
+      {scheduleView && !student ? (
+        <section className="hs-section">
+          <Card>
+            <h2>Student timetable</h2>
+            <label className="hs-search-label">
+              Search schedule
+              <input
+                type="search"
+                value={query}
+                placeholder="Student name or number"
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+            <DataTable
+              headers={[
+                "Student",
+                "Group",
+                "Drop-off day",
+                "Next drop-off",
+                "Expected return",
+              ]}
+              rows={plans
+                .filter((x) =>
+                  `${x.student_name} ${x.srn}`
+                    .toLowerCase()
+                    .includes(query.toLowerCase()),
+                )
+                .map((x) => [
+                  <span key="student">
+                    <strong>{x.student_name}</strong>
+                    <small className="hs-cell-sub">
+                      {x.srn} · Room {x.room}
+                    </small>
+                  </span>,
+                  `Group ${x.group_number}`,
+                  x.weekday,
+                  x.next_dropoff_date,
+                  x.next_return_date,
+                ])}
+            />
+          </Card>
+        </section>
+      ) : (
+        <section className="hs-section">
+          <div className="hs-toolbar">
+            <label>
+              Search batches
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Student, items or batch number"
+              />
+            </label>
+            <label>
+              Batch status
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+              >
+                {["Active", "Received", "Ready", "Collected", "All"].map(
+                  (x) => (
+                    <option key={x}>{x}</option>
+                  ),
+                )}
+              </select>
+            </label>
+          </div>
+          <Card>
+            <h2>{student ? "Your batches" : "Work queue"}</h2>
+            <DataTable
+              headers={[
+                "Batch / student",
+                "Items",
+                "Expected return",
+                "Status",
+                "Next step",
+              ]}
+              rows={visible.map((x) => [
+                <span key="name">
+                  <strong>
+                    #{x.id} · {x.student_name}
+                  </strong>
+                  <small className="hs-cell-sub">
+                    Received {dateTime(x.received_at)} · Group{" "}
+                    {x.group_number || "—"}
+                  </small>
+                </span>,
+                `${x.item_count} items · ${x.item_details}`,
+                x.expected_return_date || "Not recorded",
+                <StatusBadge key="status">{x.status}</StatusBadge>,
+                x.status === "Collected" ? (
+                  <span key="done">
+                    Collected
+                    <small className="hs-cell-sub">
+                      {dateTime(x.collected_at)}
+                    </small>
+                  </span>
+                ) : staff ? (
+                  <Button
+                    key="action"
+                    variant={x.status === "Ready" ? "primary" : "default"}
+                    disabled={busy === x.id}
+                    onClick={() =>
+                      transition(
+                        x,
+                        x.status === "Received" ? "ready" : "collect",
+                      )
+                    }
+                  >
+                    {busy === x.id
+                      ? "Saving…"
+                      : x.status === "Received"
+                        ? "Mark ready"
+                        : "Confirm collection"}
+                  </Button>
+                ) : x.status === "Ready" ? (
+                  "Ready at the laundry counter"
+                ) : (
+                  "Washing in progress"
+                ),
+              ])}
+            />
+            {data && !visible.length ? (
+              <p className="hs-empty">No batches match this view.</p>
+            ) : null}
+          </Card>
+        </section>
+      )}
+      {policyOpen ? (
+        <Dialog
+          title="Default laundry return time"
+          onClose={() => setPolicyOpen(false)}
+        >
+          <p className="hs-muted">
+            Applies to future schedules and handovers only. Existing batch dates
+            do not change.
+          </p>
+          <ResourceForm
+            title="Turnaround"
+            fields={[
+              {
+                name: "turnaround_days",
+                label: "Return after (days)",
+                type: "number",
+                min: 1,
+                max: 14,
+                step: 1,
+              },
+            ]}
+            initial={{ turnaround_days: data?.[3]?.turnaround_days || 3 }}
+            onSave={async (body) => {
+              await api("/api/laundry/policy/", { method: "PUT", body });
+              setPolicyOpen(false);
+              setNotice("Default return time updated for future batches.");
+              refresh();
+            }}
+          />
+        </Dialog>
+      ) : null}
+      {open ? (
+        <Dialog title="Receive clothes" onClose={() => setOpen(false)}>
+          <p className="hs-muted">
+            Choose the return time for this batch. The group and expected return
+            date are calculated automatically.
+          </p>
+          <ResourceForm
+            title="Handover details"
+            initial={{ turnaround_days: data?.[3]?.turnaround_days || 3 }}
+            fields={[
+              { name: "student", label: "Student", options },
+              {
+                name: "item_details",
+                label: "Item details",
+                type: "textarea",
+                maxLength: 1000,
+              },
+              {
+                name: "item_count",
+                label: "Number of items",
+                type: "number",
+                min: 1,
+                step: 1,
+              },
+              {
+                name: "turnaround_days",
+                label: "Return after (days)",
+                type: "number",
+                min: 1,
+                max: 14,
+                step: 1,
+              },
+            ]}
+            button="Record handover"
+            onSave={async (body) => {
+              await api("/api/laundry/records/", { method: "POST", body });
+              setOpen(false);
+              setNotice(
+                "Handover recorded with the selected return time. Check the expected return date in the work queue.",
+              );
+              refresh();
+            }}
+          />
+        </Dialog>
+      ) : null}
+    </>
+  );
+}
