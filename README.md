@@ -1,48 +1,85 @@
-# HostelSpace
+# HostelSpace — Hostel Management System
 
-HostelSpace is a browser-based hostel management system for Team 11, PES University. It uses a Next.js/JavaScript frontend, Django REST Framework backend, Django sessions and CSRF, and PostgreSQL in the normal containerized environment.
+HostelSpace is a browser-based hostel management system developed by Team 11 for PES University, Bangalore, Department of Computer Science and Engineering, course UE24CS341A Software Engineering. The project follows an Agile workflow and is version 1.0 in the supplied project documents.
 
-## Current state
+The normal stack is a Next.js/JavaScript frontend, Django REST Framework backend, Django sessions with CSRF protection, and PostgreSQL.
 
-The application is implemented on `main`. The latest verified local commit includes the integrated feature modules, priority acceptance tests, idempotent payment/deviation replay handling, and frontend/backend coverage evidence.
+## Team and responsibilities
 
-Normal architecture:
+| Member | Main responsibility |
+|---|---|
+| Anvi Srinivas | Authentication, profile, information/content, and Director workflows |
+| Arin Singh | Leave, Warden decisions, location-verified attendance, and deviation records |
+| Aryan Singh | Study-room and laundry workflows |
+| Atiksh Gour | Complaints, mess, fees/payments, CI and integration foundation |
+
+The whole team shares integration, authorization review, validation, documentation, and demonstration responsibilities.
+
+## Implemented modules
+
+- Session login/logout, CSRF bootstrap, active-role authorization, and student profile updates.
+- Notices, contacts, hostel rules, and study-room status.
+- Laundry assignment, handover, ready/collection states, staff queues, and retained history.
+- Leave submission, Warden decisions, Chief Warden escalation, and transition history.
+- One-time location-verified attendance with time, radius, accuracy, stale-sample, and duplicate checks. Raw coordinates are not retained.
+- Deviation records, server-side rule snapshots, active totals, deactivation, and duplicate replay protection.
+- Student complaints, Director assignment, Maintenance progress, ownership checks, and status history.
+- Mess options, capacity checks, student choices, coupons, and staff management.
+- Fee dues and payment attempts with local simulation and Razorpay test-mode integration points.
+- Director user/settings/report workflows and server-side role/ownership/assignment scoping.
+- Health endpoints, Docker Compose, GitHub Actions CI, Jest/RTL, pytest/API, and Playwright tests.
+
+## Architecture
 
 ```text
-Browser -> Next.js -> Django/DRF -> PostgreSQL
-                         |-> payment provider in Razorpay TEST mode
-                         |-> browser location sample for one-time attendance
+Browser -> Next.js frontend -> Django REST Framework -> PostgreSQL
+                                  |-- session + CSRF
+                                  |-- payment adapter (simulation/test mode)
+                                  `-- one-time browser location validation
 ```
 
-Local payment simulation is available only in Django debug/local mode. No live payments or production data are supported.
+The frontend never connects directly to the database. Django authorization is authoritative.
 
-## Implemented features
+## Repository layout
 
-- Session login/logout, CSRF protection, active-role authorization, and student profile phone updates.
-- Notices, information, contacts, hostel rules, and study-room status.
-- Automatic laundry-day assignment, handover, ready state, collection, and retained history.
-- Leave submission, assigned Warden decisions, Chief Warden escalation, and transition history.
-- One-time location-verified attendance with time, radius, accuracy, stale-sample, and duplicate checks; raw coordinates are not retained.
-- Deviation records, server-side rule snapshots, active totals, deactivation, and duplicate replay prevention.
-- Student-owned complaints, Director assignment, Maintenance progress, and retained status history.
-- Mess options, capacity checks, student choices, coupons, and staff management.
-- Fee dues, retained payment attempts, local simulation, Razorpay TEST verification, and duplicate pending-payment prevention.
-- Director user/settings/report workflows and server-side role/ownership scoping.
-- Health endpoints, Docker Compose configuration, GitHub Actions CI, Jest/RTL tests, pytest/API tests, and Playwright browser tests.
+- `frontend/` — Next.js UI, feature modules, Jest/RTL tests, and Playwright specs.
+- `backend/` — Django project, REST endpoints, domain apps, migrations, and pytest tests.
+- `backend/apps/accounts/` — authentication and roles.
+- `backend/apps/director_dashboard/` — Director overview, reports, users, and settings.
+- `backend/apps/facilities/` — laundry and study-room operations.
+- `backend/apps/information/` — notices, contacts, rules, and publication.
+- `backend/apps/leave_attendance/` — leave, attendance, location validation, and deviations.
+- `backend/apps/student_services/` — complaints, mess, fees, and payments.
+- `tests/` — system-test wrapper; actual Playwright specs are in `frontend/e2e/`.
+- `docs/` — architecture, design, validation, testing, and maintenance notes.
+- `deliverables/` — project PDFs; `demo_video/` — demonstration video.
+- `evidence/` — sanitized validation notes, not a runtime dependency.
+- `test_results/` — recorded coverage/report snapshots.
+- `STARTER_QA.json`, `STORIES.json` — retained QA and story registers.
 
-## Quick start with Docker
+## Requirements
 
-Create a local `.env` from `.env.example` and set private values for `POSTGRES_PASSWORD` and `DJANGO_SECRET_KEY`.
+Docker Desktop with Compose v2 is recommended. Node.js 22, npm, and Python 3.12 are required for local development. PostgreSQL is required for the normal stack and concurrency checks. SQLite is supported only as an explicit quick mode.
+
+## Docker setup
 
 ```powershell
+Copy-Item .env.example .env
+notepad .env
 docker compose up -d --build
 ```
 
-Open [http://localhost:3000/login](http://localhost:3000/login). API health is available at [http://localhost:8000/api/health/](http://localhost:8000/api/health/).
+Set private `POSTGRES_PASSWORD` and `DJANGO_SECRET_KEY` in `.env`. Open `http://localhost:3000/login`; API health is at `http://localhost:8000/api/health/`.
+
+Stop the stack with:
+
+```powershell
+docker compose down
+```
+
+The API container applies migrations on startup. Local synthetic demo accounts and presentation commands are in the ignored `accounts.md` file.
 
 ## Windows quick mode without Docker
-
-SQLite is supported only as an explicit local quick mode and does not replace PostgreSQL concurrency checks.
 
 ```powershell
 py -3.12 -m venv .venv
@@ -54,20 +91,21 @@ $env:DJANGO_SECRET_KEY='local-only-development-key'
 ..\.venv\Scripts\python.exe backend\manage.py seed_demo
 ```
 
-Start the services in separate terminals:
+Run these in separate terminals:
 
 ```powershell
 ..\.venv\Scripts\python.exe backend\manage.py runserver 127.0.0.1:8000
+```
+
+```powershell
 cd frontend
 npm ci
 npm run dev
 ```
 
-Local synthetic demo usernames and the private demo password are recorded in the ignored `accounts.md` file. Never use those credentials outside the local demo.
+Then open `http://localhost:3000/login`.
 
 ## Tests
-
-Backend quick-mode checks:
 
 ```powershell
 Push-Location backend
@@ -76,8 +114,6 @@ Push-Location backend
 ..\.venv\Scripts\python.exe -m pytest -q
 Pop-Location
 ```
-
-Frontend checks:
 
 ```powershell
 Push-Location frontend
@@ -88,23 +124,18 @@ npm run build
 Pop-Location
 ```
 
-The latest local quick-mode run passed 138 backend tests with 8 PostgreSQL-only skips. Frontend lint, 21 Jest tests, and the production build passed. Full PostgreSQL, Docker Compose, and Chromium/Firefox/Edge browser checks should be run when Docker Desktop is available.
+Playwright requires running services and a private seeded-account password:
 
-## CI workflow
+```powershell
+cd frontend
+$env:HOSTELSPACE_DEMO_PASSWORD='your-local-demo-password'
+npm run test:e2e -- --project=chromium
+```
 
-`.github/workflows/ci.yml` runs frontend lint/tests/build, backend Ruff/Django/migration/pytest checks against PostgreSQL, Bandit/pip-audit/npm audit, Compose health smoke, Playwright workflows for Chromium/Firefox/Edge, and a required aggregate job that rejects failed, skipped, or cancelled checks.
+The workflow `.github/workflows/ci.yml` runs frontend checks, PostgreSQL backend tests, security scans, Compose smoke checks, Playwright in Chromium/Firefox/Edge, and the aggregate `CI required` gate. The current Firefox job has a known shared login-redirect failure; therefore CI must not be described as fully passing until that is resolved.
 
-## Repository layout
+## Evidence and safety
 
-- `backend/` - Django project, domain apps, migrations, and backend tests.
-- `frontend/` - Next.js application, shared UI, feature modules, and component tests.
-- `tests/` - Playwright/system test package.
-- `docs/03-architecture/`, `docs/04-design/`, `docs/05-validation/`, `docs/06-testing/`, `docs/07-maintenance/` - current technical and validation documentation.
-- `evidence/` and `test_results/` - sanitized test evidence and coverage reports.
-- `deliverables/` - project PDFs.
-- `demo_video/` - demonstration video.
-- `STARTER_QA.json` and `STORIES.json` - retained project QA/story registers.
+`evidence/` is useful for faculty/demo traceability but is not needed to start the application. `test_results/` is also non-runtime report data. Recorded evidence must not be confused with a fresh run on every commit.
 
-## Safety boundaries
-
-Use synthetic records only. Do not commit `.env` files, passwords, session cookies, raw location samples, payment credentials, local databases, or generated dependencies. Do not run production migrations, deploy, or use live payments from this repository.
+Use synthetic records only. Never commit `.env` files, passwords, session cookies, raw location samples, payment credentials, local databases, or generated dependencies. Do not run production migrations, deploy, or use live payments from this repository.
