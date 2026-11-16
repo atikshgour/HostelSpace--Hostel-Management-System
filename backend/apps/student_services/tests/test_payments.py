@@ -1,86 +1,150 @@
-# Owner: Atiksh Gour | US-16 | Sprint 5 | Reviewer: Anvi Srinivas
-from decimal import Decimal
+# Owner: Atiksh Gour | US-16,US-24 | Dev sprint 3; 5–6 | SRS sprint 5; 6 | Reviewer: Anvi Srinivas (pending)
+import hashlib
+import hmac
 from unittest.mock import patch
 
-import pytest
-from django.conf import settings
-from django.db import IntegrityError, transaction
-from rest_framework.test import APIClient
+from django.test import override_settings
+from django.utils import timezone
 
-from apps.accounts.models import User
+from apps.accounts.tests.test_services import DomainCase
 from apps.student_services.models import FeeDue, PaymentAttempt
 
-pytestmark = pytest.mark.django_db
 
+@override_settings(DEBUG=True, PAYMENT_MODE="simulation", ALLOW_PAYMENT_SIMULATION=True)
+class PaymentTests(DomainCase):
+    def setUp(self):
+        super().setUp()
+        self.fee = FeeDue.objects.create(
+            student=self.student,
+            title="Test fee",
+            amount="100.00",
+            currency="INR",
+            due_date=timezone.localdate(),
+        )
 
-@pytest.fixture
-def setup():
-    student = User.objects.create_user(username='synthetic-fee-student', role=User.Role.STUDENT)
-    other = User.objects.create_user(username='synthetic-fee-other', role=User.Role.STUDENT)
-    fee = FeeDue.objects.create(student=student, description='Synthetic hostel fee', amount=Decimal('125.50'))
-    client = APIClient(enforce_csrf_checks=True)
-    client.force_login(student)
-    assert client.get('/api/fees/').status_code == 200
-    client.credentials(HTTP_X_CSRFTOKEN=client.cookies[settings.CSRF_COOKIE_NAME].value)
-    return student, other, fee, client
+    def start(self):
+        return self.post("/api/payments/initiate/", {"fee": self.fee.pk})
 
+    def test_simulation_explicit_label_and_server_amount(self):
+        r = self.start()
+        self.assertEqual(r.status_code, 201)
+        self.assertIn("SIMULATION", r.json()["simulation_label"])
+        self.assertEqual(r.json()["amount"], "100.00")
 
-def test_owned_fee_and_verified_capture(setup):
-    student, other, fee, client = setup
-    FeeDue.objects.create(student=other, description='Other fee', amount=Decimal('5.00'))
-    assert len(client.get('/api/fees/').data['results']) == 1
-    with patch('apps.student_services.fee_services.create_order', return_value='order_test123'), \
-         patch('apps.student_services.fee_views.credentials', return_value=('rzp_test_example', 'secret')):
-        response = client.post(f'/api/fees/{fee.pk}/initiate/', {}, format='json')
-    assert response.status_code == 201
-    attempt_id = response.data['attempt_id']
-    fee.refresh_from_db()
-    assert fee.status == FeeDue.Status.PENDING
-    with patch('apps.student_services.fee_services.valid_checkout_signature', return_value=True), \
-         patch('apps.student_services.fee_services.fetch_payment', return_value={
-             'id': 'pay_test123', 'order_id': 'order_test123', 'amount': 12550,
-             'currency': 'INR', 'status': 'captured',
-         }):
-        response = client.post(f'/api/payment-attempts/{attempt_id}/verify/',
-                               {'payment_id': 'pay_test123', 'signature': 'signature'}, format='json')
-    assert response.status_code == 200
-    assert response.data['status'] == PaymentAttempt.Status.SUCCEEDED
-    fee.refresh_from_db()
-    assert fee.status == FeeDue.Status.PAID
-    assert client.post(f'/api/fees/{fee.pk}/initiate/', {}, format='json').status_code == 400
-    assert PaymentAttempt.objects.get(pk=attempt_id).provider_reference == 'pay_test123'
-    retry = client.post(f'/api/payment-attempts/{attempt_id}/verify/',
-                        {'payment_id': 'pay_test123', 'signature': 'signature'}, format='json')
-    assert retry.status_code == 200
-    assert retry.data['status'] == PaymentAttempt.Status.SUCCEEDED
-    assert PaymentAttempt.objects.filter(fee=fee).count() == 1
+    def test_caller_cannot_supply_amount(self):
+        self.assertEqual(
+            self.post(
+                "/api/payments/initiate/", {"fee": self.fee.pk, "amount": "1.00"}
+            ).status_code,
+            403,
+        )
 
+    def test_cannot_pay_others_fee(self):
+        self.as_user(self.stranger)
+        self.assertEqual(self.start().status_code, 404)
 
-def test_mismatch_stays_pending_and_cancelled_stays_unpaid(setup):
-    _, _, fee, client = setup
-    with patch('apps.student_services.fee_services.create_order', return_value='order_test456'), \
-         patch('apps.student_services.fee_views.credentials', return_value=('rzp_test_example', 'secret')):
-        attempt_id = client.post(f'/api/fees/{fee.pk}/initiate/', {}, format='json').data['attempt_id']
-    with patch('apps.student_services.fee_services.valid_checkout_signature', return_value=True), \
-         patch('apps.student_services.fee_services.fetch_payment', return_value={
-             'id': 'pay_test456', 'order_id': 'order_test456', 'amount': 1,
-             'currency': 'INR', 'status': 'captured',
-         }):
-        assert client.post(f'/api/payment-attempts/{attempt_id}/verify/',
-                           {'payment_id': 'pay_test456', 'signature': 'signature'}, format='json').status_code == 400
-    fee.refresh_from_db()
-    assert fee.status == FeeDue.Status.PENDING
-    with patch('apps.student_services.fee_services.fetch_order_payments', return_value=[]):
-        assert client.post(f'/api/payment-attempts/{attempt_id}/verify/',
-                           {'cancelled': True}, format='json').data['status'] == PaymentAttempt.Status.CANCELLED
-    fee.refresh_from_db()
-    assert fee.status == FeeDue.Status.UNPAID
+    @override_settings(ALLOW_PAYMENT_SIMULATION=False)
+    def test_simulation_disabled_without_opt_in(self):
+        self.assertEqual(self.start().status_code, 403)
 
+    @override_settings(DEBUG=False)
+    def test_simulation_not_allowed_outside_local(self):
+        self.assertEqual(self.start().status_code, 403)
 
-def test_unique_provider_reference(setup):
-    _, _, fee, _ = setup
-    PaymentAttempt.objects.create(fee=fee, provider_order_id='order_one',
-                                  provider_reference='pay_once', amount=fee.amount, currency='INR')
-    with pytest.raises(IntegrityError), transaction.atomic():
-        PaymentAttempt.objects.create(fee=fee, provider_order_id='order_two',
-                                      provider_reference='pay_once', amount=fee.amount, currency='INR')
+    def test_failure_and_cancellation_keep_fee_unpaid(self):
+        for outcome in ["Failed", "Cancelled"]:
+            a = self.start().json()
+            r = self.post(
+                "/api/payments/simulate/", {"attempt": a["id"], "outcome": outcome}
+            )
+            self.assertEqual(r.status_code, 200)
+            self.fee.refresh_from_db()
+            self.assertEqual(self.fee.status, "Unpaid")
+        self.assertEqual(PaymentAttempt.objects.count(), 2)
+
+    def test_success_is_idempotent_and_marks_paid(self):
+        a = self.start().json()
+        body = {"attempt": a["id"], "outcome": "Success"}
+        for _ in range(2):
+            self.assertEqual(
+                self.post("/api/payments/simulate/", body).status_code, 200
+            )
+        self.fee.refresh_from_db()
+        self.assertEqual(self.fee.status, "Paid")
+        self.assertEqual(PaymentAttempt.objects.count(), 1)
+        self.assertEqual(self.start().status_code, 400)
+
+    def test_failed_attempt_cannot_silently_become_success(self):
+        a = self.start().json()
+        self.post("/api/payments/simulate/", {"attempt": a["id"], "outcome": "Failed"})
+        self.assertEqual(
+            self.post(
+                "/api/payments/simulate/", {"attempt": a["id"], "outcome": "Success"}
+            ).status_code,
+            400,
+        )
+
+    def test_unverified_attempt_stays_pending(self):
+        a = self.start().json()
+        self.fee.refresh_from_db()
+        self.assertEqual(self.fee.status, "Unpaid")
+        self.assertEqual(PaymentAttempt.objects.get(pk=a["id"]).status, "Pending")
+
+    @override_settings(
+        PAYMENT_MODE="razorpay",
+        RAZORPAY_KEY_ID="rzp_test_unit",
+        RAZORPAY_KEY_SECRET="unit-only-secret",
+    )
+    @patch("apps.student_services.payments.provider_request")
+    def test_provider_success_requires_valid_signature_and_capture(self, provider):
+        provider.return_value = {"id": "order_test", "amount": 10000, "currency": "INR"}
+        a = self.start().json()
+        body = {"attempt": a["id"], "payment_id": "pay_test", "signature": "bad"}
+        self.assertEqual(self.post("/api/payments/verify/", body).status_code, 400)
+        body["signature"] = hmac.new(
+            b"unit-only-secret", b"order_test|pay_test", hashlib.sha256
+        ).hexdigest()
+        provider.return_value = {
+            "status": "captured",
+            "amount": 10000,
+            "currency": "INR",
+            "order_id": "order_test",
+        }
+        self.assertEqual(self.post("/api/payments/verify/", body).status_code, 200)
+        self.fee.refresh_from_db()
+        self.assertEqual(self.fee.status, "Paid")
+
+    @override_settings(
+        PAYMENT_MODE="razorpay",
+        RAZORPAY_KEY_ID="rzp_test_unit",
+        RAZORPAY_KEY_SECRET="unit-only-secret",
+    )
+    @patch("apps.student_services.payments.provider_request")
+    def test_provider_mismatched_amount_cannot_mark_paid(self, provider):
+        provider.return_value = {"id": "order_test", "amount": 10000, "currency": "INR"}
+        a = self.start().json()
+        signature = hmac.new(
+            b"unit-only-secret", b"order_test|pay_test", hashlib.sha256
+        ).hexdigest()
+        provider.return_value = {
+            "status": "captured",
+            "amount": 1,
+            "currency": "INR",
+            "order_id": "order_test",
+        }
+        self.assertEqual(
+            self.post(
+                "/api/payments/verify/",
+                {"attempt": a["id"], "payment_id": "pay_test", "signature": signature},
+            ).status_code,
+            400,
+        )
+        self.fee.refresh_from_db()
+        self.assertEqual(self.fee.status, "Unpaid")
+
+    def test_payment_history_is_owner_scoped(self):
+        self.start()
+        self.as_user(self.stranger)
+        self.assertEqual(
+            self.client.get("/api/payments/attempts/").json()["results"], []
+        )

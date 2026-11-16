@@ -1,13 +1,15 @@
-# US-16 fee and test payment contract
+# FR-09 / US-16 fee contract
+Owner: Atiksh Gour; reviewer: Anvi Srinivas (pending).
 
-Owner: Atiksh Gour. Reviewer: Anvi Srinivas (pending).
-
-All endpoints require an active student session. Mutations require CSRF. All reads are owner scoped and uncached. Errors use `{code,message,fields}`.
-
-- `GET /api/fees/` returns `{results:[{id,description,amount,currency,status,paid_at,attempts:[{id,status,created_at,resolved_at}]}]}`.
-- `POST /api/fees/{id}/initiate/` creates a Razorpay **test** order using the server fee amount and returns `{attempt_id,order_id,key_id,amount,currency}`. It rejects paid fees and dues with an unresolved attempt. The public test key is the only provider credential returned.
-- `POST /api/payment-attempts/{id}/verify/` accepts `{payment_id,signature}` from test checkout, `{cancelled:true}` on checkout dismissal, or `{}` to refresh the result from the provider. Only the provider's captured payment matching the stored order, amount, currency and current fee marks Paid. A failed provider payment or an empty dismissed order leaves Unpaid. Other results stay Pending. Repeated resolved calls return the stored attempt.
-
-The application does not create fee dues through a student endpoint. An authorized administrative data flow must supply them. Set `RAZORPAY_TEST_KEY_ID` and `RAZORPAY_TEST_KEY_SECRET` in the server environment to enable checkout. The key ID must begin `rzp_test_`; no live key is accepted. Never enter real payment credentials or use live funds.
-
-The `FeeDue` and `PaymentAttempt` models are separate. Provider order ID and payment reference have database uniqueness constraints. A transaction locks both records during verification. Attempt outcomes and timestamps remain available to the student.
+Session/CSRF and no-store apply throughout. `GET /api/fees/` is student-owned;
+Director may administer dues with `POST /api/fees/`. Students cannot supply identity,
+amount or status at checkout. `POST /api/payments/initiate/` accepts `{fee}`;
+`POST /api/payments/verify/` accepts `{attempt,payment_id,signature}`.
+`GET /api/payments/attempts/` returns retained owner-scoped attempts.
+Razorpay TEST credentials use `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`.
+Payment mode defaults disabled. Local-only opt-in simulation uses
+`POST /api/payments/simulate/` and is not sandbox verification evidence.
+Server verification checks signature, captured state, order, amount and currency.
+One successful attempt per fee is enforced in PostgreSQL; retries are idempotent.
+Failed/cancelled attempts retain history and leave the fee unpaid. No credentials
+are collected. See the PDF mapping and actual execution evidence.

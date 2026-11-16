@@ -1,3 +1,4 @@
+/* Owner: Atiksh Gour | US-16 | Dev sprint 3 | SRS sprint 5 | Reviewer: Anvi Srinivas (pending) */
 "use client";
 import { useState } from "react";
 import { api } from "@/lib/api";
@@ -25,7 +26,7 @@ async function loadCheckout() {
 }
 export default function FeesPanel() {
   const user = useIdentity(),
-    director = ["DIRECTOR", "WARDEN"].includes(user.role);
+    director = user.role === "DIRECTOR";
   const { data, error, refresh } = useResource([
     "/api/fees/",
     "/api/payments/attempts/",

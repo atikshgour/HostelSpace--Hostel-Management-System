@@ -5,3 +5,7 @@ __pycache__
 .pytest_cache
 .ruff_cache
 tests
+
+.local-secret
+*.sqlite3
+.local

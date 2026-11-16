@@ -28,25 +28,44 @@ from .views import ComplaintPagination, StudentAPIView
 class IsMessStaff(BasePermission):
     def has_permission(self, request, view):
         user = request.user
-        return bool(user.is_authenticated and user.is_active and user.role == User.Role.MESS)
+        return bool(
+            user.is_authenticated and user.is_active and user.role == User.Role.MESS
+        )
 
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class StudentMess(StudentAPIView):
     def get(self, request):
-        today = timezone.localdate(timezone=ZoneInfo('Asia/Kolkata'))
+        today = timezone.localdate(timezone=ZoneInfo("Asia/Kolkata"))
         allocation = MessAllocation.objects.filter(
-            student=request.user, is_active=True, valid_from__lte=today, valid_until__gte=today,
+            student=request.user,
+            is_active=True,
+            valid_from__lte=today,
+            valid_until__gte=today,
         ).first()
-        coupons = Coupon.objects.filter(
-            allocation=allocation, is_active=True, valid_from__lte=today, valid_until__gte=today,
-        ) if allocation else Coupon.objects.none()
-        return Response({'as_of': today.isoformat(), 'timezone': 'Asia/Kolkata',
-                         'allocation': AllocationSerializer(allocation).data if allocation else None,
-                         'coupons': CouponSerializer(coupons, many=True).data})
+        coupons = (
+            Coupon.objects.filter(
+                allocation=allocation,
+                is_active=True,
+                valid_from__lte=today,
+                valid_until__gte=today,
+            )
+            if allocation
+            else Coupon.objects.none()
+        )
+        return Response(
+            {
+                "as_of": today.isoformat(),
+                "timezone": "Asia/Kolkata",
+                "allocation": AllocationSerializer(allocation).data
+                if allocation
+                else None,
+                "coupons": CouponSerializer(coupons, many=True).data,
+            }
+        )
 
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class MessStaffAPIView(StudentAPIView):
     permission_classes = [IsAuthenticated, IsMessStaff]
     pagination_class = ComplaintPagination
@@ -54,7 +73,9 @@ class MessStaffAPIView(StudentAPIView):
 
 class MessStudentList(MessStaffAPIView, generics.ListAPIView):
     serializer_class = MessStudentSerializer
-    queryset = User.objects.filter(is_active=True, role=User.Role.STUDENT).order_by('username', 'pk')
+    queryset = User.objects.filter(is_active=True, role=User.Role.STUDENT).order_by(
+        "username", "pk"
+    )
 
 
 class AllocationList(MessStaffAPIView, generics.ListAPIView):
@@ -63,7 +84,9 @@ class AllocationList(MessStaffAPIView, generics.ListAPIView):
 
     def post(self, request):
         record = create_allocation(actor=request.user, data=request.data)
-        return Response(self.get_serializer(record).data, status=status.HTTP_201_CREATED)
+        return Response(
+            self.get_serializer(record).data, status=status.HTTP_201_CREATED
+        )
 
 
 class AllocationDetail(MessStaffAPIView, generics.RetrieveAPIView):
@@ -81,7 +104,9 @@ class CouponList(MessStaffAPIView, generics.ListAPIView):
 
     def post(self, request):
         record = create_coupon(actor=request.user, data=request.data)
-        return Response(self.get_serializer(record).data, status=status.HTTP_201_CREATED)
+        return Response(
+            self.get_serializer(record).data, status=status.HTTP_201_CREATED
+        )
 
 
 class CouponDetail(MessStaffAPIView, generics.RetrieveAPIView):

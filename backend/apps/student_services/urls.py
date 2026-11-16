@@ -1,40 +1,23 @@
-# Owner: Atiksh Gour | US-13/14 | Sprint 4 | Reviewer: Anvi Srinivas
+# Owner: Atiksh Gour | US-13,US-14,US-15,US-16 | Dev sprint 2; 3 | SRS sprint 4; 5 | Reviewer: Anvi Srinivas (pending)
 from django.urls import path
 
-from .fee_views import FeeInitiate, FeeList, FeeVerify
-from .mess_views import (
-    AllocationDetail,
-    AllocationList,
-    CouponDetail,
-    CouponList,
-    MessStudentList,
-    StudentMess,
-)
-from .views import (
-    ComplaintAssignment,
-    ComplaintCategoryList,
-    ComplaintDetail,
-    ComplaintListCreate,
-    ComplaintProgress,
-    ComplaintStaffList,
-    MaintenanceStaffList,
-)
+from . import views as v
 
 urlpatterns = [
-    path('fees/', FeeList.as_view(), name='fee-list'),
-    path('fees/<int:pk>/initiate/', FeeInitiate.as_view(), name='fee-initiate'),
-    path('payment-attempts/<int:pk>/verify/', FeeVerify.as_view(), name='payment-verify'),
-    path('mess/', StudentMess.as_view(), name='student-mess'),
-    path('mess/students/', MessStudentList.as_view(), name='mess-students'),
-    path('mess/allocations/', AllocationList.as_view(), name='mess-allocations'),
-    path('mess/allocations/<int:pk>/', AllocationDetail.as_view(), name='mess-allocation-detail'),
-    path('mess/coupons/', CouponList.as_view(), name='mess-coupons'),
-    path('mess/coupons/<int:pk>/', CouponDetail.as_view(), name='mess-coupon-detail'),
-    path('complaint-categories/', ComplaintCategoryList.as_view(), name='complaint-categories'),
-    path('complaints/', ComplaintListCreate.as_view(), name='complaint-list'),
-    path('complaints/manage/', ComplaintStaffList.as_view(), name='complaint-manage'),
-    path('maintenance-staff/', MaintenanceStaffList.as_view(), name='maintenance-staff'),
-    path('complaints/<int:pk>/assign/', ComplaintAssignment.as_view(), name='complaint-assign'),
-    path('complaints/<int:pk>/progress/', ComplaintProgress.as_view(), name='complaint-progress'),
-    path('complaints/<int:pk>/', ComplaintDetail.as_view(), name='complaint-detail'),
+    path("mess/options/", v.MessOptions.as_view()),
+    path("mess/options/<int:pk>/", v.MessOptionDetail.as_view()),
+    path("mess/select/", v.MessSelect.as_view()),
+    path("mess/history/", v.MessHistory.as_view()),
+    path("complaints/", v.Complaints.as_view()),
+    path("complaints/<int:pk>/", v.ComplaintDetail.as_view()),
+    path("complaints/<int:pk>/assign/", v.ComplaintAssign.as_view()),
+    path("complaints/<int:pk>/progress/", v.ComplaintProgress.as_view()),
+    path("mess/", v.Mess.as_view()),
+    path("mess/coupons/", v.Coupons.as_view()),
+    path("mess/coupons/<int:pk>/", v.CouponDetail.as_view()),
+    path("fees/", v.Fees.as_view()),
+    path("payments/attempts/", v.Attempts.as_view()),
+    path("payments/initiate/", v.Initiate.as_view()),
+    path("payments/verify/", v.Verify.as_view()),
+    path("payments/simulate/", v.Simulate.as_view()),
 ]

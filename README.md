@@ -1,5 +1,17 @@
 # HostelSpace
 
+> Atiksh integration (2026-11-16, review pending): the supplied project folder's
+> complaints/mess/fees implementation and required shared auth/UI dependencies
+> are integrated on the Atiksh branch. Permissions follow the supplied SRS/SAD/STP:
+> Director complaint assignment, Mess Staff updates, student-owned reads.
+> Other owners' feature modules remain their responsibility. See
+> [current setup/merge boundaries](docs/07-maintenance/ci-setup.md),
+> [PDF case mapping](docs/05-validation/atiksh-stp-mapping.md), and
+> [actual execution evidence](evidence/atiksh-integration-2026-11-16.md).
+> Use a fresh disposable local database; this replaces the earlier migration
+> baseline and does not upgrade existing data. Earlier dated notes below describe
+> earlier implementations and are retained as history.
+
 > US-16 implementation (Atiksh, 2026-10-31): student fee listing and Razorpay
 > test-mode order/verification are wired at `/fees`, with server-side matching
 > and retained attempt results. See [fee API contract](backend/apps/student_services/FEES_API.md)

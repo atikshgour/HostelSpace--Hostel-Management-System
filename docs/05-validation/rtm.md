@@ -108,3 +108,13 @@ Commands and observed results: Not Run
 Unresolved decisions / limitations: Record before implementation
 PR / reviewer / evidence: Not available
 ```
+
+
+## Atiksh implementation evidence ? 2026-11-16 (review pending)
+
+FR-07 / US-13?14 / TC-FR07-01; FR-08 / US-15 / TC-FR08-01;
+FR-09 / US-16 / TC-FR09-01: local PostgreSQL/API/component and Chromium
+execution is recorded in [actual evidence](../../evidence/atiksh-integration-2026-11-16.md).
+[Exact PDF mappings and remaining cases](atiksh-stp-mapping.md) preserve all original
+requirement IDs. US-20 / TC-CICD-01 is partial until hosted CI, branch protection
+and same-SHA staging are verified. No release/faculty acceptance is claimed.

@@ -1,176 +1,187 @@
-# Owner: Atiksh Gour | US-13/14 | Sprint 4 (development plan: 2) | Reviewer: Anvi Srinivas
+# Owner: Atiksh Gour | US-13,US-14,US-15,US-16 | Dev sprint 2; 3 | SRS sprint 4; 5 | Reviewer: Anvi Srinivas (pending)
+import uuid
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import F, Q
+
+U = settings.AUTH_USER_MODEL
 
 
-class ComplaintCategory(models.Model):
-    code = models.SlugField(max_length=32, unique=True)
-    name = models.CharField(max_length=80)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ['name', 'id']
-
-    def __str__(self):
-        return self.name
-
-
-class Complaint(models.Model):
-    class Status(models.TextChoices):
-        OPEN = 'Open', 'Open'
-        IN_PROGRESS = 'In Progress', 'In Progress'
-        RESOLVED = 'Resolved', 'Resolved'
-
-    student = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='complaints',
-    )
-    room = models.CharField(max_length=32)
-    category = models.ForeignKey(ComplaintCategory, on_delete=models.PROTECT)
-    description = models.CharField(max_length=2000)
-    status = models.CharField(max_length=16, choices=Status.choices, default=Status.OPEN)
-    assigned_to = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
-        related_name='assigned_complaints',
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at', '-id']
-        indexes = [models.Index(fields=['student', '-created_at', '-id'], name='complaint_student_created')]
-        constraints = [
-            models.CheckConstraint(
-                condition=~models.Q(description__regex=r'^\s*$'),
-                name='complaint_description_not_blank',
-            ),
-            models.CheckConstraint(
-                condition=~models.Q(room__regex=r'^\s*$'),
-                name='complaint_room_not_blank',
-            ),
-            models.CheckConstraint(
-                condition=models.Q(status__in=['Open', 'In Progress', 'Resolved']),
-                name='complaint_valid_status',
-            ),
-        ]
-
-
-class AppendOnlyTransitions(models.QuerySet):
+class AppendOnlyEvents(models.QuerySet):
     def update(self, **kwargs):
-        raise ValidationError('Complaint history is append-only.')
+        raise ValidationError("Operational history is append-only.")
 
     def delete(self):
-        raise ValidationError('Complaint history is append-only.')
+        raise ValidationError("Operational history is append-only.")
 
     def bulk_update(self, objs, fields, batch_size=None):
-        raise ValidationError('Complaint history is append-only.')
+        raise ValidationError("Operational history is append-only.")
 
 
-class ComplaintTransition(models.Model):
-    complaint = models.ForeignKey(Complaint, on_delete=models.PROTECT, related_name='history')
-    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    created_at = models.DateTimeField(auto_now_add=True)
-    old_status = models.CharField(max_length=16, blank=True)
-    new_status = models.CharField(max_length=16, choices=Complaint.Status.choices)
-    remarks = models.CharField(max_length=500)
-    old_assigned_to = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
-        related_name='+',
-    )
-    new_assigned_to = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT,
-        related_name='+',
-    )
-
-    objects = AppendOnlyTransitions.as_manager()
-
-    class Meta:
-        ordering = ['created_at', 'id']
-
-    def save(self, *args, **kwargs):
-        if not self._state.adding:
-            raise ValidationError('Complaint history is append-only.')
-        return super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        raise ValidationError('Complaint history is append-only.')
-
-
-# Owner: Atiksh Gour | US-15 | Sprint 5 (development plan: 3) | Reviewer: Anvi Srinivas
-class MessRecord(models.Model):
-    valid_from = models.DateField()
-    valid_until = models.DateField()
-    is_active = models.BooleanField(default=True)
-    version = models.PositiveIntegerField(default=1)
-    updated_at = models.DateTimeField(auto_now=True)
-    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='+')
+class ImmutableEvent(models.Model):
+    objects = AppendOnlyEvents.as_manager()
 
     class Meta:
         abstract = True
 
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Operational history is append-only.")
+        return super().save(*args, **kwargs)
 
-class MessAllocation(MessRecord):
-    student = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='mess_allocation')
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Operational history is append-only.")
+
+
+class Complaint(models.Model):
+    student = models.ForeignKey(U, on_delete=models.PROTECT, related_name="complaints")
+    room_snapshot = models.CharField(max_length=120)
+    category = models.CharField(
+        max_length=20,
+        choices=[
+            (x, x) for x in ["Electrical", "Plumbing", "Furniture", "Cleaning", "Other"]
+        ],
+    )
+    description = models.TextField(max_length=3000)
+    status = models.CharField(
+        max_length=12,
+        default="Open",
+        choices=[(x, x) for x in ["Open", "In Progress", "Resolved"]],
+    )
+    assigned_to = models.ForeignKey(
+        U,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="assigned_complaints",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-pk"]
+
+
+class ComplaintTransition(ImmutableEvent):
+    complaint = models.ForeignKey(
+        Complaint, on_delete=models.PROTECT, related_name="transitions"
+    )
+    actor = models.ForeignKey(U, on_delete=models.PROTECT)
+    from_status = models.CharField(max_length=12, blank=True)
+    to_status = models.CharField(max_length=12)
+    remarks = models.CharField(max_length=2000)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["occurred_at", "pk"]
+
+
+class MessAllocation(models.Model):
+    option = models.ForeignKey(
+        "MessOption",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="allocations",
+    )
+    student = models.OneToOneField(U, on_delete=models.PROTECT)
     mess_name = models.CharField(max_length=100)
+    assigned_by = models.ForeignKey(U, on_delete=models.PROTECT, related_name="+")
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class Coupon(models.Model):
+    student = models.ForeignKey(U, on_delete=models.PROTECT)
+    code = models.CharField(max_length=80, unique=True)
+    valid_from = models.DateField()
+    valid_to = models.DateField()
+    active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(U, on_delete=models.PROTECT, related_name="+")
 
     class Meta:
-        ordering = ['student_id', 'id']
         constraints = [
-            models.CheckConstraint(condition=models.Q(valid_until__gte=models.F('valid_from')), name='mess_allocation_valid_dates'),
-            models.CheckConstraint(condition=~models.Q(mess_name__regex=r'^\s*$'), name='mess_name_not_blank'),
+            models.CheckConstraint(
+                condition=Q(valid_to__gte=F("valid_from")), name="coupon_valid_dates"
+            )
         ]
 
 
-class Coupon(MessRecord):
-    allocation = models.ForeignKey(MessAllocation, on_delete=models.PROTECT, related_name='coupons')
-    code = models.CharField(max_length=80)
-
-    class Meta:
-        ordering = ['-valid_until', 'id']
-        constraints = [
-            models.CheckConstraint(condition=models.Q(valid_until__gte=models.F('valid_from')), name='mess_coupon_valid_dates'),
-            models.CheckConstraint(condition=~models.Q(code__regex=r'^\s*$'), name='mess_coupon_code_not_blank'),
-            models.UniqueConstraint(fields=['allocation', 'code'], name='mess_coupon_allocation_code_unique'),
-        ]
-
-
-# Owner: Atiksh Gour | US-16 | Sprint 5 | Reviewer: Anvi Srinivas
 class FeeDue(models.Model):
-    class Status(models.TextChoices):
-        UNPAID = 'Unpaid', 'Unpaid'
-        PENDING = 'Pending', 'Pending'
-        PAID = 'Paid', 'Paid'
-
-    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='fee_dues')
-    description = models.CharField(max_length=200)
+    student = models.ForeignKey(U, on_delete=models.PROTECT)
+    title = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=3, default='INR')
-    status = models.CharField(max_length=8, choices=Status.choices, default=Status.UNPAID)
-    paid_at = models.DateTimeField(null=True, blank=True)
+    currency = models.CharField(max_length=3, default="INR")
+    due_date = models.DateField()
+    status = models.CharField(
+        max_length=6, default="Unpaid", choices=[("Unpaid", "Unpaid"), ("Paid", "Paid")]
+    )
 
     class Meta:
-        ordering = ['-id']
+        ordering = ["due_date", "pk"]
         constraints = [
-            models.CheckConstraint(condition=models.Q(amount__gt=0), name='fee_positive_amount'),
-            models.CheckConstraint(condition=models.Q(currency='INR'), name='fee_inr_only'),
+            models.CheckConstraint(
+                condition=Q(amount__gt=0), name="positive_fee_amount"
+            )
         ]
 
 
 class PaymentAttempt(models.Model):
-    class Status(models.TextChoices):
-        PENDING = 'Pending', 'Pending'
-        SUCCEEDED = 'Succeeded', 'Succeeded'
-        FAILED = 'Failed', 'Failed'
-        CANCELLED = 'Cancelled', 'Cancelled'
-
-    fee = models.ForeignKey(FeeDue, on_delete=models.PROTECT, related_name='attempts')
-    provider_order_id = models.CharField(max_length=100, unique=True)
-    provider_reference = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    fee = models.ForeignKey(FeeDue, on_delete=models.PROTECT, related_name="attempts")
+    order_id = models.CharField(max_length=100, unique=True)
+    provider_reference = models.CharField(max_length=100, unique=True, null=True)
+    provider = models.CharField(max_length=15)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3)
-    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    status = models.CharField(
+        max_length=10,
+        default="Pending",
+        choices=[(x, x) for x in ["Pending", "Success", "Failed", "Cancelled"]],
+    )
     created_at = models.DateTimeField(auto_now_add=True)
-    resolved_at = models.DateTimeField(null=True, blank=True)
+    verified_at = models.DateTimeField(null=True)
 
     class Meta:
-        ordering = ['-created_at', '-id']
-        constraints = [models.CheckConstraint(condition=models.Q(amount__gt=0), name='attempt_positive_amount')]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["fee"],
+                condition=Q(status="Success"),
+                name="one_successful_attempt_per_fee",
+            )
+        ]
+
+
+class MessOption(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    diet = models.CharField(
+        max_length=20, choices=[("Vegetarian", "Vegetarian"), ("Mixed", "Mixed")]
+    )
+    description = models.CharField(max_length=500, blank=True)
+    capacity = models.PositiveIntegerField(default=100)
+    breakfast = models.CharField(max_length=300, blank=True)
+    lunch = models.CharField(max_length=300, blank=True)
+    dinner = models.CharField(max_length=300, blank=True)
+    timings = models.CharField(
+        max_length=200, default="Breakfast 7–9 AM · Lunch 12–2 PM · Dinner 7–9 PM"
+    )
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["name"]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(capacity__gt=0), name="mess_positive_capacity"
+            )
+        ]
+
+
+class MessChoiceEvent(ImmutableEvent):
+    student = models.ForeignKey(U, on_delete=models.PROTECT)
+    actor = models.ForeignKey(U, on_delete=models.PROTECT, related_name="+")
+    old_mess = models.CharField(max_length=100, blank=True)
+    new_mess = models.CharField(max_length=100)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-occurred_at", "-pk"]

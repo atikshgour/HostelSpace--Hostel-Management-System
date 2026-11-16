@@ -16,6 +16,7 @@ services:
       retries: 20
   api:
     build: ./backend
+    command: ["sh", "-c", "python manage.py migrate --noinput && exec gunicorn config.wsgi:application --bind 0.0.0.0:8000"]
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.local
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set a local Django key in .env}
@@ -23,6 +24,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-hostelspace}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a local PostgreSQL password in .env}
       POSTGRES_HOST: db
+      HOSTELSPACE_SQLITE: "0"
+      DATABASE_URL: postgresql://${POSTGRES_USER:-hostelspace}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-hostelspace}
       DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,api,testserver}
       DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
     ports:
@@ -37,7 +40,10 @@ services:
       retries: 20
       start_period: 10s
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        DJANGO_API_ORIGIN: http://api:8000
     ports:
       - "${FRONTEND_BIND_ADDRESS:-127.0.0.1}:3000:3000"
     depends_on:

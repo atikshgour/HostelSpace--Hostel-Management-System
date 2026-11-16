@@ -2,8 +2,8 @@
 import { render, screen } from '@testing-library/react';
 import Home from './page';
 
-test('identifies the application and its implementation boundary', () => {
+test('identifies the application and exposes sign-in', () => {
   render(<Home />);
   expect(screen.getByRole('heading', { name: 'HostelSpace' })).toBeInTheDocument();
-  expect(screen.getByText(/awaiting implementation/)).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Sign in to student services' })).toHaveAttribute('href', '/login');
 });

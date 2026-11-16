@@ -1,42 +1,72 @@
-# Minimal dependency for US-13, authorized by user | Owner: Anvi Srinivas
-# US-01/02 foundation; original SRS Sprint 1 | Independent review pending
-from django.conf import settings
+# Owner: Anvi Srinivas | US-01,US-02 | Dev sprint 1; 2 | SRS sprint 1 | Reviewer: Arin Singh (pending)
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
 
 
 class User(AbstractUser):
     class Role(models.TextChoices):
-        STUDENT = 'student', 'Student'
-        WARDEN = 'warden', 'Warden'
-        CHIEF_WARDEN = 'chief_warden', 'Chief Warden'
-        HOSTEL_DIRECTOR = 'hostel_director', 'Hostel Director'
-        MAINTENANCE = 'maintenance_staff', 'Maintenance Staff'
-        MESS = 'mess_staff', 'Mess Staff'
-        LAUNDRY = 'laundry_staff', 'Laundry Staff'
+        STUDENT = "STUDENT", "Student"
+        WARDEN = "WARDEN", "Warden"
+        CHIEF_WARDEN = "CHIEF_WARDEN", "Chief Warden"
+        DIRECTOR = "DIRECTOR", "Director"
+        LAUNDRY_STAFF = "LAUNDRY_STAFF", "Laundry Staff"
+        MAINTENANCE_STAFF = "MAINTENANCE_STAFF", "Maintenance Staff"
+        MESS_STAFF = "MESS_STAFF", "Mess Staff"
+        CONTENT_STAFF = "CONTENT_STAFF", "Content Staff"
 
-    role = models.CharField(max_length=24, choices=Role.choices)
-    REQUIRED_FIELDS = ['role']
+    managed_by = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="managed_accounts",
+    )
+    role = models.CharField(max_length=24, choices=Role.choices, default=Role.STUDENT)
+    chief_warden = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.PROTECT, related_name="wardens"
+    )
 
-    class Meta(AbstractUser.Meta):
+    class Meta:
         constraints = [
-            models.CheckConstraint(
-                condition=models.Q(role__in=[
-                    'student', 'warden', 'chief_warden', 'hostel_director',
-                    'maintenance_staff', 'mess_staff', 'laundry_staff',
-                ]),
-                name='accounts_valid_role',
-            ),
+            models.UniqueConstraint(
+                fields=["role"],
+                condition=Q(role="CHIEF_WARDEN", is_active=True),
+                name="one_active_chief",
+            )
         ]
 
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='student_profile',
+        User, on_delete=models.PROTECT, related_name="student_profile"
     )
-    srn = models.CharField(max_length=32, unique=True)
-    room = models.CharField(max_length=32, blank=True)
-    phone = models.CharField(max_length=24, blank=True)
+    srn = models.CharField(max_length=40, unique=True)
+    hostel = models.CharField(max_length=80, default="Block A")
+    room = models.CharField(max_length=30)
+    phone = models.CharField(max_length=20, blank=True)
+    assigned_warden = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="assigned_students",
+    )
 
-    def __str__(self):
-        return self.srn
+
+class SiteSetting(models.Model):
+    key = models.CharField(max_length=50, unique=True)
+    value = models.CharField(max_length=500)
+    updated_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class AuditEvent(models.Model):
+    actor = models.ForeignKey(User, on_delete=models.PROTECT)
+    action = models.CharField(max_length=80)
+    object_key = models.CharField(max_length=100)
+    details = models.JSONField(default=dict)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-occurred_at", "-pk"]

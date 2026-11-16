@@ -1,86 +1,221 @@
-# Owner: Atiksh Gour | US-13/14 | Sprint 4 | Reviewer: Anvi Srinivas
-from collections.abc import Mapping
+# Owner: Atiksh Gour | US-13,US-14,US-15,US-16 | Dev sprint 2; 3 | SRS sprint 4; 5 | Reviewer: Anvi Srinivas (pending)
+from decimal import Decimal
 
 from rest_framework import serializers
 
 from apps.accounts.models import User
+from apps.accounts.serializers import StrictModelSerializer, StrictSerializer
 
-from .models import Complaint, ComplaintCategory, ComplaintTransition
+from .models import (
+    Complaint,
+    ComplaintTransition,
+    Coupon,
+    FeeDue,
+    MessAllocation,
+    MessChoiceEvent,
+    MessOption,
+    PaymentAttempt,
+)
 
 
-class ComplaintCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ComplaintCategory
-        fields = ['id', 'code', 'name']
-        read_only_fields = fields
-
-
-class ComplaintSubmissionSerializer(serializers.Serializer):
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=ComplaintCategory.objects.filter(is_active=True),
-        pk_field=serializers.IntegerField(min_value=1),
+class ComplaintInput(StrictSerializer):
+    category = serializers.ChoiceField(
+        choices=[x[0] for x in Complaint._meta.get_field("category").choices]
     )
-    description = serializers.CharField(max_length=2000, allow_blank=False, trim_whitespace=True)
-
-    def to_internal_value(self, data):
-        if isinstance(data, Mapping):
-            unexpected = set(data) - set(self.fields)
-            if unexpected:
-                raise serializers.ValidationError({
-                    key: ['This field is not accepted.'] for key in sorted(unexpected)
-                })
-            if 'description' in data and not isinstance(data['description'], str):
-                raise serializers.ValidationError({'description': ['Expected a string.']})
-        return super().to_internal_value(data)
+    description = serializers.CharField(max_length=3000)
 
 
-class ComplaintTransitionSerializer(serializers.ModelSerializer):
+class TransitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComplaintTransition
-        fields = ['id', 'actor', 'created_at', 'old_status', 'new_status', 'remarks',
-                  'old_assigned_to', 'new_assigned_to']
-        read_only_fields = fields
+        fields = ["id", "actor", "from_status", "to_status", "remarks", "occurred_at"]
 
 
 class ComplaintSerializer(serializers.ModelSerializer):
-    category_code = serializers.CharField(source='category.code', read_only=True)
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    history = ComplaintTransitionSerializer(many=True, read_only=True)
+    student_name = serializers.SerializerMethodField()
+    assigned_name = serializers.SerializerMethodField()
+
+    def get_student_name(self, obj):
+        return obj.student.get_full_name() or obj.student.username
+
+    def get_assigned_name(self, obj):
+        return (
+            (obj.assigned_to.get_full_name() or obj.assigned_to.username)
+            if obj.assigned_to
+            else None
+        )
+
+    transitions = TransitionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Complaint
-        fields = [
-            'id', 'room', 'category', 'category_code', 'category_name',
-            'description', 'status', 'assigned_to', 'created_at', 'history',
-        ]
-        read_only_fields = fields
+        fields = "__all__"
 
 
-class StrictStaffInput(ComplaintSubmissionSerializer):
-    category = None
-    description = None
-    remarks = serializers.CharField(max_length=500, allow_blank=False)
-
-    def to_internal_value(self, data):
-        if isinstance(data, Mapping) and 'remarks' in data and not isinstance(data['remarks'], str):
-            raise serializers.ValidationError({'remarks': ['Expected a string.']})
-        return super().to_internal_value(data)
-
-
-class ComplaintAssignmentSerializer(StrictStaffInput):
+class AssignInput(StrictSerializer):
     assigned_to = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.filter(is_active=True, role=User.Role.MAINTENANCE),
-        pk_field=serializers.IntegerField(min_value=1),
+        queryset=User.objects.filter(role="MAINTENANCE_STAFF", is_active=True)
     )
 
 
-class ComplaintProgressSerializer(StrictStaffInput):
-    status = serializers.ChoiceField(choices=Complaint.Status.choices)
-    expected_status = serializers.ChoiceField(choices=Complaint.Status.choices)
+class ProgressInput(StrictSerializer):
+    status = serializers.ChoiceField(choices=["In Progress", "Resolved"])
+    remarks = serializers.CharField(max_length=2000)
 
 
-class MaintenanceStaffSerializer(serializers.ModelSerializer):
+class MessInput(StrictSerializer):
+    student = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(role="STUDENT", is_active=True)
+    )
+    mess_name = serializers.CharField(max_length=100)
+
+
+class MessSerializer(serializers.ModelSerializer):
+    student_name = serializers.SerializerMethodField()
+
+    def get_student_name(self, obj):
+        return obj.student.get_full_name() or obj.student.username
+
     class Meta:
-        model = User
-        fields = ['id', 'first_name', 'last_name', 'username']
-        read_only_fields = fields
+        model = MessAllocation
+        fields = "__all__"
+
+
+class CouponSerializer(StrictModelSerializer):
+    student_name = serializers.SerializerMethodField()
+
+    def get_student_name(self, obj):
+        return obj.student.get_full_name() or obj.student.username
+
+    student = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(role="STUDENT", is_active=True)
+    )
+
+    class Meta:
+        model = Coupon
+        fields = [
+            "id",
+            "student",
+            "student_name",
+            "code",
+            "valid_from",
+            "valid_to",
+            "active",
+        ]
+        read_only_fields = ["id"]
+
+    def validate(self, data):
+        a = data.get("valid_from", getattr(self.instance, "valid_from", None))
+        b = data.get("valid_to", getattr(self.instance, "valid_to", None))
+        if a and b and b < a:
+            raise serializers.ValidationError({"valid_to": "End must follow start."})
+        return data
+
+
+class FeeSerializer(StrictModelSerializer):
+    student_name = serializers.SerializerMethodField()
+
+    def get_student_name(self, obj):
+        return obj.student.get_full_name() or obj.student.username
+
+    student = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(role="STUDENT", is_active=True)
+    )
+    amount = serializers.DecimalField(
+        max_digits=10, decimal_places=2, min_value=Decimal("0.01")
+    )
+    currency = serializers.ChoiceField(choices=["INR"])
+
+    class Meta:
+        model = FeeDue
+        fields = [
+            "id",
+            "student",
+            "student_name",
+            "title",
+            "amount",
+            "currency",
+            "due_date",
+            "status",
+        ]
+        read_only_fields = ["id", "status"]
+
+
+class AttemptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentAttempt
+        fields = "__all__"
+
+
+class InitiateInput(StrictSerializer):
+    fee = serializers.IntegerField(min_value=1)
+
+
+class VerifyInput(StrictSerializer):
+    attempt = serializers.UUIDField()
+    payment_id = serializers.CharField(max_length=100)
+    signature = serializers.CharField(max_length=128)
+
+
+class SimulateInput(StrictSerializer):
+    attempt = serializers.UUIDField()
+    outcome = serializers.ChoiceField(choices=["Success", "Failed", "Cancelled"])
+
+
+class MessOptionSerializer(StrictModelSerializer):
+    enrolled = serializers.IntegerField(read_only=True)
+    available = serializers.SerializerMethodField()
+
+    def get_available(self, obj):
+        return max(
+            0,
+            obj.capacity
+            - getattr(
+                obj, "enrolled", obj.allocations.filter(student__is_active=True).count()
+            ),
+        )
+
+    capacity = serializers.IntegerField(min_value=1, max_value=100000)
+
+    class Meta:
+        model = MessOption
+        fields = [
+            "id",
+            "name",
+            "diet",
+            "description",
+            "capacity",
+            "breakfast",
+            "lunch",
+            "dinner",
+            "timings",
+            "active",
+            "enrolled",
+            "available",
+        ]
+        read_only_fields = ["id"]
+
+
+class MessSelectInput(StrictSerializer):
+    option = serializers.PrimaryKeyRelatedField(queryset=MessOption.objects.all())
+    student = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(role="STUDENT", is_active=True), required=False
+    )
+
+
+class MessChoiceSerializer(serializers.ModelSerializer):
+    student_name = serializers.SerializerMethodField()
+
+    def get_student_name(self, obj):
+        return obj.student.get_full_name() or obj.student.username
+
+    class Meta:
+        model = MessChoiceEvent
+        fields = [
+            "id",
+            "student",
+            "student_name",
+            "old_mess",
+            "new_mess",
+            "occurred_at",
+        ]

@@ -6,8 +6,11 @@
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
-    "lint": "eslint --no-ignore app src/features/complaints/api.js src/features/complaints/ComplaintManagePanel.jsx src/features/mess/api.js src/features/mess/MessPanel.jsx src/features/mess/MessManageForm.jsx next.config.mjs eslint.config.mjs jest.config.mjs jest.setup.js postcss.config.mjs --max-warnings=0",
-    "test:ci": "jest --ci --coverage"
+    "lint": "eslint app src scripts e2e *.mjs jest.setup.js --max-warnings=0",
+    "test:ci": "jest --ci --coverage",
+    "test:e2e": "playwright test",
+    "prebuild": "node scripts/sync-app-routes.mjs",
+    "predev": "node scripts/sync-app-routes.mjs"
   },
   "dependencies": {
     "next": "16.4.3",

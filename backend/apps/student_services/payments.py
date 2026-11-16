@@ -1,73 +1,158 @@
-# Owner: Atiksh Gour | US-16 | Sprint 5 | Reviewer: Anvi Srinivas
-"""Razorpay test-mode boundary. Provider data is always checked on the server."""
+# Owner: Atiksh Gour | US-16 | Dev sprint 3 | SRS sprint 5 | Reviewer: Anvi Srinivas (pending)
+"""Razorpay TEST integration plus explicit local simulation. Never accept client amount/status as proof."""
+
 import base64
 import hashlib
 import hmac
-import http.client
 import json
-import os
-import urllib.parse
+import secrets
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
-from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
-
-class ProviderError(Exception):
-    pass
-
-
-def credentials():
-    key = os.environ.get('RAZORPAY_TEST_KEY_ID', '')
-    secret = os.environ.get('RAZORPAY_TEST_KEY_SECRET', '')
-    if not key.startswith('rzp_test_') or not secret:
-        raise ImproperlyConfigured('Razorpay test credentials are not configured.')
-    return key, secret
+from .models import FeeDue, PaymentAttempt
 
 
-def _request(path, method='GET', payload=None):
-    key, secret = credentials()
-    encoded = base64.b64encode(f'{key}:{secret}'.encode()).decode()
-    connection = http.client.HTTPSConnection('api.razorpay.com', timeout=10)
-    try:
-        connection.request(
-            method, f'/v1/{path}',
-            body=json.dumps(payload).encode() if payload is not None else None,
-            headers={'Authorization': f'Basic {encoded}', 'Content-Type': 'application/json'},
+def provider_request(path, payload=None):
+    key = settings.RAZORPAY_KEY_ID
+    secret = settings.RAZORPAY_KEY_SECRET
+    if not key.startswith("rzp_test_") or not secret:
+        raise ValidationError(
+            "Configure Razorpay TEST credentials; live payments are not enabled."
         )
-        response = connection.getresponse()
-        if response.status >= 400:
-            raise ProviderError('Test payment provider rejected the request.')
-        return json.loads(response.read())
-    except (OSError, TimeoutError, ValueError, http.client.HTTPException) as exc:
-        raise ProviderError('Test payment provider is temporarily unavailable.') from exc
-    finally:
-        connection.close()
+    auth = base64.b64encode(f"{key}:{secret}".encode()).decode()
+    request = Request(
+        "https://api.razorpay.com/v1/" + path,
+        data=json.dumps(payload).encode() if payload is not None else None,
+        headers={"Authorization": "Basic " + auth, "Content-Type": "application/json"},
+    )
+    try:
+        with urlopen(request, timeout=15) as response:  # nosec B310
+            return json.load(response)
+    except (URLError, HTTPError, ValueError):
+        raise ValidationError(
+            "Sandbox provider unavailable. No fee status was changed."
+        )
 
 
-def create_order(fee):
-    amount_paise = int(fee.amount * 100)
-    order = _request('orders', 'POST', {
-        'amount': amount_paise, 'currency': fee.currency,
-        'receipt': f'fee-{fee.pk}', 'payment_capture': 1,
-    })
-    if (not str(order.get('id', '')).startswith('order_') or
-            order.get('amount') != amount_paise or order.get('currency') != fee.currency):
-        raise ProviderError('Test provider returned an invalid order.')
-    return order['id']
+def local_simulation():
+    if (
+        settings.PAYMENT_MODE != "simulation"
+        or not settings.ALLOW_PAYMENT_SIMULATION
+        or not settings.DEBUG
+    ):
+        raise PermissionDenied(
+            "Local simulation is disabled. Use verified sandbox checkout."
+        )
 
 
-def fetch_payment(payment_id):
-    if not isinstance(payment_id, str) or not payment_id.startswith('pay_') or len(payment_id) > 100:
-        raise ProviderError('Invalid payment reference.')
-    return _request(f'payments/{urllib.parse.quote(payment_id, safe="")}')
+@transaction.atomic
+def initiate(user, fee_id):
+    fee = get_object_or_404(FeeDue.objects.select_for_update(), pk=fee_id, student=user)
+    if fee.status == "Paid":
+        raise ValidationError("This fee is already Paid.")
+    mode = settings.PAYMENT_MODE
+    if mode == "simulation":
+        local_simulation()
+        order = "sim_" + secrets.token_hex(16)
+    elif mode == "razorpay":
+        order_data = provider_request(
+            "orders",
+            {
+                "amount": int(fee.amount * 100),
+                "currency": fee.currency,
+                "receipt": str(fee.pk),
+            },
+        )
+        if (
+            order_data.get("amount") != int(fee.amount * 100)
+            or order_data.get("currency") != fee.currency
+            or not str(order_data.get("id", "")).startswith("order_")
+        ):
+            raise ValidationError("Provider returned an invalid order.")
+        order = order_data["id"]
+    else:
+        raise ValidationError(
+            "Payment checkout is disabled. Configure the sandbox provider."
+        )
+    return PaymentAttempt.objects.create(
+        fee=fee, order_id=order, provider=mode, amount=fee.amount, currency=fee.currency
+    )
 
 
-def fetch_order_payments(order_id):
-    if not isinstance(order_id, str) or not order_id.startswith('order_') or len(order_id) > 100:
-        raise ProviderError('Invalid order reference.')
-    return _request(f'orders/{urllib.parse.quote(order_id, safe="")}/payments').get('items', [])
+@transaction.atomic
+def finalize(attempt_id, user, reference, outcome, amount, currency, order):
+    a = get_object_or_404(
+        PaymentAttempt.objects.select_for_update(), pk=attempt_id, fee__student=user
+    )
+    fee = FeeDue.objects.select_for_update().get(pk=a.fee_id)
+    if (
+        a.order_id != order
+        or a.amount != amount
+        or a.currency != currency
+        or a.amount != fee.amount
+        or a.currency != fee.currency
+    ):
+        raise ValidationError("Payment does not match the server-side fee and order.")
+    if a.status == "Success":
+        if a.provider_reference != reference:
+            raise ValidationError("Payment reference mismatch.")
+        return a
+    if a.status != "Pending":
+        raise ValidationError("This attempt is final. Create a new attempt to retry.")
+    if (
+        PaymentAttempt.objects.filter(provider_reference=reference)
+        .exclude(pk=a.pk)
+        .exists()
+    ):
+        raise ValidationError("Payment reference already used.")
+    if outcome == "Success" and fee.status == "Paid":
+        raise ValidationError("This fee already has a successful payment.")
+    a.status = outcome
+    a.provider_reference = reference
+    a.verified_at = timezone.now()
+    a.save(update_fields=["status", "provider_reference", "verified_at"])
+    if outcome == "Success":
+        fee.status = "Paid"
+        fee.save(update_fields=["status"])
+    return a
 
 
-def valid_checkout_signature(order_id, payment_id, signature):
-    _, secret = credentials()
-    expected = hmac.new(secret.encode(), f'{order_id}|{payment_id}'.encode(), hashlib.sha256).hexdigest()
-    return isinstance(signature, str) and hmac.compare_digest(expected, signature)
+def verify(user, attempt, payment_id, signature):
+    a = get_object_or_404(PaymentAttempt, pk=attempt, fee__student=user)
+    if a.provider != "razorpay":
+        raise ValidationError("This is not a provider payment attempt.")
+    if not payment_id.startswith("pay_") or not payment_id.replace("_", "").isalnum():
+        raise ValidationError("Invalid payment reference.")
+    expected = hmac.new(
+        settings.RAZORPAY_KEY_SECRET.encode(),
+        f"{a.order_id}|{payment_id}".encode(),
+        hashlib.sha256,
+    ).hexdigest()
+    if not hmac.compare_digest(expected, signature):
+        raise ValidationError("Payment signature verification failed.")
+    p = provider_request("payments/" + payment_id)
+    if (
+        p.get("status") != "captured"
+        or p.get("order_id") != a.order_id
+        or p.get("amount") != int(a.amount * 100)
+        or p.get("currency") != a.currency
+    ):
+        raise ValidationError(
+            "Payment has not been verified as captured. Fee remains unchanged."
+        )
+    return finalize(a.pk, user, payment_id, "Success", a.amount, a.currency, a.order_id)
+
+
+def simulate(user, attempt, outcome):
+    local_simulation()
+    a = get_object_or_404(
+        PaymentAttempt, pk=attempt, fee__student=user, provider="simulation"
+    )
+    reference = a.provider_reference or "sim_result_" + str(a.pk)
+    return finalize(a.pk, user, reference, outcome, a.amount, a.currency, a.order_id)

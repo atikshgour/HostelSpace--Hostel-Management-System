@@ -1,5 +1,5 @@
 # Owner: Atiksh (authorized foundation) | US-19/20 | Sprint 1
-FROM python:3.13-slim-bookworm
+FROM python:3.12-slim-bookworm
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY requirements.txt ./

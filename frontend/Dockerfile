@@ -5,13 +5,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY app ./app
-COPY src/app/globals.css ./src/app/globals.css
-COPY src/features/complaints/api.js src/features/complaints/ComplaintManagePanel.jsx ./src/features/complaints/
-COPY src/features/mess/api.js src/features/mess/MessPanel.jsx src/features/mess/MessManageForm.jsx ./src/features/mess/
-COPY src/features/fees/api.js src/features/fees/FeesPanel.jsx ./src/features/fees/
+COPY scripts ./scripts
+COPY src ./src
 COPY next.config.mjs postcss.config.mjs jsconfig.json ./
-ARG DJANGO_API_URL=http://api:8000
-ENV DJANGO_API_URL=$DJANGO_API_URL
+ARG DJANGO_API_ORIGIN=http://api:8000
+ENV DJANGO_API_ORIGIN=$DJANGO_API_ORIGIN
 RUN npm run build
 
 FROM node:22-bookworm-slim AS runtime

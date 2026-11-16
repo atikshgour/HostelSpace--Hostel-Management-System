@@ -1,3 +1,4 @@
+/* Owner: Atiksh Gour | US-15 | Dev sprint 3 | SRS sprint 5 | Reviewer: Anvi Srinivas (pending) */
 "use client";
 import { useState } from "react";
 import {
@@ -17,16 +18,15 @@ import { dateTime } from "@/lib/format";
 export default function MessPanel() {
   const user = useIdentity(),
     student = user.role === "STUDENT",
-    warden = user.role === "WARDEN";
+    canManage = user.role === "MESS_STAFF";
   const { data, error, refresh } = useResource([
     "/api/mess/",
     "/api/mess/coupons/",
     "/api/mess/options/",
     "/api/mess/history/",
-    !student ? "/api/choices/users/" : null,
+    canManage ? "/api/choices/users/?role=STUDENT" : null,
   ]);
   const [failure, setFailure] = useState(null),
-    [busy, setBusy] = useState(null),
     [message, setMessage] = useState(""),
     [modal, setModal] = useState(null),
     [editing, setEditing] = useState(null),
@@ -37,28 +37,6 @@ export default function MessPanel() {
     history = data?.[3] || [],
     students = (data?.[4] || []).map((x) => ({ value: x.id, label: x.name }));
   const selected = allocations[0];
-  async function choose(o) {
-    if (
-      !window.confirm(
-        `Choose ${o.name}? This replaces your current mess selection immediately.`,
-      )
-    )
-      return;
-    setBusy(o.id);
-    setFailure(null);
-    try {
-      await api("/api/mess/select/", {
-        method: "POST",
-        body: { option: o.id },
-      });
-      setMessage(`You are now enrolled in ${o.name}.`);
-      refresh();
-    } catch (e) {
-      setFailure(e);
-    } finally {
-      setBusy(null);
-    }
-  }
   const optionFields = [
     { name: "name", label: "Mess name" },
     { name: "diet", label: "Meal type", options: ["Vegetarian", "Mixed"] },
@@ -81,12 +59,12 @@ export default function MessPanel() {
         title={student ? "Mess & meals" : "Mess management"}
         description={
           student
-            ? "Choose the mess that suits you. Compare meals, timings and available places."
+            ? "View your assigned mess, meals and valid coupons."
             : "Publish clear meal choices, review enrolments and manage meal coupons."
         }
       >
         <div className="hs-actions">
-          {warden ? (
+          {canManage ? (
             <Button
               variant="primary"
               onClick={() => {
@@ -97,7 +75,7 @@ export default function MessPanel() {
               + Add mess option
             </Button>
           ) : null}
-          {!student ? (
+          {canManage ? (
             <>
               <Button onClick={() => setModal("assign")}>
                 Select for student
@@ -118,19 +96,19 @@ export default function MessPanel() {
         <div className="hs-selected-strip">
           <div>
             <span className="hs-eyebrow">YOUR CURRENT MESS</span>
-            <h2>{selected?.mess_name || "No mess selected yet"}</h2>
+            <h2>{selected?.mess_name || "No mess assigned yet"}</h2>
             <p className="hs-muted">
               {selected
-                ? "You can change your choice below when a place is available."
-                : "Explore the options below to enrol."}
+                ? "Contact Mess Staff for allocation changes."
+                : "Mess Staff will assign your mess."}
             </p>
           </div>
-          <StatusBadge>{selected ? "Enrolled" : "Choose a mess"}</StatusBadge>
+          <StatusBadge>{selected ? "Enrolled" : "Not assigned"}</StatusBadge>
         </div>
       ) : null}
       <section className="hs-section">
         <div className="hs-section-title">
-          <h2>{student ? "Explore mess options" : "Mess catalogue"}</h2>
+          <h2>{student ? "Mess options" : "Mess catalogue"}</h2>
           <span className="hs-muted">Capacity is checked when saving</span>
         </div>
         <div className="hs-mess-grid">
@@ -168,27 +146,13 @@ export default function MessPanel() {
                 </dl>
                 <p className="hs-meal-times">{o.timings}</p>
                 {student ? (
-                  <Button
-                    variant={current ? "default" : "primary"}
-                    disabled={
-                      busy !== null || current || o.available === 0 || !o.active
-                    }
-                    onClick={() => choose(o)}
-                  >
-                    {busy === o.id
-                      ? "Selecting…"
-                      : current
-                        ? "Currently selected"
-                        : o.available === 0
-                          ? "No places available"
-                          : "Choose this mess"}
-                  </Button>
+                  <p className="hs-muted">{current ? "Your assigned mess" : "Contact Mess Staff for allocation."}</p>
                 ) : (
                   <div className="hs-row">
                     <span className="hs-muted">
                       {o.enrolled || 0} / {o.capacity} enrolled
                     </span>
-                    {warden ? (
+                    {canManage ? (
                       <Button
                         onClick={() => {
                           setEditing(o);
@@ -206,7 +170,7 @@ export default function MessPanel() {
         </div>
         {data && !options.length ? (
           <p className="hs-empty">
-            No mess options have been published. Contact your Warden.
+            No mess options have been published. Contact Mess Staff.
           </p>
         ) : null}
       </section>
@@ -262,7 +226,7 @@ export default function MessPanel() {
               <p className="hs-muted">
                 {c.valid_from} to {c.valid_to}
               </p>
-              {!student ? (
+              {canManage ? (
                 <Button
                   onClick={async () => {
                     try {

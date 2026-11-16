@@ -1,10 +1,8 @@
-// Owner: Atiksh | US-20 foundation | Sprint 1
-const nextConfig = {
-  output: 'standalone', poweredByHeader: false,
-  // Django's canonical endpoints retain their trailing slash through the proxy.
+// Owner: Atiksh Gour | US-20 | Shared session/CSRF proxy
+const backend = process.env.DJANGO_API_ORIGIN || 'http://127.0.0.1:8000';
+const config = {
+  output: 'standalone', poweredByHeader: false, devIndicators: false,
   skipTrailingSlashRedirect: true,
-  async rewrites() {
-    return [{ source: '/api/:path*', destination: `${process.env.DJANGO_API_URL || 'http://127.0.0.1:8000'}/api/:path*/` }];
-  },
+  async rewrites() { return [{ source: '/api/:path*', destination: `${backend}/api/:path*/` }]; },
 };
-export default nextConfig;
+export default config;
