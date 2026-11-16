@@ -1,0 +1,18 @@
+{
+  "owner": "Atiksh Gour",
+  "reviewer": "Anvi Srinivas (pending)",
+  "story": "US-15",
+  "github_issue": 23,
+  "sprint": 5,
+  "original_srs_sprint": 5,
+  "proposed_development_plan_sprint": 3,
+  "generated_by": "Django 5.2.18 manage.py makemigrations student_services --no-header",
+  "paths": ["backend/apps/student_services/migrations/0003_messallocation_coupon_and_more.py"],
+  "changes": [
+    "MessAllocation: one protected student reference, mess name, validity dates, active flag and update provenance/version",
+    "Coupon: protected allocation reference, coupon code, validity dates, active flag and update provenance/version",
+    "Date-order and nonblank name/code checks; per-allocation coupon-code uniqueness"
+  ],
+  "existing_data": "No prior records or migrations rewritten",
+  "production_migration": "Not Run"
+}

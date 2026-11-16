@@ -1,5 +1,37 @@
 # Canonical endpoint contract
 
+## US-15 implemented extension (2026-10-29; review pending)
+
+See [the mess contract](../../backend/apps/student_services/MESS_API.md).
+`GET /api/mess/` returns only the active student's current allocation/valid coupons.
+Mess Staff alone can GET/POST `/api/mess/allocations/` and `/api/mess/coupons/`,
+GET/PATCH their ID details, and GET `/api/mess/students/`. Writes require CSRF;
+PATCH requires expected_version. Dates are inclusive in Asia/Kolkata. No ordering,
+redemption, Director bypass, or student writes are exposed. Existing error/no-cache
+contracts are preserved.
+
+## US-14 implemented extension (2026-10-29; independent review pending)
+
+The [module contract](../../backend/apps/student_services/README.md)
+defines the new staff endpoints: `GET /api/complaints/manage/`,
+`GET /api/maintenance-staff/`, `POST /api/complaints/{id}/assign/`, and
+`POST /api/complaints/{id}/progress/`. Existing student endpoints remain scoped
+to their owner. Responses add assignment IDs and assignment snapshots in history.
+Progress requires an expected current status, a permitted next status and remarks.
+Sessions, CSRF, standardized errors and uncached responses apply throughout.
+
+## US-13 implemented slice (2026-10-27; independent review pending)
+
+The [student-services module contract](../../backend/apps/student_services/README.md)
+documents the implemented request/response fields and errors. Routes are
+`GET /api/complaint-categories/`, `GET|POST /api/complaints/`, and
+`GET /api/complaints/{id}/`. All require an active student session. Mutations
+require CSRF; reads/errors are uncached. Only `category` and `description` are
+accepted on submission; room, identity, status, timestamps and history are server-owned.
+Cross-student detail reads return the same 404 schema as a missing record.
+This records the implemented contract for review; it does not claim team approval
+or define the still-unimplemented US-14 staff endpoints.
+
 ```text
 HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
 STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.

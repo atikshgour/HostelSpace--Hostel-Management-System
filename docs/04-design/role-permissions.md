@@ -1,5 +1,45 @@
 # Role/assignment authorization matrix
 
+## US-15 mess permissions (2026-10-29; review pending)
+
+| Principal | Student mess view | Management lists/details | Create/update |
+| --- | --- | --- | --- |
+| Active Student | Own active/current allocation and coupons only | Denied | Denied |
+| Active Mess Staff | Denied | All mess records; active student directory | Allowed with CSRF and validation |
+| Other roles, including Director/superusers without Mess Staff role | Denied | Denied | Denied |
+| Inactive/anonymous | Denied | Denied | Denied |
+
+Ownership comes from the session; request parameters cannot switch student identity.
+The write services lock/reload authoritative actor roles; no superuser bypass.
+See [the complete contract](../../backend/apps/student_services/MESS_API.md).
+
+## US-14 staff extension (2026-10-29; independent review pending)
+
+| Principal | Management list | Staff directory | Assignment | Progress |
+| --- | --- | --- | --- | --- |
+| Active Hostel Director | All complaints | Active Maintenance Staff only | Active Maintenance Staff; unresolved complaints | One forward step on assigned complaints |
+| Active Maintenance Staff | Own assignments only | Denied | Denied | One forward step on own assignment |
+| All other roles, including unrelated superusers | Denied | Denied | Denied | Denied |
+| Inactive/anonymous | Denied | Denied | Denied | Denied |
+
+No superuser bypass. Foreign/unassigned maintenance complaint IDs return 404.
+The service reloads and locks current roles/assignment for every write. Students
+retain read-only access to their own current complaint and complete history.
+See [the full policy and API contract](../../backend/apps/student_services/README.md).
+
+## US-13 implemented permissions (2026-10-27; review pending)
+
+| Principal | Categories | Create complaint | List/detail | Update/delete |
+| --- | --- | --- | --- | --- |
+| Active Student | Active categories | Own identity and profile room only, with CSRF | Own complaints only | Denied |
+| Inactive or unauthenticated user | Denied | Denied | Denied | Denied |
+| Any staff role, including superusers | Denied in this student API slice | Denied | Denied | Denied |
+
+Ownership is applied in the database query before detail lookup. Session roles
+are loaded on each request; stale role objects do not authorize service writes.
+US-14 staff assignments/transitions remain separate, unimplemented work. No Django
+superuser bypass or account/profile editing endpoints are introduced here.
+
 ```text
 HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
 STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.

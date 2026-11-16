@@ -1,0 +1,8 @@
+# Owner: Atiksh | US-20 | Sprint 1
+-r requirements.in
+pytest>=8,<10
+pytest-django>=4.11,<5
+pytest-cov>=6,<8
+ruff>=0.14,<1
+bandit>=1.8,<2
+pip-audit>=2.9,<3

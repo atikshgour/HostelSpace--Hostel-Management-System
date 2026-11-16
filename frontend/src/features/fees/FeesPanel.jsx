@@ -1,72 +1,226 @@
-/*
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: frontend/src/features/fees/FeesPanel.jsx
-ACCOUNTABLE OWNER: Atiksh Gour
-INDEPENDENT REVIEWER: Anvi Srinivas
-USER STORIES: US-16
-DEVELOPMENT PLAN SPRINT(S): 3 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 5 (preserved baseline mapping)
-REQUIREMENTS: FR-09; NFR-03; SEC-06; BR-06
-FILE PURPOSE: FeesPanel UI component
-
-WHAT TO IMPLEMENT IN THIS FILE
-Personal dues, amounts/currency/status and safe sandbox checkout initiation; disable Paid re-initiation, handle pending/failure. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-
-OWNER: Atiksh Gour | REVIEWER: Anvi Srinivas
-TARGET FILE: frontend/src/features/fees/FeesPanel.jsx
-DEVELOPMENT-PLAN SPRINT: 3
-ORIGINAL SRS SPRINT: 5
-STORY: US-16
-REQUIREMENTS: FR-09; NFR-03; SEC-06; BR-06
-RESPONSIBILITY: FeesPanel UI component
-FILE TASK: Personal dues, amounts/currency/status and safe sandbox checkout initiation; disable Paid re-initiation, handle pending/failure. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-US-16 — View fees and verify test payment results
-Dependencies: US-01, US-18; sandbox provider access
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Separate FeeDue and PaymentAttempt; fixed-precision amount/currency; initiate for server-calculated amount.
-- Only verified server-side matching fee/order/amount/currency success marks fee Paid.
-- Failed/cancelled attempts leave Unpaid; unverified result stays Pending.
-- Unique provider reference plus atomic update prevents duplicate success even on concurrent callbacks/retries.
-- Keep failure/cancellation/pending attempt history; no credentials, card/UPI PINs or real funds; provider-hosted test checkout only. Simulation requires faculty approval and explicit labeling.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-*/
-
-/* IMPLEMENTATION AREA: replace this marker with reviewed code. */
+/* Owner: Atiksh Gour | US-16 | Dev sprint 3 | SRS sprint 5 | Reviewer: Anvi Srinivas (pending) */
+"use client";
+import { useState } from "react";
+import { api } from "@/lib/api";
+import {
+  useResource,
+  useIdentity,
+  ErrorMessage,
+  ResourceForm,
+} from "@/components/ui/AppShell";
+import Card from "@/components/ui/Card";
+import PageHeader from "@/components/ui/PageHeader";
+import Button from "@/components/ui/Button";
+import StatusBadge from "@/components/ui/StatusBadge";
+import DataTable from "@/components/ui/DataTable";
+import { money, dateTime } from "@/lib/format";
+async function loadCheckout() {
+  if (window.Razorpay) return;
+  await new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "https://checkout.razorpay.com/v1/checkout.js";
+    s.onload = resolve;
+    s.onerror = () => reject(new Error("Unable to load sandbox checkout."));
+    document.body.append(s);
+  });
+}
+export default function FeesPanel() {
+  const user = useIdentity(),
+    director = user.role === "DIRECTOR";
+  const { data, error, refresh } = useResource([
+    "/api/fees/",
+    "/api/payments/attempts/",
+    director ? "/api/choices/users/" : null,
+  ]);
+  const [failure, setFailure] = useState(null),
+    [attempt, setAttempt] = useState(null),
+    [busy, setBusy] = useState(false),
+    [message, setMessage] = useState("");
+  async function begin(fee) {
+    setBusy(true);
+    setFailure(null);
+    try {
+      const a = await api("/api/payments/initiate/", {
+        method: "POST",
+        body: { fee },
+      });
+      refresh();
+      if (a.provider === "simulation") {
+        setAttempt(a);
+        return;
+      }
+      await loadCheckout();
+      const checkout = new window.Razorpay({
+        key: a.checkout_key,
+        order_id: a.order_id,
+        amount: Math.round(Number(a.amount) * 100),
+        currency: a.currency,
+        name: "HostelSpace · TEST",
+        description: "Sandbox hostel fee payment",
+        handler: async (r) => {
+          try {
+            await api("/api/payments/verify/", {
+              method: "POST",
+              body: {
+                attempt: a.id,
+                payment_id: r.razorpay_payment_id,
+                signature: r.razorpay_signature,
+              },
+            });
+            setMessage("Sandbox payment verified by the server.");
+            refresh();
+          } catch (e) {
+            setFailure(e);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setMessage(
+              "Checkout closed. No success was verified; the attempt remains Pending.",
+            );
+            refresh();
+          },
+        },
+      });
+      checkout.open();
+    } catch (e) {
+      setFailure(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function simulate(outcome) {
+    setBusy(true);
+    setFailure(null);
+    try {
+      await api("/api/payments/simulate/", {
+        method: "POST",
+        body: { attempt: attempt.id, outcome },
+      });
+      setMessage(`Local simulation: ${outcome}. No real payment was made.`);
+      setAttempt(null);
+      refresh();
+    } catch (e) {
+      setFailure(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <>
+      <PageHeader
+        title="Fees & payments"
+        description="Fee balances and retained payment-attempt history. Live payments are not supported."
+      />
+      <ErrorMessage error={error || failure} />
+      {message ? (
+        <p role="status" className="hs-notice">
+          {message}
+        </p>
+      ) : null}
+      {director ? (
+        <Card>
+          <ResourceForm
+            title="Create fee due"
+            fields={[
+              {
+                name: "student",
+                label: "Student",
+                options: (data?.[2] || []).map((x) => ({
+                  value: x.id,
+                  label: x.name,
+                })),
+              },
+              { name: "title", label: "Fee title" },
+              {
+                name: "amount",
+                label: "Amount",
+                type: "number",
+                min: ".01",
+                step: ".01",
+              },
+              { name: "currency", label: "Currency", options: ["INR"] },
+              { name: "due_date", label: "Due date", type: "date" },
+            ]}
+            onSave={async (body) => {
+              await api("/api/fees/", { method: "POST", body });
+              refresh();
+            }}
+          />
+        </Card>
+      ) : null}
+      <div className="hs-stack" style={{ marginTop: 24 }}>
+        {(data?.[0] || []).map((x) => (
+          <Card key={x.id}>
+            <div className="hs-row">
+              <div>
+                <h2>{x.title}</h2>
+                <p className="hs-stat">{money(x.amount, x.currency)}</p>
+                <p className="hs-muted">
+                  Due {x.due_date}
+                  {director ? ` · ${x.student_name || "Student"}` : ""}
+                </p>
+              </div>
+              <div className="hs-stack">
+                <StatusBadge>{x.status}</StatusBadge>
+                {!director && x.status !== "Paid" ? (
+                  <Button
+                    variant="primary"
+                    disabled={busy}
+                    onClick={() => begin(x.id)}
+                  >
+                    Open test checkout
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </Card>
+        ))}
+        <Card>
+          <h2>Payment history</h2>
+          <DataTable
+            headers={["Attempt", "Fee", "Amount", "Mode", "Status", "Created"]}
+            rows={(data?.[1] || []).map((x) => [
+              x.id.slice(0, 8),
+              x.fee,
+              money(x.amount, x.currency),
+              x.provider === "simulation"
+                ? "Local simulation"
+                : "Razorpay TEST",
+              <StatusBadge key="status">{x.status}</StatusBadge>,
+              dateTime(x.created_at),
+            ])}
+          />
+          {data && !data[1].length ? (
+            <p className="hs-empty">No payment attempts.</p>
+          ) : null}
+        </Card>
+      </div>
+      {attempt ? (
+        <div className="hs-modal">
+          <section
+            className="hs-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Local payment simulation"
+          >
+            <h2>LOCAL PAYMENT SIMULATION</h2>
+            <p className="hs-notice">
+              No funds, card details or real payments. For coursework
+              demonstration only; obtain faculty approval before presenting it
+              as payment acceptance evidence.
+            </p>
+            <p>{money(attempt.amount, attempt.currency)}</p>
+            <div className="hs-actions">
+              {["Success", "Failed", "Cancelled"].map((x) => (
+                <Button disabled={busy} key={x} onClick={() => simulate(x)}>
+                  Simulate {x.toLowerCase()}
+                </Button>
+              ))}
+            </div>
+          </section>
+        </div>
+      ) : null}
+    </>
+  );
+}
