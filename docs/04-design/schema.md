@@ -1,115 +1,29 @@
-# Entity keys, constraints and relationships
+# Arin schema and integration assumptions
 
-## US-15 mess schema (2026-10-29; review pending)
+## Required shared models
 
-MessAllocation has one protected Student reference, mess_name, validity dates and
-active status. Coupon belongs to an allocation with a code, its own validity and
-active status. Both retain last updater/server time and an incrementing version.
-Database constraints enforce unique allocation per student, ordered dates, nonblank
-name/code and unique code per allocation. This is mutable configuration, not an
-audit ledger. See the [contract](../../backend/apps/student_services/MESS_API.md)
-and [generated migration sidecar](../07-maintenance/us15-migration-manifest.json).
+- `settings.AUTH_USER_MODEL` defaults to `accounts.User` in shared config. Required fields/behavior: pk, is_authenticated, is_active, role, get_full_name(), get_username().
+- Student has reverse one-to-one `student_profile`, whose `assigned_warden` references the user model. Warden has `chief_warden` referencing a Chief user. Production must validate assignment roles and the single-active-Chief policy.
+- `settings.HOSTELSPACE_RULE_MODEL` defaults to `information.Rule`. Required: pk, title (<=200), weightage decimal(10,2) nonnegative, active Boolean.
 
-## US-14 additive assignment fields (2026-10-29; review pending)
+## Arin models
 
-Complaint now has a nullable protected `assigned_to` User foreign key.
-ComplaintTransition adds nullable protected `old_assigned_to`/`new_assigned_to`
-foreign keys. Assignment events preserve status and snapshot both assignees;
-progress events snapshot status and current assignee. Existing rows are preserved.
-See the [generated-migration sidecar](../07-maintenance/us14-migration-manifest.json)
-and [transaction/authorization contract](../../backend/apps/student_services/README.md).
+| Model | Key relationships / data | Invariants |
+|---|---|---|
+| LeaveRequest | UUID; student; captured assigned_warden; dates/reason/status; server created_at | DB end>=start; API Pending on create; final states immutable through service |
+| LeaveTransition | leave; actor; from/to; remarks; server occurred_at | Append through transactional submit/decision; no update/delete API |
+| AttendanceSession | UUID; warden; title; window; centre configuration; radius/accuracy/age policy | DB valid window, positive limits, coordinate ranges; serializer finite numeric validation |
+| Attendance | UUID; session; student; result/reason_code/server submitted_at | Partial unique `(session,student)` WHERE result='Accepted'; rejected retries allowed; NO student sample fields |
+| Deviation | UUID; student; rule; title/weight snapshots; remarks; recording actor/time; active; deactivation actor/time/reason | Nonnegative DB weight; server reads/locks source rule; totals include active only; retained history |
 
-## US-13 implemented foundation (2026-10-27; review pending)
+Foreign keys use PROTECT to avoid silently deleting historical records. UUIDs reduce accidental ID collisions but are NOT authorization. Lists are bounded to 25 rows per page. `Deviation` is the concrete implementation name for the original plan’s descriptive DeviationRecord entity.
 
-User-authorized dependency: `accounts.User` extends Django AbstractUser with an
-explicit role and a database role constraint. `StudentProfile` has one user,
-unique SRN, room and phone. Passwords use Django hashing. Login/profile management,
-warden assignment and Chief Warden policy remain outside this minimal dependency.
+## Transactions and migration portability
 
-`ComplaintCategory` stores managed category codes/labels and active state. The source
-does not enumerate categories; no real category list or seed data is invented.
-`Complaint` references the student and category with protected foreign keys and
-stores the room snapshot, description, status and server creation time. PostgreSQL
-checks reject blank description/room and unknown statuses. A student/time/id index
-supports ordered, ownership-scoped pagination.
+`decide_leave()` locks the scoped request with `select_for_update` inside an atomic transaction. `submit_attendance()` combines a preliminary check with a database partial unique constraint and a nested savepoint to handle a racing acceptance as 409. Deviation recording locks the rule before snapshot; deactivation locks the existing entry.
 
-`ComplaintTransition` stores actor, server time, old/new status and remarks. Creation
-and its initial transition are atomic. No API modifies history; model/QuerySet
-write guards prohibit rewriting/deleting it. Protected foreign keys prevent routine
-ORM deletion of referenced complaints/users. Privileged direct SQL is outside these
-application guards and must follow the institutional retention policy.
+The initial migration resolves user and rule models via settings and first-migration dependencies. It is shared by both harness and proposed integration. Confirm the real Rule is created in its first migration and review dependency cycles before applying anywhere. If the team already has applied migrations, create a reviewed forward migration instead of overwriting existing history. Disposable integration migration and `makemigrations --check` results are in `docs/05-validation/execution-log.md`; real shared-model and PostgreSQL gates are not automatically satisfied.
 
-Initial migrations were generated by Django, replacing only untouched starter
-placeholders. [Migration ownership metadata](../07-maintenance/us13-migration-manifest.json)
-records attribution. Existing databases that already used Django's default user model
-need a reviewed conversion plan; no reset or production migration is authorized here.
+## Scope boundaries
 
-```text
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: docs/04-design/schema.md
-ACCOUNTABLE OWNER: Arin Singh
-INDEPENDENT REVIEWER: Aryan Singh
-USER STORIES: US-18
-DEVELOPMENT PLAN SPRINT(S): 1 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 1 (preserved baseline mapping)
-REQUIREMENTS: All FRs; SEC-01–06
-FILE PURPOSE: Entity keys, constraints and relationships
-
-WHAT TO IMPLEMENT IN THIS FILE
-One profile/student, unique login/SRN, active Chief uniqueness, student Warden assignment, one current laundry allocation, attendance uniqueness, Decimal fee/attempt and provider reference. Each feature owner writes own migrations.
-
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-
-OWNER: Arin Singh | REVIEWER: Aryan Singh
-TARGET FILE: docs/04-design/schema.md
-DEVELOPMENT-PLAN SPRINT: 1
-ORIGINAL SRS SPRINT: 1
-STORY: US-18
-REQUIREMENTS: All FRs; SEC-01–06
-RESPONSIBILITY: Entity keys, constraints and relationships
-FILE TASK: One profile/student, unique login/SRN, active Chief uniqueness, student Warden assignment, one current laundry allocation, attendance uniqueness, Decimal fee/attempt and provider reference. Each feature owner writes own migrations.
-
-US-18 — Agree models, permissions and API contracts
-Dependencies: US-17
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Reviewed data design covers all profile/information/study/laundry/leave/attendance/complaint/mess/fee/deviation entities.
-- Specify endpoint inputs, outputs, roles, ownership and errors; choose custom user model before initial migrations.
-- Each owner supplies portable migrations; clean SQLite quick-mode and PostgreSQL runs; prove attendance/payment uniqueness on PostgreSQL.
-- All four owners approve shared schema and permission matrix.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-```
+Only Arin’s domain schema is implemented here. Shared user/profile/content, study-room/laundry, complaint/mess/payment and Director-management models must come from their owners. US-18 full-project approval stays pending until all entity/permission contracts and migration graphs are reviewed.
