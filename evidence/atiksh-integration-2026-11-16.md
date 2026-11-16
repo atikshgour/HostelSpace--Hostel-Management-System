@@ -69,3 +69,17 @@ configuration; this branch does not claim their acceptance cases.
 
 HISTORY.md and human-review handoff entries are preserved and will be appended
 only after actual human review, as required by repository instructions.
+
+## Hosted CI correction
+
+Initial pushed commit `3ef3edf` ran in GitHub Actions run `43904506352`.
+Hosted frontend lint/tests/build passed. Python 3.12 dependency installation and
+Docker failed because the Python-3.13-generated hashed locks omitted the conditional
+`typing-extensions` dependency needed by psycopg/CycloneDX on Python 3.12.
+The missing compatibility dependency was added to requirements.in and both hash
+locks were regenerated with pip-compile 7.6.2 (not hand-edited). The exact commands
+used `--allow-unsafe --generate-hashes --no-emit-index-url --strip-extras`, the
+appropriate `--output-file=backend/requirements[-dev].txt` and corresponding input,
+plus `--quiet --pip-args='--timeout=30 --retries=0'`.
+`pip check` reported no broken requirements. The corrected hosted run is verified
+separately; the initial failed run is retained as honest evidence.

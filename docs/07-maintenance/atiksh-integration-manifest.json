@@ -483,5 +483,19 @@
       "source_sha256": "596cd5753839e518ade03ba766928f502b308c469b30ec1fd41b7a8fe5f9d85d",
       "replicated_sha256": "7354d19ecfd5ca71c52b3f35fdd744f5db958f854f1efe78376512f733289c16"
     }
+  ],
+  "generated_locks": [
+    {
+      "path": "backend/requirements.txt",
+      "sha256": "bc2f3526569fd28907f004bd4ef6b684662b70a441d39649205fda1ffebfa093",
+      "tool": "pip-compile 7.6.2",
+      "reason": "Retain Python 3.12 conditional typing-extensions dependency in both hashed locks."
+    },
+    {
+      "path": "backend/requirements-dev.txt",
+      "sha256": "e943c642151dfbce8396eba7059b79024c7ffa563d4214368150ff3b96e38940",
+      "tool": "pip-compile 7.6.2",
+      "reason": "Retain Python 3.12 conditional typing-extensions dependency in both hashed locks."
+    }
   ]
 }
