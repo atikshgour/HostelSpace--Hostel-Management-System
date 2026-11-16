@@ -1,19 +1,69 @@
-# HostelSpace — Hostel Management System
+# Hostel Management System
 
-HostelSpace is a browser-based hostel management system developed by Team 11 for PES University, Bangalore, Department of Computer Science and Engineering, course UE24CS341A Software Engineering. The project follows an Agile workflow and is version 1.0 in the supplied project documents.
+## HostelSpace
 
-The normal stack is a Next.js/JavaScript frontend, Django REST Framework backend, Django sessions with CSRF protection, and PostgreSQL.
+HostelSpace is a browser-based hostel management system developed for the UE24CS341A - Software Engineering course at PES University, Bangalore.
 
-## Team and responsibilities
+At present, many hostel activities are handled through notice boards, paper forms, registers, messages, and repeated visits to the hostel office. Information is spread across different places, so students may need to ask several people before receiving an update. Staff also have to check different records to answer common questions.
 
-| Member | Main responsibility |
+HostelSpace brings these activities into one portal. Students can sign in, view hostel notices and rules, check study-room status, see their assigned laundry day, track clothes given and collected, apply for leave, submit attendance, raise maintenance complaints, view mess details, pay hostel fees, and check deviation-weightage records. Students see only their own records and services.
+
+Hostel staff use the same system according to their roles. Wardens process leave, attendance, and discipline records. The Chief Warden supervises wardens and handles escalated matters. The Hostel Director controls authorized users, information, settings, and reports. Laundry, mess, maintenance, and content staff update only records related to their work.
+
+## Project information
+
+| Item | Details |
 |---|---|
-| Anvi Srinivas | Authentication, profile, information/content, and Director workflows |
-| Arin Singh | Leave, Warden decisions, location-verified attendance, and deviation records |
-| Aryan Singh | Study-room and laundry workflows |
-| Atiksh Gour | Complaints, mess, fees/payments, CI and integration foundation |
+| Project name | HostelSpace |
+| Project | Hostel Management System |
+| Course | UE24CS341A - Software Engineering |
+| University | PES University, Bangalore |
+| Department | Computer Science and Engineering |
+| Team | Team 11 |
+| Methodology | Agile |
+| Version | 1.0 |
+| Development | Git and GitHub |
+| Project planning | Jira |
+
+## Team members
+
+| Name | USN | Primary responsibilities |
+|---|---|---|
+| Anvi Srinivas | PES1UG24CS076 | Student profile, notices, information, contacts, hostel rules, and Director workflows |
+| Arin Singh | PES1UG24CS079 | Leave, location-verified attendance, and deviation records |
+| Aryan Singh | PES1UG24CS086 | Study-room status, laundry allocation, handover, and collection |
+| Atiksh Gour | PES1UG24CS096 | Maintenance complaints, mess and coupons, hostel fee payment, CI, and integration |
 
 The whole team shares integration, authorization review, validation, documentation, and demonstration responsibilities.
+
+## Project scope
+
+The first version covers role-based sign-in and student profile access, hostel notices and rules, study-room status, assigned laundry tracking, laundry handover and collection, leave management, location-verified attendance, maintenance complaints, mess allocation and coupons, hostel fee payment records, deviation-weightage records, authorized staff updates, and Director reports.
+
+## Out of scope
+
+The first version does not include study-room booking, student selection of laundry days, continuous location tracking, full hostel accounting, biometric devices, inventory management, or a native mobile application.
+
+## User roles
+
+- **Student** — uses student services and views personal records.
+- **Warden** — reviews leave, views attendance, and records deviations.
+- **Chief Warden** — supervises wardens and handles escalated matters.
+- **Hostel Director** — controls authorized users, information, settings, and reports.
+- **Maintenance Staff** — updates assigned maintenance complaints.
+- **Mess Staff** — maintains mess allocation and coupons.
+- **Laundry Staff** — maintains laundry assignment, handover, and collection records.
+- **Content Staff** — publishes approved hostel information.
+
+## Technology stack
+
+- Frontend: Next.js, JavaScript, HTML, CSS
+- Backend: Django and Django REST Framework
+- Database: PostgreSQL in the normal stack; SQLite only for explicit local quick mode
+- Authentication: Django sessions with CSRF protection and server-side role authorization
+- Version control: Git and GitHub
+- Project management: Jira
+- Delivery: Docker Compose and GitHub Actions
 
 ## Implemented modules
 
