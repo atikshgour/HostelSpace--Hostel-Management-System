@@ -1,0 +1,2 @@
+const {defineConfig}=require('@playwright/test');
+module.exports=defineConfig({testDir:'.',testMatch:['e2e/**/*.spec.js','system/**/*.spec.js'],fullyParallel:false,workers:1,retries:0,timeout:60000,use:{baseURL:process.env.BASE_URL||'http://127.0.0.1:3000',headless:true,viewport:{width:1366,height:900},screenshot:'only-on-failure',trace:'retain-on-failure',launchOptions:process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}},reporter:[['list'],['html',{open:'never'}]]});

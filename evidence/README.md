@@ -1,71 +1,42 @@
 # Sanitized evidence index
 
-```text
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: evidence/README.md
-ACCOUNTABLE OWNER: Aryan Singh
-INDEPENDENT REVIEWER: Atiksh Gour
-USER STORIES: US-23
-DEVELOPMENT PLAN SPRINT(S): 4–6 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 6 (preserved baseline mapping)
-REQUIREMENTS: All FRs; NFR-01,03–05
-FILE PURPOSE: Sanitized evidence index
+Owner: Aryan Singh · Reviewer: Atiksh Gour · Story: US-23
 
-WHAT TO IMPLEMENT IN THIS FILE
-Links to genuine PR/CI/migration/container/validation results, actual SHA; no invented screenshots or secret data; large generated reports as CI artifacts.
+## UI screenshots
 
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
+`tests/e2e/critical-flows.spec.js` writes screenshots to `evidence/ui/` each time the browser suite runs against disposable synthetic accounts. **The images are not committed on branch `aryan`.** They contain only synthetic demo data, but they are regenerated on every run, so commit them only if the team decides to keep a fixed evidence set.
 
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
+The 2026-11-14 run (12/12 passed) produced these 22 files:
 
-OWNER: Aryan Singh | REVIEWER: Atiksh Gour
-TARGET FILE: evidence/README.md
-DEVELOPMENT-PLAN SPRINT: 4–6
-ORIGINAL SRS SPRINT: 6
-STORY: US-23
-REQUIREMENTS: All FRs; NFR-01,03–05
-RESPONSIBILITY: Sanitized evidence index
-FILE TASK: Links to genuine PR/CI/migration/container/validation results, actual SHA; no invented screenshots or secret data; large generated reports as CI artifacts.
+- `ui/announcement-editor-dialog.png`
+- `ui/announcements.png`
+- `ui/attendance-accepted.png`
+- `ui/complaint-resolved.png`
+- `ui/deviation-management.png`
+- `ui/director-overview.png`
+- `ui/hostel-rules.png`
+- `ui/laundry-group-schedule.png`
+- `ui/laundry-receive-dialog.png`
+- `ui/laundry-work-queue.png`
+- `ui/leave-approved.png`
+- `ui/mobile-navigation.png`
+- `ui/mobile-profile.png`
+- `ui/payment-simulation.png`
+- `ui/student-dashboard.png`
+- `ui/student-laundry.png`
+- `ui/student-mess.png`
+- `ui/study-room.png`
+- `ui/warden-account-dialog.png`
+- `ui/warden-announcements.png`
+- `ui/warden-mess-management.png`
+- `ui/warden-people.png`
 
-US-23 — Run integrated workflows and reliability checks
-Dependencies: US-19, US-20; US-01–16 for regression
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Critical Playwright login/leave/laundry/complaint flows across integrated app.
-- PostgreSQL tests prove attendance/payment retries and concurrency produce no duplicate accepted/success records.
-- Performance baseline proposed: 20 signed-in synthetic users, 100 warm visits, p95 navigation-to-usable ≤3s; approval required before target is binding.
-- Record browser/env/dataset/SHA/time/observations and failures; cover mess/payment/deviation with repeatable manual cases where appropriate.
+These screenshots show views that were exercised. They are not independent human acceptance.
 
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
+## Other evidence
 
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-```
+- Test commands and observed results: `docs/06-testing/test-summary.md`.
+- Branch `aryan` commits: `325bad1` (Sprint 1), `f240aed` (Sprint 2), `7f44eee` (Sprint 3), `72b15c8` (Sprint 4), `b7a9aa3` (Sprint 5).
+- Hosted CI, container runs and migration runs on a shared database: none yet for this branch.
+
+No passwords, session cookies, databases, raw attendance coordinates, payment credentials or Playwright failure traces are stored here.

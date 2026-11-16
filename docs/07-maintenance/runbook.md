@@ -1,71 +1,25 @@
-# Recovery and maintenance handoff
+# Recovery and maintenance runbook
 
-```text
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: docs/07-maintenance/runbook.md
-ACCOUNTABLE OWNER: Atiksh Gour
-INDEPENDENT REVIEWER: Anvi Srinivas
-USER STORIES: US-24
-DEVELOPMENT PLAN SPRINT(S): 5–6 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 6 (preserved baseline mapping)
-REQUIREMENTS: FR-09; NFR-03; SEC-06; recovery
-FILE PURPOSE: Recovery and maintenance handoff
+Owner: Atiksh Gour (payments and recovery). Independent reviewer: Anvi Srinivas. Sprint 6, US-24. Arin Singh owns leave and attendance triage; Aryan Singh owns facilities triage. A production operator and backup schedule remain to be appointed before release.
 
-WHAT TO IMPLEMENT IN THIS FILE
-Named owners, weekly dependency triage, backup separate restore, compatible rollback, incident and payment failure flow; no real secrets/dumps.
+## Weekly routine
 
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
+Atiksh reviews backend/frontend dependency and security advisories weekly, records versions and an upgrade issue, and runs CI and payment tests after accepted upgrades. The assigned operator checks the most recent backup job, retention and restore drill evidence. Triage new bugs by impact, affected roles, reproduction, owner and severity; escalate data loss, authentication failure and payment mismatch immediately to Atiksh and Anvi. Preserve logs without secrets, cookies, payment credentials or student coordinates.
 
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
+## Synthetic PostgreSQL drill
 
-OWNER: Atiksh Gour | REVIEWER: Anvi Srinivas
-TARGET FILE: docs/07-maintenance/runbook.md
-DEVELOPMENT-PLAN SPRINT: 5–6
-ORIGINAL SRS SPRINT: 6
-STORY: US-24
-REQUIREMENTS: FR-09; NFR-03; SEC-06; recovery
-RESPONSIBILITY: Recovery and maintenance handoff
-FILE TASK: Named owners, weekly dependency triage, backup separate restore, compatible rollback, incident and payment failure flow; no real secrets/dumps.
+Use an isolated local PostgreSQL server and **synthetic records only**. Never run these scripts against production. Set PostgreSQL connection variables `PGHOST`, `PGPORT`, `PGUSER`, and credentials via a secured passfile or environment. Use `PGDATABASE=hostelspace_synthetic_<label>` and `HS_SYNTHETIC_ONLY=YES`. Set `HS_BACKUP_DIR` to a secured existing directory outside this repository and run `bash scripts/backup.sh`. It creates a custom-format dump and exact per-table count manifest with restrictive file permissions. Keep both outside Git and restrict access and retention under the operator's policy.
 
-US-24 — Verify recovery and complete maintenance guidance
-Dependencies: US-16, US-20; US-23 before release
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Restore synthetic PostgreSQL backup into separate database and verify expected counts.
-- Record/test known-good frontend/API rollback after checking schema compatibility; app rollback does not reverse migrations.
-- Retest sandbox success/failure/pending/duplicate payment acceptance with no real funds/data.
-- Name maintainers, weekly dependency review, backups, incident/bug triage and recovery steps; no dumps/secrets in repository.
+Create an empty, separate `hostelspace_restore_<label>` database on the isolated server. Set `HS_RESTORE_DATABASE`, `HS_BACKUP_FILE`, `HS_COUNTS_FILE`, and `HS_RESTORE_CONFIRM='RESTORE SYNTHETIC TEST DATABASE'`; run `bash scripts/restore-test.sh`. The script refuses a missing or populated target and checks every public-table count after restore. Compare schema/migration state, health endpoint and sample synthetic API reads manually. Dispose of drill databases and files under the approved local retention policy. Do not interpret matching counts as proof of row-level integrity.
 
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
+## Compatible application rollback
 
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-```
+Record the deployed frontend/API commit and migration state before release. Keep the last known-good images. In an isolated clone, restore the synthetic database, run `python backend/manage.py showmigrations`, and verify the known-good API models and frontend against the **current** schema. Run health, authentication and payment regression tests. If compatible, redeploy the paired known-good frontend/API images, then check health and the same smoke tests. Do not reverse migrations or rewrite payment attempts as part of an application rollback. If incompatible, stop and prepare a reviewed forward fix or data recovery plan. Production rollback and deployment require explicit approval.
+
+## Payment incident
+
+For an ambiguous or pending sandbox attempt, inspect the server attempt ID and provider order state through authorized tools. Recheck provider status through the existing verification API; do not create a duplicate due or mark Paid manually. A captured payment must match order, amount and currency. Record only sanitized attempt IDs, timestamps and outcome in the incident ticket. Escalate mismatches and provider errors to Atiksh; preserve immutable attempt history. Retest success, failure, pending and duplicate calls with synthetic test-mode records before release. Never use live funds.
+
+## Status
+
+The scripts and procedure are implemented for review. A separate restore drill, compatible rollback drill and external Razorpay sandbox flows require environment access and are tracked in `evidence/us24-validation.md`. Independent review and US-23 release checks remain open.

@@ -92,3 +92,10 @@ htmlcov/
 playwright-report/
 test-results/
 .DS_Store
+.local/
+
+# Local source handoff archives and private generated keys
+/Hostel Management System/
+/backend.zip
+.local-secret
+security-results/

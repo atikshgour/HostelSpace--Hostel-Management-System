@@ -1,0 +1,144 @@
+class RevisedMessTests(DomainCase):
+    def option(self, **kw):
+        return MessOption.objects.create(
+            name="Test hall", diet="Vegetarian", capacity=1, **kw
+        )
+
+    def test_student_select_and_retry_are_idempotent(self):
+        o = self.option()
+        for _ in range(2):
+            self.assertEqual(
+                self.post("/api/mess/select/", {"option": o.pk}).status_code, 200
+            )
+        self.assertEqual(MessChoiceEvent.objects.count(), 1)
+
+    def test_capacity_and_inactive_mess(self):
+        o = self.option()
+        self.post("/api/mess/select/", {"option": o.pk})
+        self.as_user(self.stranger)
+        self.assertEqual(
+            self.post("/api/mess/select/", {"option": o.pk}).status_code, 400
+        )
+        o.active = False
+        o.save()
+        self.assertEqual(
+            self.post("/api/mess/select/", {"option": o.pk}).status_code, 400
+        )
+
+    def test_student_cannot_choose_for_somebody_else(self):
+        o = self.option()
+        self.assertEqual(
+            self.post(
+                "/api/mess/select/", {"option": o.pk, "student": self.stranger.pk}
+            ).status_code,
+            403,
+        )
+
+    def test_warden_student_scope_for_selection_and_coupon(self):
+        o = self.option()
+        self.as_user(self.warden)
+        self.assertEqual(
+            self.post(
+                "/api/mess/select/", {"option": o.pk, "student": self.stranger.pk}
+            ).status_code,
+            403,
+        )
+        self.assertEqual(
+            self.post(
+                "/api/mess/coupons/",
+                {
+                    "student": self.stranger.pk,
+                    "code": "OTHER",
+                    "valid_from": "2026-01-01",
+                    "valid_to": "2026-12-31",
+                    "active": True,
+                },
+            ).status_code,
+            403,
+        )
+
+    def test_selection_change_retains_history_and_releases_capacity(self):
+        first = self.option()
+        second = MessOption.objects.create(name="Second hall", diet="Mixed", capacity=1)
+        self.post("/api/mess/select/", {"option": first.pk})
+        self.post("/api/mess/select/", {"option": second.pk})
+        self.as_user(self.stranger)
+        self.assertEqual(
+            self.post("/api/mess/select/", {"option": first.pk}).status_code, 200
+        )
+        self.assertEqual(MessChoiceEvent.objects.count(), 3)
+
+    def test_only_warden_publishes_catalogue(self):
+        body = {"name": "New hall", "diet": "Vegetarian", "capacity": 30}
+        for u in [self.student, self.mess, self.director]:
+            self.as_user(u)
+            self.assertEqual(self.post("/api/mess/options/", body).status_code, 403)
+        self.as_user(self.warden)
+        self.assertEqual(self.post("/api/mess/options/", body).status_code, 201)
+
+    def test_capacity_cannot_drop_below_enrolment(self):
+        o = self.option()
+        self.post("/api/mess/select/", {"option": o.pk})
+        self.as_user(self.warden)
+        self.assertEqual(
+            self.client.patch(
+                f"/api/mess/options/{o.pk}/", {"capacity": 0}, format="json"
+            ).status_code,
+            400,
+        )
+
+    def test_cannot_rename_enrolled_mess(self):
+        o = self.option()
+        self.post("/api/mess/select/", {"option": o.pk})
+        self.as_user(self.warden)
+        self.assertEqual(
+            self.client.patch(
+                f"/api/mess/options/{o.pk}/", {"name": "Changed"}, format="json"
+            ).status_code,
+            400,
+        )
+
+    def test_warden_can_assign_own_student_complaint_not_others(self):
+        mine = self.post(
+            "/api/complaints/", {"category": "Other", "description": "Issue"}
+        ).json()["id"]
+        self.as_user(self.stranger)
+        other = self.post(
+            "/api/complaints/", {"category": "Other", "description": "Issue"}
+        ).json()["id"]
+        self.as_user(self.warden)
+        self.assertEqual(
+            self.post(
+                f"/api/complaints/{mine}/assign/", {"assigned_to": self.maintenance.pk}
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.post(
+                f"/api/complaints/{other}/assign/", {"assigned_to": self.maintenance.pk}
+            ).status_code,
+            404,
+        )
+
+    @skipUnless(
+        apps.is_installed("apps.information"),
+        "Information integration runs after the owner module is merged.",
+    )
+    def test_warden_announcements_and_student_no_write(self):
+        body = {
+            "kind": "notice",
+            "title": "Laundry collection update",
+            "body": "Collect at the counter.",
+            "active": True,
+        }
+        self.assertEqual(self.post("/api/information/", body).status_code, 403)
+        self.as_user(self.warden)
+        self.assertEqual(self.post("/api/information/", body).status_code, 201)
+        self.as_user(self.student)
+        self.assertIn(
+            body["title"],
+            [
+                x["title"]
+                for x in self.client.get("/api/information/").json()["results"]
+            ],
+        )

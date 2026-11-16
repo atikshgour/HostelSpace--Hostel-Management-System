@@ -1,5 +1,44 @@
 # Live requirement/story/file/test/evidence matrix
 
+## US-24 recovery guidance — 2026-11-07 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-09, NFR-03, SEC-06 | US-24 / Atiksh Gour / Sprint 6; reviewer Anvi Srinivas pending | TC-REL-01, TC-FR09-01 | [Actual results](../../evidence/us24-validation.md), [runbook](../07-maintenance/runbook.md), [backup](../../scripts/backup.sh), [restore](../../scripts/restore-test.sh) | Scripts and guidance implemented; `git diff --check` passed. Bash syntax, separate restore/count drill, rollback drill and external sandbox payment flows Not Run. |
+
+## US-16 evidence — 2026-10-31 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-09, BR-06, NFR-03, SEC-06 | US-16 / Atiksh Gour / Sprint 5; reviewer Anvi Srinivas pending | TC-FR09-01, TC-SEC06-01 (partial) | [Actual results](../../evidence/us16-validation.md), [backend tests](../../backend/apps/student_services/tests/test_payments.py), [UI tests](../../frontend/app/fees/page.test.jsx), [contract](../../backend/apps/student_services/FEES_API.md) | Three SQLite API tests and two Jest tests passed; Next.js build passed. PostgreSQL concurrency, provider sandbox checkout and human review Not Run. |
+
+## US-15 evidence — 2026-10-29 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-08, SEC-03; SEC-01/04 supporting checks | US-15 / Atiksh Gour / Sprint 5; reviewer Anvi Srinivas pending | TC-FR08-01 | [Actual results](../../evidence/us15-validation.md), [API/constraint/concurrency tests](../../backend/apps/student_services/tests/test_mess.py), [browser workflow](../../frontend/e2e/us15-browser.mjs), [contract](../../backend/apps/student_services/MESS_API.md) | 148 backend tests, 17 frontend tests, one US-15 Playwright workflow passed locally on PostgreSQL 15.19. Human review, PostgreSQL 16, Docker and remote CI pending. |
+
+## US-14 evidence — 2026-10-29 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-07, SEC-01; SEC-03/04 supporting checks | US-14 / Atiksh Gour / Sprint 4; reviewer Anvi Srinivas pending | TC-FR07-01 staff assignment/progress | [Actual results](../../evidence/us14-validation.md), [API/service tests](../../backend/apps/student_services/tests/test_complaint_management.py), [browser test](../../frontend/e2e/us14-browser.mjs) | 93 backend tests, 8 frontend tests, and one full Playwright workflow passed locally; PostgreSQL 15.19. Independent review, PostgreSQL 16, Docker and remote CI pending. |
+
+## US-13 backend evidence — 2026-10-27 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| FR-07, SEC-03; SEC-01/04 supporting checks | US-13 / Atiksh Gour, user-selected Sprint 4; reviewer Anvi Srinivas pending | TC-FR07-01 (student submission/tracking portion) | [Actual local results](../../evidence/us13-backend-validation.md), [API tests](../../backend/apps/student_services/tests/test_complaints.py), [module contract](../../backend/apps/student_services/README.md) | Backend slice verified on isolated PostgreSQL 15.19; 57 tests passed including the three baseline health tests. PostgreSQL 16/remote CI and independent review remain pending. FR-07 staff updates belong to US-14 and are not claimed complete. |
+
+## US-20 implementation evidence — 2026-10-27 (review pending)
+
+| Requirement | Story / owner | Test | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| NFR-05 | US-20 / Atiksh Gour; reviewer Anvi Srinivas pending | TC-CICD-01 | [Local commands and actual outcomes](../../evidence/ci-local-validation.md), [CI configuration](../../.github/workflows/ci.yml), [Compose and protection setup](../07-maintenance/ci-setup.md) | Partially verified. Local checks pass; PostgreSQL 16/Compose, remote PR, deliberate failed-test merge block and main protection remain pending. No CI/PR/Jira reference yet. |
+
+The instruction register below is preserved; this entry claims evidence only for
+the delivery foundation, not for unimplemented functional or validation rules.
+
 ```text
 HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
 STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
@@ -69,3 +108,25 @@ Commands and observed results: Not Run
 Unresolved decisions / limitations: Record before implementation
 PR / reviewer / evidence: Not available
 ```
+
+
+## Atiksh implementation evidence ? 2026-11-16 (review pending)
+
+FR-07 / US-13?14 / TC-FR07-01; FR-08 / US-15 / TC-FR08-01;
+FR-09 / US-16 / TC-FR09-01: local PostgreSQL/API/component and Chromium
+execution is recorded in [actual evidence](../../evidence/atiksh-integration-2026-11-16.md).
+[Exact PDF mappings and remaining cases](atiksh-stp-mapping.md) preserve all original
+requirement IDs. US-20 / TC-CICD-01 is partial until hosted CI, branch protection
+and same-SHA staging are verified. No release/faculty acceptance is claimed.
+
+
+## Team integration execution - 2026-11-16 (independent review pending)
+
+FR-01 through FR-11 automated implementation evidence is recorded in
+[team integration verification](../../evidence/team-integration-2026-11-16.md).
+The exact source-folder paths/hashes and merged PR heads are preserved in the
+[integration manifest](../07-maintenance/team-integration-manifest.json).
+115 PostgreSQL tests and 18 component tests passed locally. Browser journeys
+cover every functional domain, with PDF permission differences explicitly tested.
+Coverage, initial failures, reruns and unexecuted STP acceptance are recorded;
+this entry does not mark manual, provider, release or recovery acceptance complete.

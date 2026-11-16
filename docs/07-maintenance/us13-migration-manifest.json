@@ -1,0 +1,22 @@
+{
+  "story": "US-13",
+  "requirements": ["FR-07", "SEC-03"],
+  "test": "TC-FR07-01",
+  "implementation_owner": "Atiksh Gour",
+  "reviewer": "Anvi Srinivas",
+  "review_status": "Pending human review",
+  "user_selected_sprint": 4,
+  "original_srs_sprint": 4,
+  "prior_proposed_development_plan_sprint": 2,
+  "account_dependency": "User explicitly authorized minimal User/StudentProfile implementation in this conversation",
+  "generated_by": "Django 5.2.18 manage.py makemigrations accounts student_services --no-header",
+  "generated_paths": [
+    "backend/apps/accounts/migrations/0001_initial.py",
+    "backend/apps/student_services/migrations/0001_initial.py"
+  ],
+  "original_module_owners": {
+    "accounts": "Anvi Srinivas (original independent reviewer: Arin Singh)",
+    "student_services": "Atiksh Gour (independent reviewer: Anvi Srinivas)"
+  },
+  "migration_scope": "Untouched instruction-only migration placeholders replaced with tool-generated initial migrations. Applied only by Django tests on an isolated synthetic PostgreSQL cluster. No production migrations or data resets."
+}

@@ -1,5 +1,54 @@
 # HostelSpace
 
+> Team integration (2026-11-16): all four feature branches are combined with the
+> completed local folder under the canonical Django and `frontend/src/app` paths.
+> PDF permissions take precedence over broader source-folder permissions. Start
+> with [integrated setup and CI](docs/07-maintenance/ci-setup.md) and
+> [integration evidence](evidence/team-integration-2026-11-16.md). Earlier dated
+> implementation notes below are historical; independent human review is pending.
+
+> Atiksh integration (2026-11-16, review pending): the supplied project folder's
+> complaints/mess/fees implementation and required shared auth/UI dependencies
+> are integrated on the Atiksh branch. Permissions follow the supplied SRS/SAD/STP:
+> Director complaint assignment, Mess Staff updates, student-owned reads.
+> Other owners' feature modules remain their responsibility. See
+> [current setup/merge boundaries](docs/07-maintenance/ci-setup.md),
+> [PDF case mapping](docs/05-validation/atiksh-stp-mapping.md), and
+> [actual execution evidence](evidence/atiksh-integration-2026-11-16.md).
+> Use a fresh disposable local database; this replaces the earlier migration
+> baseline and does not upgrade existing data. Earlier dated notes below describe
+> earlier implementations and are retained as history.
+
+> US-16 implementation (Atiksh, 2026-10-31): student fee listing and Razorpay
+> test-mode order/verification are wired at `/fees`, with server-side matching
+> and retained attempt results. See [fee API contract](backend/apps/student_services/FEES_API.md)
+> and [actual checks](evidence/us16-validation.md). Sandbox checkout, PostgreSQL
+> concurrency verification and independent review remain pending.
+
+> US-15 update (Atiksh, 2026-10-29): student mess allocation/valid coupon viewing
+> and Mess Staff-only management are implemented at `/mess` and `/mess/manage`.
+> See the [mess API contract](backend/apps/student_services/MESS_API.md) and
+> [actual verification](evidence/us15-validation.md). Independent review and the
+> separate US-01 sign-in flow remain pending.
+
+> US-14 update (Atiksh, 2026-10-29): Director complaint assignment and authorized
+> progress updates are implemented, including `/complaints/manage`, retained
+> assignment/status history and a generated additive migration. See the
+> [module contract](backend/apps/student_services/README.md) and
+> [verification evidence](evidence/us14-validation.md). Independent review and
+> the separate US-01 sign-in flow remain pending.
+
+> US-13 backend update (Atiksh, 2026-10-27): complaint submission and owned-record
+> tracking are implemented, with the user-approved minimal User/Profile dependency.
+> See the [API/setup contract](backend/apps/student_services/README.md) and
+> [actual PostgreSQL test results](evidence/us13-backend-validation.md).
+
+> US-20 update (Atiksh, 2026-10-27): the minimal frontend/API foundation,
+> PostgreSQL 16 Compose stack and PR CI are now implemented. Feature modules below
+> remain starter placeholders. See [local setup and CI](docs/07-maintenance/ci-setup.md)
+> and [actual verification results](evidence/ci-local-validation.md).
+> Remote CI and main branch protection still need verification; no deployment is included.
+
 ## Hostel Management System
 
 HostelSpace is a browser-based hostel management system developed for the **UE24CS341A - Software Engineering** course at **PES University, Bangalore**.

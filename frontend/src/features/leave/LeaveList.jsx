@@ -1,79 +1,367 @@
-/*
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: frontend/src/features/leave/LeaveList.jsx
-ACCOUNTABLE OWNER: Arin Singh
-INDEPENDENT REVIEWER: Aryan Singh
-USER STORIES: US-05, US-06
-DEVELOPMENT PLAN SPRINT(S): 2 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 3 (preserved baseline mapping)
-REQUIREMENTS: FR-05; SEC-03–04; FR-05; BR-01
-FILE PURPOSE: LeaveList UI component
-
-WHAT TO IMPLEMENT IN THIS FILE
-Own history with statuses/dates/remarks and detail links; Warden/Chief queues only in authorized review UI. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-
-OWNER: Arin Singh | REVIEWER: Aryan Singh
-TARGET FILE: frontend/src/features/leave/LeaveList.jsx
-DEVELOPMENT-PLAN SPRINT: 2
-ORIGINAL SRS SPRINT: 3
-STORY: US-05, US-06
-REQUIREMENTS: FR-05; SEC-03–04; FR-05; BR-01
-RESPONSIBILITY: LeaveList UI component
-FILE TASK: Own history with statuses/dates/remarks and detail links; Warden/Chief queues only in authorized review UI. Read globals.css first and use common cards/forms/badges/tables/history patterns; accessible keyboard and responsive layout.
-
-US-05 — Submit and track a leave request
-Dependencies: US-01, US-18
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Valid dates and non-empty reason create a Pending request with ID and submission time.
-- Reject end before start and missing input.
-- Derive student identity and assigned warden on the server; show assigned requests to that warden.
-- Students see only their own request history.
-
-US-06 — Review leave and escalate to the Chief Warden
-Dependencies: US-05
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Only the assigned Warden decides Pending: Approve, Reject or Escalate.
-- Only Chief Warden finalizes Escalated requests.
-- Approved/Rejected are final and immutable; concurrent/repeated decisions cannot overwrite them.
-- Append actor, server timestamp, previous/new status and remarks for each transition; student sees status and decision history.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
-*/
-
-/* IMPLEMENTATION AREA: replace this marker with reviewed code. */
+"use client";
+/* Existing leave API and transaction rules retained; task-focused presentation. */
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  decideLeave,
+  getIdentity,
+  getLeave,
+  listLeaves,
+  submitLeave,
+} from "./api";
+import { ErrorMessage as SharedError } from "@/components/ui/AppShell";
+import Card from "@/components/ui/Card";
+import PageHeader from "@/components/ui/PageHeader";
+import Button from "@/components/ui/Button";
+import StatusBadge from "@/components/ui/StatusBadge";
+import DataTable from "@/components/ui/DataTable";
+import Dialog from "@/components/ui/Dialog";
+export const ErrorMessage = SharedError;
+export function LeaveForm({ onSaved }) {
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState(null);
+  async function submit(e) {
+    e.preventDefault();
+    const body = Object.fromEntries(new FormData(e.currentTarget));
+    setError(null);
+    if (body.end_date < body.start_date) {
+      setError(new Error("End date must be on or after start date."));
+      return;
+    }
+    setBusy(true);
+    try {
+      await submitLeave(body);
+      onSaved();
+    } catch (e) {
+      setError(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <form method="post" onSubmit={submit}>
+      <h2>Apply for leave</h2>
+      <p className="hs-muted">
+        Your request goes to your assigned Warden. Wait for approval before
+        leaving.
+      </p>
+      <div className="hs-grid">
+        <label className="hs-field">
+          Start date
+          <input name="start_date" type="date" required />
+        </label>
+        <label className="hs-field">
+          End date
+          <input name="end_date" type="date" required />
+        </label>
+      </div>
+      <label className="hs-field">
+        Reason
+        <textarea name="reason" maxLength={2000} required />
+      </label>
+      <ErrorMessage error={error} />
+      <Button variant="primary" disabled={busy}>
+        {busy ? "Submitting…" : "Submit leave"}
+      </Button>
+    </form>
+  );
+}
+export function LeaveHistory({ transitions = [] }) {
+  return (
+    <ol className="hs-timeline">
+      {transitions.map((t) => (
+        <li key={t.id}>
+          <strong>
+            {t.from_status || "New"} → {t.to_status}
+          </strong>
+          <p>{t.remarks}</p>
+          <small className="hs-muted">
+            {t.actor_name || "Authorized staff"} ·{" "}
+            {new Date(t.occurred_at).toLocaleString()}
+          </small>
+        </li>
+      ))}
+    </ol>
+  );
+}
+export function LeaveReviewPanel({ row, role, onSaved }) {
+  const [decision, setDecision] = useState("Approved"),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(null);
+  if (
+    !(
+      (row.status === "Pending" && role === "WARDEN") ||
+      (row.status === "Escalated" && role === "CHIEF_WARDEN")
+    )
+  )
+    return null;
+  async function save(e) {
+    e.preventDefault();
+    if (
+      !window.confirm(
+        `Confirm decision: ${decision}? Final approvals and rejections cannot be changed.`,
+      )
+    )
+      return;
+    setBusy(true);
+    setError(null);
+    try {
+      await decideLeave(row.id, {
+        decision,
+        remarks: new FormData(e.currentTarget).get("remarks"),
+      });
+      onSaved();
+    } catch (e) {
+      setError(e);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <form method="post" onSubmit={save} className="hs-section">
+      <h2>Review request</h2>
+      <label className="hs-field">
+        Decision
+        <select value={decision} onChange={(e) => setDecision(e.target.value)}>
+          <option>Approved</option>
+          <option>Rejected</option>
+          {role === "WARDEN" ? <option>Escalated</option> : null}
+        </select>
+      </label>
+      <label className="hs-field">
+        Decision remarks
+        <textarea name="remarks" maxLength={2000} required />
+      </label>
+      <ErrorMessage error={error} />
+      <Button variant="primary" disabled={busy}>
+        {busy ? "Saving…" : "Save decision"}
+      </Button>
+    </form>
+  );
+}
+export default function LeaveWorkspace({ detailId = null }) {
+  const [identity, setIdentity] = useState(null),
+    [rows, setRows] = useState(null),
+    [error, setError] = useState(null),
+    [revision, setRevision] = useState(0),
+    [open, setOpen] = useState(false),
+    [query, setQuery] = useState(""),
+    [filter, setFilter] = useState("All"),
+    [page, setPage] = useState(1),
+    [notice, setNotice] = useState("");
+  useEffect(() => {
+    let live = true;
+    getIdentity()
+      .then((u) => {
+        if (live) {
+          setIdentity(u);
+          setFilter(
+            u.role === "STUDENT"
+              ? "All"
+              : u.role === "WARDEN"
+                ? "Pending"
+                : "Escalated",
+          );
+        }
+      })
+      .catch((e) => live && setError(e));
+    return () => {
+      live = false;
+    };
+  }, []);
+  useEffect(() => {
+    let live = true;
+    setError(null);
+    async function load() {
+      if (detailId) return [await getLeave(detailId)];
+      let items = [],
+        p = 1,
+        data;
+      do {
+        data = await listLeaves(p++);
+        items.push(...data.results);
+      } while (data.next);
+      return items;
+    }
+    load()
+      .then((x) => live && setRows(x))
+      .catch((e) => live && setError(e));
+    return () => {
+      live = false;
+    };
+  }, [detailId, revision]);
+  const role = identity?.role,
+    refresh = () => setRevision((x) => x + 1),
+    matching = (rows || []).filter(
+      (r) =>
+        (filter === "All" || r.status === filter) &&
+        `${r.student_name || ""} ${r.reason} ${r.id}`
+          .toLowerCase()
+          .includes(query.toLowerCase()),
+    );
+  const current = rows?.[0];
+  return (
+    <>
+      <PageHeader
+        title={
+          detailId
+            ? "Leave request"
+            : role === "STUDENT"
+              ? "My leave requests"
+              : "Leave review"
+        }
+        description={
+          detailId
+            ? "Request details, decisions and a complete activity trail."
+            : role === "STUDENT"
+              ? "Submit a request and follow its progress."
+              : "Review requests that need your attention."
+        }
+      >
+        {role === "STUDENT" && !detailId ? (
+          <Button variant="primary" onClick={() => setOpen(true)}>
+            + Request leave
+          </Button>
+        ) : null}
+      </PageHeader>
+      <ErrorMessage error={error} />
+      {notice ? (
+        <p className="hs-success" role="status">
+          {notice}
+        </p>
+      ) : null}
+      {!rows && !error ? <p role="status">Loading requests…</p> : null}
+      {!detailId ? (
+        <>
+          <div className="hs-toolbar">
+            <label>
+              Search requests
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Student, reason or request number"
+              />
+            </label>
+            <label>
+              Status
+              <select
+                value={filter}
+                onChange={(e) => {
+                  setFilter(e.target.value);
+                  setPage(1);
+                }}
+              >
+                {["All", "Pending", "Escalated", "Approved", "Rejected"].map(
+                  (x) => (
+                    <option key={x}>{x}</option>
+                  ),
+                )}
+              </select>
+            </label>
+          </div>
+          <Card>
+            <DataTable
+              headers={[
+                "Student / request",
+                "Leave dates",
+                "Reason",
+                "Status",
+                "Action",
+              ]}
+              rows={matching.slice((page - 1) * 10, page * 10).map((r) => [
+                <span key="name">
+                  <strong>{r.student_name || "Your request"}</strong>
+                  <small className="hs-cell-sub">#{r.id.slice(0, 8)}</small>
+                </span>,
+                `${r.start_date} → ${r.end_date}`,
+                r.reason,
+                <StatusBadge key="status">{r.status}</StatusBadge>,
+                <Link key="view" className="hs-button" href={`/leave/${r.id}`}>
+                  Open request
+                </Link>,
+              ])}
+            />
+            {rows && !matching.length ? (
+              <p className="hs-empty">No requests match this view.</p>
+            ) : null}
+          </Card>
+          <nav className="hs-pagination" aria-label="Leave pages">
+            <Button disabled={page === 1} onClick={() => setPage((x) => x - 1)}>
+              Previous
+            </Button>
+            <span>
+              Page {page} · {matching.length} requests
+            </span>
+            <Button
+              disabled={page * 10 >= matching.length}
+              onClick={() => setPage((x) => x + 1)}
+            >
+              Next
+            </Button>
+          </nav>
+        </>
+      ) : current ? (
+        <>
+          <Link href={role === "STUDENT" ? "/leave" : "/leave/review"}>
+            ← Back to requests
+          </Link>
+          <div className="hs-grid hs-section">
+            <Card>
+              <div className="hs-row">
+                <h2>{current.student_name || "Student request"}</h2>
+                <StatusBadge>{current.status}</StatusBadge>
+              </div>
+              <dl className="hs-detail">
+                <div>
+                  <dt>From</dt>
+                  <dd>{current.start_date}</dd>
+                </div>
+                <div>
+                  <dt>To</dt>
+                  <dd>{current.end_date}</dd>
+                </div>
+                <div>
+                  <dt>Assigned Warden</dt>
+                  <dd>{current.warden_name || "Assigned Warden"}</dd>
+                </div>
+                <div>
+                  <dt>Request number</dt>
+                  <dd>{current.id.slice(0, 8)}</dd>
+                </div>
+              </dl>
+              <h3 className="hs-section">Reason for leave</h3>
+              <p>{current.reason}</p>
+              <LeaveReviewPanel
+                row={current}
+                role={role}
+                onSaved={() => {
+                  refresh();
+                  setNotice("Decision saved. The student can see the update.");
+                }}
+              />
+            </Card>
+            <Card>
+              <h2>Request activity</h2>
+              <LeaveHistory transitions={current.transitions} />
+            </Card>
+          </div>
+        </>
+      ) : null}
+      {open ? (
+        <Dialog title="New leave request" onClose={() => setOpen(false)}>
+          <LeaveForm
+            onSaved={() => {
+              setOpen(false);
+              setNotice("Leave request submitted with Pending status.");
+              refresh();
+            }}
+          />
+        </Dialog>
+      ) : null}
+    </>
+  );
+}
