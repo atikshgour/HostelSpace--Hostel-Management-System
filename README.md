@@ -36,6 +36,25 @@ Hostel staff use the same system according to their roles. Wardens process leave
 
 The whole team shares integration, authorization review, validation, documentation, and demonstration responsibilities.
 
+## Arin Singh — completed user stories
+
+The following stories are assigned to Arin Singh in `STORIES.json` and are implemented in the integrated branch:
+
+| Story | Completed scope |
+|---|---|
+| US-05 | Student leave submission and tracking with validation and ownership checks |
+| US-06 | Warden leave review, approval/rejection, and Chief Warden escalation |
+| US-07 | Attendance-session configuration and one-time location-verified attendance |
+| US-08 | Deviation records, active weightage totals, snapshots, and replay protection |
+| US-18 | Shared models, permissions, API contracts, and role/ownership rules |
+| US-22 | Validation cases, access-rule checks, attendance boundary/retry coverage, and privacy checks |
+
+The main implementation is in `backend/apps/leave_attendance/`, its unit/API/concurrency tests, and `frontend/src/features/leave/`, `frontend/src/features/attendance/`, and `frontend/src/features/deviations/`.
+
+### Branch integration status
+
+The `arin` branch was fast-forwarded to the integrated `main` branch at commit `a15288d`, and the updated branch was pushed to GitHub. No separate pull request was created because `arin` had no commits ahead of the already-integrated `main`; the branch is therefore already synchronized with `main`.
+
 ## Project scope
 
 The first version covers role-based sign-in and student profile access, hostel notices and rules, study-room status, assigned laundry tracking, laundry handover and collection, leave management, location-verified attendance, maintenance complaints, mess allocation and coupons, hostel fee payment records, deviation-weightage records, authorized staff updates, and Director reports.
