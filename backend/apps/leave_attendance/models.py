@@ -1,8 +1,10 @@
 """Arin Singh | US-05/06 Sprint 3; US-07/08 Sprint 4. Server-owned audit data."""
 import uuid
+
 from django.conf import settings
 from django.db import models
-from django.db.models import Q, F
+from django.db.models import F, Q
+
 
 class LeaveRequest(models.Model):
     class Status(models.TextChoices):

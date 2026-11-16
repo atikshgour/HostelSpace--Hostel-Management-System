@@ -1,4 +1,3 @@
-# Owner: Anvi Srinivas | US-01,US-02 | Dev sprint 1; 2 | SRS sprint 1 | Reviewer: Arin Singh (pending)
 from rest_framework.test import APIClient
 
 from .test_services import DomainCase
@@ -12,7 +11,12 @@ class AuthenticationTests(DomainCase):
 
     def test_anonymous_apis_require_login(self):
         self.client.force_authenticate(None)
-        for p in ["/api/auth/me/", "/api/complaints/", "/api/mess/", "/api/fees/"]:
+        for p in [
+            "/api/auth/me/",
+            "/api/information/",
+            "/api/fees/",
+            "/api/director/users/",
+        ]:
             self.assertEqual(self.client.get(p).status_code, 403)
 
     def test_login_requires_csrf_even_when_anonymous(self):
@@ -72,7 +76,7 @@ class AuthenticationTests(DomainCase):
         )
         self.assertEqual(
             c.post(
-                "/api/fees/", {"title": "Synthetic fee", "amount": "100.00"}
+                "/api/director/settings/", {"key": "site_title", "value": "X"}
             ).status_code,
             403,
         )

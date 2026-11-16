@@ -118,3 +118,15 @@ execution is recorded in [actual evidence](../../evidence/atiksh-integration-202
 [Exact PDF mappings and remaining cases](atiksh-stp-mapping.md) preserve all original
 requirement IDs. US-20 / TC-CICD-01 is partial until hosted CI, branch protection
 and same-SHA staging are verified. No release/faculty acceptance is claimed.
+
+
+## Team integration execution - 2026-11-16 (independent review pending)
+
+FR-01 through FR-11 automated implementation evidence is recorded in
+[team integration verification](../../evidence/team-integration-2026-11-16.md).
+The exact source-folder paths/hashes and merged PR heads are preserved in the
+[integration manifest](../07-maintenance/team-integration-manifest.json).
+115 PostgreSQL tests and 18 component tests passed locally. Browser journeys
+cover every functional domain, with PDF permission differences explicitly tested.
+Coverage, initial failures, reruns and unexecuted STP acceptance are recorded;
+this entry does not mark manual, provider, release or recovery acceptance complete.

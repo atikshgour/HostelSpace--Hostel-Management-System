@@ -1,9 +1,285 @@
 "use client";
 /* Arin Singh | US-07 | Sprint 4. One location sample is requested only after a click. */
 import { useEffect, useState } from "react";
-import { createSession, getIdentity, listAttendance, listSessions, submitAttendance } from "./api";
-const ui={page:{maxWidth:960,margin:"0 auto",padding:24},card:{border:"1px solid #cbd5e1",borderRadius:12,padding:20,margin:"16px 0",background:"#fff"},row:{display:"flex",gap:12,flexWrap:"wrap"},field:{display:"grid",gap:6,margin:"12px 0",minWidth:220},input:{minHeight:42,padding:9,border:"1px solid #94a3b8",borderRadius:8,font:"inherit"},button:{minHeight:42,padding:"8px 14px",border:"1px solid #1d4ed8",borderRadius:8,background:"#fff",color:"#1d4ed8"},error:{padding:12,borderLeft:"4px solid #b91c1c",background:"#fef2f2"}};
-function ErrorMessage({error}){return error?<div role="alert" style={ui.error}>{error.message}</div>:null;} function Field({label,...props}){return <label style={ui.field}><span>{label}</span><input style={ui.input}{...props}/></label>;}
-export function AttendanceSessionForm({onSaved}){const[busy,setBusy]=useState(false),[error,setError]=useState(null),[message,setMessage]=useState("");async function submit(event){event.preventDefault();const form=event.currentTarget,raw=Object.fromEntries(new FormData(form));if(new Date(raw.closes_at)<=new Date(raw.opens_at)){setError(new Error("Closing time must follow opening time."));return;}const body={...raw,opens_at:new Date(raw.opens_at).toISOString(),closes_at:new Date(raw.closes_at).toISOString()};for(const key of ["centre_latitude","centre_longitude","radius_m","max_accuracy_m","max_sample_age_seconds"])body[key]=Number(raw[key]);setBusy(true);setError(null);try{await createSession(body);form.reset();setMessage("Attendance session created.");onSaved();}catch(failure){setError(failure);}finally{setBusy(false);}}return <section style={ui.card}><h2>Create attendance session</h2><p>Use only the location policy approved by the team and faculty.</p><form onSubmit={submit}><Field label="Title" name="title" maxLength={120} required/><div style={ui.row}><Field label="Opens" name="opens_at" type="datetime-local" required/><Field label="Closes" name="closes_at" type="datetime-local" required/><Field label="Centre latitude" name="centre_latitude" type="number" step="any" min="-90" max="90" required/><Field label="Centre longitude" name="centre_longitude" type="number" step="any" min="-180" max="180" required/><Field label="Radius (m)" name="radius_m" type="number" step="any" min="0.01" required/><Field label="Maximum accuracy (m)" name="max_accuracy_m" type="number" step="any" min="0.01" required/><Field label="Maximum sample age (seconds)" name="max_sample_age_seconds" type="number" min="1" max="300" required/></div><button style={ui.button} disabled={busy}>{busy?"Saving…":"Create session"}</button><ErrorMessage error={error}/><p role="status">{message}</p></form></section>}
-export function AttendanceSubmit({session,onSaved}){const[busy,setBusy]=useState(false),[error,setError]=useState(null),[message,setMessage]=useState("");async function submit(){setError(null);setMessage("");if(!navigator.geolocation){setError(new Error("Location is unavailable; attendance was not accepted."));return;}setBusy(true);try{const sample=await new Promise((resolve,reject)=>navigator.geolocation.getCurrentPosition(resolve,()=>reject(new Error("Location was denied, unavailable, or timed out.")),{enableHighAccuracy:true,timeout:15000,maximumAge:0}));const result=await submitAttendance({session:session.id,latitude:sample.coords.latitude,longitude:sample.coords.longitude,accuracy_m:sample.coords.accuracy,sampled_at:new Date(sample.timestamp).toISOString()});setMessage(`${result.result} · ${result.reason_code}`);onSaved();}catch(failure){setError(failure);}finally{setBusy(false);}}return <div><p>Clicking requests one location sample. There is no background tracking.</p><button style={ui.button} disabled={busy} onClick={submit}>{busy?"Checking…":"Submit one-time location attendance"}</button><ErrorMessage error={error}/><p role="status">{message}</p></div>}
-export default function AttendanceWorkspace(){const[identity,setIdentity]=useState({loading:true}),[sessions,setSessions]=useState({results:[]}),[history,setHistory]=useState({results:[]}),[error,setError]=useState(null),[revision,setRevision]=useState(0);useEffect(()=>{getIdentity().then(user=>setIdentity({loading:false,user})).catch(error=>setIdentity({loading:false,error}));},[]);useEffect(()=>{Promise.all([listSessions(),listAttendance()]).then(([sessions,history])=>{setSessions(sessions);setHistory(history);}).catch(setError);},[revision]);if(identity.loading)return <main style={ui.page}>Checking session…</main>;if(identity.error)return <main style={ui.page}><ErrorMessage error={identity.error}/></main>;const role=identity.user?.role,refresh=()=>setRevision(value=>value+1);return <main style={ui.page}><h1>Attendance</h1>{role==="WARDEN"?<AttendanceSessionForm onSaved={refresh}/>:null}<ErrorMessage error={error}/><h2>Attendance sessions</h2>{sessions.results.map(session=><article style={ui.card} key={session.id}><h3>{session.title}</h3><p>{new Date(session.opens_at).toLocaleString()} — {new Date(session.closes_at).toLocaleString()}</p>{role==="STUDENT"?<AttendanceSubmit session={session} onSaved={refresh}/>:<p>Radius {session.radius_m} m · Accuracy {session.max_accuracy_m} m</p>}</article>)}{!sessions.results.length?<p>No assigned sessions.</p>:null}<h2>{role==="STUDENT"?"My attendance history":"Assigned attendance history"}</h2>{history.results.map(row=><article style={ui.card} key={row.id}><strong>{row.result} · {row.reason_code}</strong><p>Student {row.student} · Session {row.session}</p><p>{new Date(row.submitted_at).toLocaleString()}</p></article>)}{!history.results.length?<p>No attendance records.</p>:null}</main>}
+import {
+  createSession,
+  getIdentity,
+  listAttendance,
+  listSessions,
+  submitAttendance,
+} from "./api";
+const ui = {
+  page: { maxWidth: 960, margin: "0 auto", padding: 24 },
+  card: {
+    border: "1px solid #cbd5e1",
+    borderRadius: 12,
+    padding: 20,
+    margin: "16px 0",
+    background: "#fff",
+  },
+  row: { display: "flex", gap: 12, flexWrap: "wrap" },
+  field: { display: "grid", gap: 6, margin: "12px 0", minWidth: 220 },
+  input: {
+    minHeight: 42,
+    padding: 9,
+    border: "1px solid #94a3b8",
+    borderRadius: 8,
+    font: "inherit",
+  },
+  button: {
+    minHeight: 42,
+    padding: "8px 14px",
+    border: "1px solid #1d4ed8",
+    borderRadius: 8,
+    background: "#fff",
+    color: "#1d4ed8",
+  },
+  error: {
+    padding: 12,
+    borderLeft: "4px solid #b91c1c",
+    background: "#fef2f2",
+  },
+};
+function ErrorMessage({ error }) {
+  return error ? (
+    <div role="alert" style={ui.error}>
+      {error.message}
+    </div>
+  ) : null;
+}
+function Field({ label, ...props }) {
+  return (
+    <label style={ui.field}>
+      <span>{label}</span>
+      <input style={ui.input} {...props} />
+    </label>
+  );
+}
+export function AttendanceSessionForm({ onSaved }) {
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState(null),
+    [message, setMessage] = useState("");
+  async function submit(event) {
+    event.preventDefault();
+    const form = event.currentTarget,
+      raw = Object.fromEntries(new FormData(form));
+    if (new Date(raw.closes_at) <= new Date(raw.opens_at)) {
+      setError(new Error("Closing time must follow opening time."));
+      return;
+    }
+    const body = {
+      ...raw,
+      opens_at: new Date(raw.opens_at).toISOString(),
+      closes_at: new Date(raw.closes_at).toISOString(),
+    };
+    for (const key of [
+      "centre_latitude",
+      "centre_longitude",
+      "radius_m",
+      "max_accuracy_m",
+      "max_sample_age_seconds",
+    ])
+      body[key] = Number(raw[key]);
+    setBusy(true);
+    setError(null);
+    try {
+      await createSession(body);
+      form.reset();
+      setMessage("Attendance session created.");
+      onSaved();
+    } catch (failure) {
+      setError(failure);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <section style={ui.card}>
+      <h2>Create attendance session</h2>
+      <p>Use only the location policy approved by the team and faculty.</p>
+      <form method="post" onSubmit={submit}>
+        <Field label="Title" name="title" maxLength={120} required />
+        <div style={ui.row}>
+          <Field label="Opens" name="opens_at" type="datetime-local" required />
+          <Field
+            label="Closes"
+            name="closes_at"
+            type="datetime-local"
+            required
+          />
+          <Field
+            label="Centre latitude"
+            name="centre_latitude"
+            type="number"
+            step="any"
+            min="-90"
+            max="90"
+            required
+          />
+          <Field
+            label="Centre longitude"
+            name="centre_longitude"
+            type="number"
+            step="any"
+            min="-180"
+            max="180"
+            required
+          />
+          <Field
+            label="Radius (m)"
+            name="radius_m"
+            type="number"
+            step="any"
+            min="0.01"
+            required
+          />
+          <Field
+            label="Maximum accuracy (m)"
+            name="max_accuracy_m"
+            type="number"
+            step="any"
+            min="0.01"
+            required
+          />
+          <Field
+            label="Maximum sample age (seconds)"
+            name="max_sample_age_seconds"
+            type="number"
+            min="1"
+            max="300"
+            required
+          />
+        </div>
+        <button style={ui.button} disabled={busy}>
+          {busy ? "Saving…" : "Create session"}
+        </button>
+        <ErrorMessage error={error} />
+        <p role="status">{message}</p>
+      </form>
+    </section>
+  );
+}
+export function AttendanceSubmit({ session, onSaved }) {
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState(null),
+    [message, setMessage] = useState("");
+  async function submit() {
+    setError(null);
+    setMessage("");
+    if (!navigator.geolocation) {
+      setError(
+        new Error("Location is unavailable; attendance was not accepted."),
+      );
+      return;
+    }
+    setBusy(true);
+    try {
+      const sample = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          () =>
+            reject(
+              new Error("Location was denied, unavailable, or timed out."),
+            ),
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
+        ),
+      );
+      const result = await submitAttendance({
+        session: session.id,
+        latitude: sample.coords.latitude,
+        longitude: sample.coords.longitude,
+        accuracy_m: sample.coords.accuracy,
+        sampled_at: new Date(sample.timestamp).toISOString(),
+      });
+      setMessage(`${result.result} · ${result.reason_code}`);
+      onSaved();
+    } catch (failure) {
+      setError(failure);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div>
+      <p>
+        Clicking requests one location sample. There is no background tracking.
+      </p>
+      <button style={ui.button} disabled={busy} onClick={submit}>
+        {busy ? "Checking…" : "Submit one-time location attendance"}
+      </button>
+      <ErrorMessage error={error} />
+      <p role="status">{message}</p>
+    </div>
+  );
+}
+export default function AttendanceWorkspace() {
+  const [identity, setIdentity] = useState({ loading: true }),
+    [sessions, setSessions] = useState({ results: [] }),
+    [history, setHistory] = useState({ results: [] }),
+    [error, setError] = useState(null),
+    [revision, setRevision] = useState(0);
+  useEffect(() => {
+    getIdentity()
+      .then((user) => setIdentity({ loading: false, user }))
+      .catch((error) => setIdentity({ loading: false, error }));
+  }, []);
+  useEffect(() => {
+    Promise.all([listSessions(), listAttendance()])
+      .then(([sessions, history]) => {
+        setSessions(sessions);
+        setHistory(history);
+      })
+      .catch(setError);
+  }, [revision]);
+  if (identity.loading) return <main style={ui.page}>Checking session…</main>;
+  if (identity.error)
+    return (
+      <main style={ui.page}>
+        <ErrorMessage error={identity.error} />
+      </main>
+    );
+  const role = identity.user?.role,
+    refresh = () => setRevision((value) => value + 1);
+  return (
+    <main style={ui.page}>
+      <h1>Attendance</h1>
+      {role === "WARDEN" ? <AttendanceSessionForm onSaved={refresh} /> : null}
+      <ErrorMessage error={error} />
+      <h2>Attendance sessions</h2>
+      {sessions.results.map((session) => (
+        <article style={ui.card} key={session.id}>
+          <h3>{session.title}</h3>
+          <p>
+            {new Date(session.opens_at).toLocaleString()} —{" "}
+            {new Date(session.closes_at).toLocaleString()}
+          </p>
+          {role === "STUDENT" ? (
+            <AttendanceSubmit session={session} onSaved={refresh} />
+          ) : (
+            <p>
+              Radius {session.radius_m} m · Accuracy {session.max_accuracy_m} m
+            </p>
+          )}
+        </article>
+      ))}
+      {!sessions.results.length ? <p>No assigned sessions.</p> : null}
+      <h2>
+        {role === "STUDENT"
+          ? "My attendance history"
+          : "Assigned attendance history"}
+      </h2>
+      {history.results.map((row) => (
+        <article style={ui.card} key={row.id}>
+          <strong>
+            {row.result} · {row.reason_code}
+          </strong>
+          <p>
+            Student {row.student} · Session {row.session}
+          </p>
+          <p>{new Date(row.submitted_at).toLocaleString()}</p>
+        </article>
+      ))}
+      {!history.results.length ? <p>No attendance records.</p> : null}
+    </main>
+  );
+}

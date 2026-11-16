@@ -35,3 +35,16 @@ Strict allowlists reject caller-supplied actor/status/snapshot/active/owner fiel
 Local harness implements GET `/api/auth/csrf/` → `{csrfToken}`, POST `/login/` → `{id,role}`, POST `/logout/` → `{signed_out:true}`, GET `/me/` → `{id,role}`. The frontend uses these exact paths. Both login/logout are explicitly CSRF-protected. Shared routes must provide equivalent semantics or adapt the client/identity hook in one place. Production login throttling, session policy and profile management are outside this pack. No role is accepted from the sign-in body.
 
 Internal `queries.py` aggregate functions are not public routes. Caller must authorize Director access before invoking them; do not expose personal querysets to Director by copying these helpers blindly.
+
+
+## Combined API registration (2026-11-16)
+
+Existing leave/attendance/deviation contracts above remain under `/api/`.
+Session/CSRF APIs use `/api/auth/`. Information uses `/api/information/`
+and `/api/rules/`; facilities use `/api/study-room/` and `/api/laundry/`.
+Director accounts/settings/reports use `/api/director/`; dashboard uses
+`/api/overview/`, with role-filtered counters. `/api/choices/users/` returns only
+identifiers, display names and roles for authorized selectors.
+Complaint/mess/fees contracts remain in `backend/apps/student_services/`.
+All permissions are server-enforced per the integration matrix; authenticated
+API responses are private/no-store. API errors use `{code,message,fields}`.

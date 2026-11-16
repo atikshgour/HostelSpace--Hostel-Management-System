@@ -1,9 +1,246 @@
 "use client";
 /* Arin Singh | US-08 | Sprint 4. Rule weights and totals always come from the server. */
 import { useEffect, useState } from "react";
-import { deactivateDeviation, getIdentity, getTotal, listDeviations, listRules, listStudents, recordDeviation } from "./api";
-const ui={page:{maxWidth:960,margin:"0 auto",padding:24},card:{border:"1px solid #cbd5e1",borderRadius:12,padding:20,margin:"16px 0",background:"#fff"},field:{display:"grid",gap:6,margin:"12px 0"},input:{minHeight:42,padding:9,border:"1px solid #94a3b8",borderRadius:8,font:"inherit"},button:{minHeight:42,padding:"8px 14px",border:"1px solid #1d4ed8",borderRadius:8,background:"#fff",color:"#1d4ed8"},error:{padding:12,borderLeft:"4px solid #b91c1c",background:"#fef2f2"},notice:{padding:14,background:"#eff6ff",borderRadius:8}};
-function ErrorMessage({error}){return error?<div role="alert" style={ui.error}>{error.message}</div>:null;}function Select({label,value,onChange,children}){return <label style={ui.field}><span>{label}</span><select style={ui.input} required value={value} onChange={event=>onChange(event.target.value)}><option value="">Select…</option>{children}</select></label>}
-export function DeviationForm({student,rules,onSaved}){const[rule,setRule]=useState(""),[remarks,setRemarks]=useState(""),[busy,setBusy]=useState(false),[error,setError]=useState(null);async function submit(event){event.preventDefault();setBusy(true);setError(null);try{await recordDeviation({student,rule,remarks});setRemarks("");onSaved();}catch(failure){setError(failure);}finally{setBusy(false);}}return <form style={ui.card} onSubmit={submit}><h2>Record deviation</h2><Select label="Active rule" value={rule} onChange={setRule}>{rules.map(item=><option key={item.id} value={item.id}>{item.title} · {item.weightage}</option>)}</Select><label style={ui.field}><span>Remarks</span><textarea style={{...ui.input,minHeight:90}} maxLength={2000} required value={remarks} onChange={event=>setRemarks(event.target.value)}/></label><button style={ui.button} disabled={busy||!student||!rule}>{busy?"Saving…":"Record deviation"}</button><ErrorMessage error={error}/></form>}
-function Deactivate({row,onSaved}){const[reason,setReason]=useState(""),[error,setError]=useState(null),[busy,setBusy]=useState(false);async function submit(event){event.preventDefault();setBusy(true);setError(null);try{await deactivateDeviation(row.id,reason);onSaved();}catch(failure){setError(failure);}finally{setBusy(false);}}return <form onSubmit={submit}><label style={ui.field}><span>Deactivation reason</span><textarea style={{...ui.input,minHeight:70}} required maxLength={2000} value={reason} onChange={event=>setReason(event.target.value)}/></label><button style={ui.button} disabled={busy}>{busy?"Saving…":"Deactivate and retain history"}</button><ErrorMessage error={error}/></form>}
-export default function DeviationPanel(){const[identity,setIdentity]=useState({loading:true}),[students,setStudents]=useState([]),[rules,setRules]=useState([]),[student,setStudent]=useState(""),[rows,setRows]=useState([]),[total,setTotal]=useState(null),[error,setError]=useState(null),[revision,setRevision]=useState(0);useEffect(()=>{getIdentity().then(user=>setIdentity({loading:false,user})).catch(error=>setIdentity({loading:false,error}));},[]);const role=identity.user?.role,staff=["WARDEN","CHIEF_WARDEN"].includes(role);useEffect(()=>{if(!staff)return;Promise.all([listStudents(),listRules()]).then(([students,rules])=>{setStudents(students.results);setRules(rules.results);}).catch(setError);},[staff]);useEffect(()=>{if(identity.loading||(staff&&!student))return;Promise.all([listDeviations(student),getTotal(student,staff)]).then(([data,total])=>{setRows(data.results);setTotal(total.active_total);}).catch(setError);},[identity.loading,staff,student,revision]);if(identity.loading)return <main style={ui.page}>Checking session…</main>;if(identity.error)return <main style={ui.page}><ErrorMessage error={identity.error}/></main>;const refresh=()=>setRevision(value=>value+1);return <main style={ui.page}><h1>Deviation records</h1>{staff?<><Select label="Assigned student" value={student} onChange={setStudent}>{students.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</Select>{student?<DeviationForm student={student} rules={rules} onSaved={refresh}/>:null}</>:null}<ErrorMessage error={error}/><p style={ui.notice}>Active weightage total: {total ?? (staff&&!student?"Select a student":"Loading…")}</p>{rows.map(row=><article style={ui.card} key={row.id}><h2>{row.rule_title_snapshot} · {row.weightage_snapshot}</h2><p>{row.active?"Active":"Inactive"} · Student {row.student}</p><p>{row.remarks}</p><p>Recorded by {row.recorded_by} · {new Date(row.recorded_at).toLocaleString()}</p>{row.active&&staff?<Deactivate row={row} onSaved={refresh}/>:null}{!row.active?<p>Deactivated by {row.deactivated_by} · {new Date(row.deactivated_at).toLocaleString()} · {row.deactivation_reason}</p>:null}</article>)}{!rows.length?<p>No deviation records.</p>:null}</main>}
+import {
+  deactivateDeviation,
+  getIdentity,
+  getTotal,
+  listDeviations,
+  listRules,
+  listStudents,
+  recordDeviation,
+} from "./api";
+const ui = {
+  page: { maxWidth: 960, margin: "0 auto", padding: 24 },
+  card: {
+    border: "1px solid #cbd5e1",
+    borderRadius: 12,
+    padding: 20,
+    margin: "16px 0",
+    background: "#fff",
+  },
+  field: { display: "grid", gap: 6, margin: "12px 0" },
+  input: {
+    minHeight: 42,
+    padding: 9,
+    border: "1px solid #94a3b8",
+    borderRadius: 8,
+    font: "inherit",
+  },
+  button: {
+    minHeight: 42,
+    padding: "8px 14px",
+    border: "1px solid #1d4ed8",
+    borderRadius: 8,
+    background: "#fff",
+    color: "#1d4ed8",
+  },
+  error: {
+    padding: 12,
+    borderLeft: "4px solid #b91c1c",
+    background: "#fef2f2",
+  },
+  notice: { padding: 14, background: "#eff6ff", borderRadius: 8 },
+};
+function ErrorMessage({ error }) {
+  return error ? (
+    <div role="alert" style={ui.error}>
+      {error.message}
+    </div>
+  ) : null;
+}
+function Select({ label, value, onChange, children }) {
+  return (
+    <label style={ui.field}>
+      <span>{label}</span>
+      <select
+        style={ui.input}
+        required
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        <option value="">Select…</option>
+        {children}
+      </select>
+    </label>
+  );
+}
+export function DeviationForm({ student, rules, onSaved }) {
+  const [rule, setRule] = useState(""),
+    [remarks, setRemarks] = useState(""),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(null);
+  async function submit(event) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await recordDeviation({ student, rule, remarks });
+      setRemarks("");
+      onSaved();
+    } catch (failure) {
+      setError(failure);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <form style={ui.card} onSubmit={submit}>
+      <h2>Record deviation</h2>
+      <Select label="Active rule" value={rule} onChange={setRule}>
+        {rules.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.title} · {item.weightage}
+          </option>
+        ))}
+      </Select>
+      <label style={ui.field}>
+        <span>Remarks</span>
+        <textarea
+          style={{ ...ui.input, minHeight: 90 }}
+          maxLength={2000}
+          required
+          value={remarks}
+          onChange={(event) => setRemarks(event.target.value)}
+        />
+      </label>
+      <button style={ui.button} disabled={busy || !student || !rule}>
+        {busy ? "Saving…" : "Record deviation"}
+      </button>
+      <ErrorMessage error={error} />
+    </form>
+  );
+}
+function Deactivate({ row, onSaved }) {
+  const [reason, setReason] = useState(""),
+    [error, setError] = useState(null),
+    [busy, setBusy] = useState(false);
+  async function submit(event) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await deactivateDeviation(row.id, reason);
+      onSaved();
+    } catch (failure) {
+      setError(failure);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <form method="post" onSubmit={submit}>
+      <label style={ui.field}>
+        <span>Deactivation reason</span>
+        <textarea
+          style={{ ...ui.input, minHeight: 70 }}
+          required
+          maxLength={2000}
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+        />
+      </label>
+      <button style={ui.button} disabled={busy}>
+        {busy ? "Saving…" : "Deactivate and retain history"}
+      </button>
+      <ErrorMessage error={error} />
+    </form>
+  );
+}
+export default function DeviationPanel() {
+  const [identity, setIdentity] = useState({ loading: true }),
+    [students, setStudents] = useState([]),
+    [rules, setRules] = useState([]),
+    [student, setStudent] = useState(""),
+    [rows, setRows] = useState([]),
+    [total, setTotal] = useState(null),
+    [error, setError] = useState(null),
+    [revision, setRevision] = useState(0);
+  useEffect(() => {
+    getIdentity()
+      .then((user) => setIdentity({ loading: false, user }))
+      .catch((error) => setIdentity({ loading: false, error }));
+  }, []);
+  const role = identity.user?.role,
+    staff = ["WARDEN", "CHIEF_WARDEN"].includes(role);
+  useEffect(() => {
+    if (!staff) return;
+    Promise.all([listStudents(), listRules()])
+      .then(([students, rules]) => {
+        setStudents(students.results);
+        setRules(rules.results);
+      })
+      .catch(setError);
+  }, [staff]);
+  useEffect(() => {
+    if (identity.loading || (staff && !student)) return;
+    Promise.all([listDeviations(student), getTotal(student, staff)])
+      .then(([data, total]) => {
+        setRows(data.results);
+        setTotal(total.active_total);
+      })
+      .catch(setError);
+  }, [identity.loading, staff, student, revision]);
+  if (identity.loading) return <main style={ui.page}>Checking session…</main>;
+  if (identity.error)
+    return (
+      <main style={ui.page}>
+        <ErrorMessage error={identity.error} />
+      </main>
+    );
+  const refresh = () => setRevision((value) => value + 1);
+  return (
+    <main style={ui.page}>
+      <h1>Deviation records</h1>
+      {staff ? (
+        <>
+          <Select
+            label="Assigned student"
+            value={student}
+            onChange={setStudent}
+          >
+            {students.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </Select>
+          {student ? (
+            <DeviationForm student={student} rules={rules} onSaved={refresh} />
+          ) : null}
+        </>
+      ) : null}
+      <ErrorMessage error={error} />
+      <p style={ui.notice}>
+        Active weightage total:{" "}
+        {total ?? (staff && !student ? "Select a student" : "Loading…")}
+      </p>
+      {rows.map((row) => (
+        <article style={ui.card} key={row.id}>
+          <h2>
+            {row.rule_title_snapshot} · {row.weightage_snapshot}
+          </h2>
+          <p>
+            {row.active ? "Active" : "Inactive"} · Student {row.student}
+          </p>
+          <p>{row.remarks}</p>
+          <p>
+            Recorded by {row.recorded_by} ·{" "}
+            {new Date(row.recorded_at).toLocaleString()}
+          </p>
+          {row.active && staff ? (
+            <Deactivate row={row} onSaved={refresh} />
+          ) : null}
+          {!row.active ? (
+            <p>
+              Deactivated by {row.deactivated_by} ·{" "}
+              {new Date(row.deactivated_at).toLocaleString()} ·{" "}
+              {row.deactivation_reason}
+            </p>
+          ) : null}
+        </article>
+      ))}
+      {!rows.length ? <p>No deviation records.</p> : null}
+    </main>
+  );
+}

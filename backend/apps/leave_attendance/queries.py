@@ -1,5 +1,6 @@
 """Arin | US-18. Director summaries call these read-only aggregates after Director authorization."""
-from .models import LeaveRequest, Attendance
+from .models import Attendance, LeaveRequest
+
 
 def pending_leave_count():
     return LeaveRequest.objects.filter(status='Pending').count()

@@ -1,12 +1,21 @@
 """Arin | US-05/06 Sprint 3; US-07/08 Sprint 4. Authoritative state transitions."""
 from decimal import Decimal
-from django.db import transaction, IntegrityError
+
+from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
+
 from . import permissions as access
-from .models import LeaveRequest, LeaveTransition, AttendanceSession, Attendance, Deviation
 from .location import check_sample
+from .models import (
+    Attendance,
+    AttendanceSession,
+    Deviation,
+    LeaveRequest,
+    LeaveTransition,
+)
+
 
 class Conflict(APIException):
     status_code = 409

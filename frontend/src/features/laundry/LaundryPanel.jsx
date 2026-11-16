@@ -90,7 +90,7 @@ export default function LaundryPanel() {
         description="Automatic weekly groups with return dates set by your laundry team."
       >
         {staff && !scheduleView ? (
-          <Button variant="primary" onClick={() => setOpen(true)}>
+          <Button variant="primary" disabled={!data} onClick={() => setOpen(true)}>
             + Receive clothes
           </Button>
         ) : null}
@@ -102,7 +102,7 @@ export default function LaundryPanel() {
             Default return time:{" "}
             <strong>{data?.[3]?.turnaround_days || 3} days</strong>
           </span>
-          <Button onClick={() => setPolicyOpen(true)}>
+          <Button disabled={!data} onClick={() => setPolicyOpen(true)}>
             Change return time
           </Button>
         </div>

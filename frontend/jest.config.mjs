@@ -2,7 +2,7 @@
 import nextJest from 'next/jest.js';
 import { readdirSync, readFileSync } from 'node:fs';
 const createConfig = nextJest({ dir: './' });
-const testFiles = ['app', 'src'].flatMap(root => readdirSync(root, { recursive: true })
+const testFiles = ['src'].flatMap(root => readdirSync(root, { recursive: true })
   .map(name => `${root}/${name}`.replaceAll('\\', '/'))
   .filter(name => /\.test\.[jt]sx?$/.test(name))
   // Starter task comments contain no executable tests. Replacements join CI automatically.
@@ -15,7 +15,6 @@ export default createConfig({
   modulePathIgnorePatterns: ['<rootDir>/.next/'],
   testMatch: testFiles,
   coverageThreshold: {
-    './app/page.js': { lines: 100, statements: 100, functions: 100 },
-    './app/health/route.js': { lines: 100, statements: 100, functions: 100 },
+    './src/app/health/route.js': { lines: 100, statements: 100, functions: 100 },
   },
 });

@@ -1,10 +1,14 @@
 """Arin Singh | US-05–08 and US-22 scoped API tests."""
 import uuid
+
 from django.test import TestCase
 from rest_framework.test import APIClient
+
 from apps.leave_attendance import services
 from apps.leave_attendance.models import Attendance, Deviation
+
 from .test_services import build_fixtures
+
 
 class ApiTests(TestCase):
     def setUp(self):

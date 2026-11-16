@@ -22,9 +22,14 @@ INSTALLED_APPS = [
     "rest_framework",
     "apps.accounts",
     "apps.student_services",
+    "apps.information",
+    "apps.leave_attendance",
+    "apps.facilities",
+    "apps.director_dashboard",
     "django.contrib.staticfiles",
 ]
 AUTH_USER_MODEL = "accounts.User"
+HOSTELSPACE_RULE_MODEL = "information.Rule"
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

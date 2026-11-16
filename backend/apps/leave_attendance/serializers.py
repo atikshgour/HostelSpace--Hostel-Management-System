@@ -1,12 +1,20 @@
 """Arin | US-18 Sprint 4. Strict allowlists; all actor/status/snapshot fields server-owned."""
 import math
 from collections.abc import Mapping
+
 from django.apps import apps
 from django.conf import settings
-from django.db.models import Sum
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
-from .models import LeaveRequest, LeaveTransition, AttendanceSession, Attendance, Deviation
+
+from .models import (
+    Attendance,
+    AttendanceSession,
+    Deviation,
+    LeaveRequest,
+    LeaveTransition,
+)
+
 
 class StrictInput(serializers.Serializer):
     def to_internal_value(self, data):
@@ -38,15 +46,21 @@ class DecisionInput(StrictInput):
     remarks = serializers.CharField(max_length=2000, trim_whitespace=True)
 
 class TransitionOutput(serializers.ModelSerializer):
+    actor_name=serializers.SerializerMethodField()
+    def get_actor_name(self,obj):return obj.actor.get_full_name() or obj.actor.username
     class Meta:
         model = LeaveTransition
-        fields = ['id', 'actor', 'from_status', 'to_status', 'remarks', 'occurred_at']
+        fields = ['id', 'actor', 'actor_name', 'from_status', 'to_status', 'remarks', 'occurred_at']
 
 class LeaveOutput(serializers.ModelSerializer):
+    student_name=serializers.SerializerMethodField()
+    warden_name=serializers.SerializerMethodField()
+    def get_student_name(self,obj):return obj.student.get_full_name() or obj.student.username
+    def get_warden_name(self,obj):return obj.assigned_warden.get_full_name() or obj.assigned_warden.username
     transitions = TransitionOutput(many=True, read_only=True)
     class Meta:
         model = LeaveRequest
-        fields = ['id', 'student', 'assigned_warden', 'start_date', 'end_date', 'reason', 'status', 'created_at', 'transitions']
+        fields = ['id', 'student', 'student_name', 'assigned_warden', 'warden_name', 'start_date', 'end_date', 'reason', 'status', 'created_at', 'transitions']
 
 class SessionInput(StrictInput):
     title = serializers.CharField(max_length=120)

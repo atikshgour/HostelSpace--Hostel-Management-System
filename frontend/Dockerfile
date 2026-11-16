@@ -4,8 +4,6 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY package.json package-lock.json ./
 RUN npm ci
-COPY app ./app
-COPY scripts ./scripts
 COPY src ./src
 COPY next.config.mjs postcss.config.mjs jsconfig.json ./
 ARG DJANGO_API_ORIGIN=http://api:8000

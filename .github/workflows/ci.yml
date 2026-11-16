@@ -133,7 +133,7 @@ jobs:
       - run: docker compose up --build --wait --wait-timeout 180
       - name: Check all service responses
         run: |
-          curl --fail --retry 5 --retry-connrefused http://127.0.0.1:3000/ | grep -q HostelSpace
+          curl --fail --retry 5 --retry-connrefused http://127.0.0.1:3000/login | grep -q HostelSpace
           curl --fail http://127.0.0.1:3000/health
           curl --fail http://127.0.0.1:8000/api/health/
       - name: Capture container logs
@@ -199,7 +199,7 @@ jobs:
           echo "HOSTELSPACE_DEMO_PASSWORD=$password" >> "$GITHUB_ENV"
       - run: python manage.py migrate --noinput
         working-directory: backend
-      - run: python manage.py seed_service_demo
+      - run: python manage.py seed_demo
         working-directory: backend
       - name: Start services and require readiness
         run: |

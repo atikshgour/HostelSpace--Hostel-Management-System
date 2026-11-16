@@ -1,5 +1,7 @@
 from django.urls import path
+
 from . import views
+
 urlpatterns = [
     path('leaves/', views.Leaves.as_view()),
     path('leaves/<uuid:pk>/', views.LeaveDetail.as_view()),

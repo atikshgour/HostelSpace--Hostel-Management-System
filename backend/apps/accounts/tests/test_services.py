@@ -1,8 +1,7 @@
-# Owner: Anvi Srinivas | US-01,US-02 | Dev sprint 1; 2 | SRS sprint 1 | Reviewer: Arin Singh (pending)
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 
-from apps.accounts.models import StudentProfile, User
+from apps.accounts.models import User
 from apps.accounts.services import identity
 
 
@@ -10,21 +9,9 @@ class DomainCase(TestCase):
     def setUp(self):
         from rest_framework.test import APIClient
 
-        self.chief = User.objects.create_user(username="chief", role="CHIEF_WARDEN")
-        self.warden = User.objects.create_user(
-            username="warden", role="WARDEN", chief_warden=self.chief
-        )
-        self.other = User.objects.create_user(
-            username="other", role="WARDEN", chief_warden=self.chief
-        )
-        self.student = User.objects.create_user(username="student", role="STUDENT")
-        self.stranger = User.objects.create_user(username="stranger", role="STUDENT")
-        StudentProfile.objects.create(
-            user=self.student, srn="TEST-001", room="T-1", assigned_warden=self.warden
-        )
-        StudentProfile.objects.create(
-            user=self.stranger, srn="TEST-002", room="T-2", assigned_warden=self.other
-        )
+        from apps.leave_attendance.tests.test_services import build_fixtures
+
+        build_fixtures(self)
         self.director = User.objects.create_user(
             username="director", password="Test-only-random-4779", role="DIRECTOR"
         )

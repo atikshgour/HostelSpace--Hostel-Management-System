@@ -1,5 +1,12 @@
 # HostelSpace
 
+> Team integration (2026-11-16): all four feature branches are combined with the
+> completed local folder under the canonical Django and `frontend/src/app` paths.
+> PDF permissions take precedence over broader source-folder permissions. Start
+> with [integrated setup and CI](docs/07-maintenance/ci-setup.md) and
+> [integration evidence](evidence/team-integration-2026-11-16.md). Earlier dated
+> implementation notes below are historical; independent human review is pending.
+
 > Atiksh integration (2026-11-16, review pending): the supplied project folder's
 > complaints/mess/fees implementation and required shared auth/UI dependencies
 > are integrated on the Atiksh branch. Permissions follow the supplied SRS/SAD/STP:

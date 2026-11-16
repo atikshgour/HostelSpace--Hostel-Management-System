@@ -1,8 +1,12 @@
-from decimal import Decimal
 from datetime import timedelta
+from decimal import Decimal
+
 from django.utils import timezone
-from demo_accounts.models import User, StudentProfile, Rule
+
+from apps.accounts.models import StudentProfile, User
+from apps.information.models import Rule
 from apps.leave_attendance.models import AttendanceSession
+
 
 def fixtures(case):
     case.chief=User.objects.create_user(username='chief',role='CHIEF_WARDEN')

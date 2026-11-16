@@ -1,6 +1,4 @@
-## Updated integration
-
-See the root README “Updated usability and workflows” and `docs/04-design/api-contract.md` for current permissions and endpoints. Warden operational account creation, automatic laundry schedules/selectable return days, catalogue-based mess choice and Warden announcements supersede older Director-only/manual-allocation notes below. Historical model/API paths are retained for compatibility.
+Integration permissions follow the supplied PDF; see `docs/04-design/role-permissions.md` and `evidence/team-integration-2026-11-16.md`.
 
 # facilities
 

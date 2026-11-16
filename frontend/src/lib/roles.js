@@ -21,14 +21,9 @@ export const menus = {
     ["Fees & payments", "/fees"],
   ],
   WARDEN: [
-    ["Dashboard", "/dashboard"],
-    ["Leave review", "/leave/review"],
-    ["Attendance sessions", "/attendance/manage"],
-    ["Deviation records", "/deviations/manage"],
-    ["People & accounts", "/director/users"],
-    ["Laundry overview", "/laundry/manage"],
-    ["Announcements & rules", "/information/manage"],
-    ["Study room", "/study-room/manage"],
+    ['Dashboard','/dashboard'], ['Leave review','/leave/review'],
+    ['Attendance sessions','/attendance/manage'], ['Deviation records','/deviations/manage'],
+    ['Announcements & info','/information'], ['Study room','/study-room'],
   ],
   CHIEF_WARDEN: [
     ["Dashboard", "/dashboard"],
