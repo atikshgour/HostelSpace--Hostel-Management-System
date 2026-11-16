@@ -74,3 +74,17 @@ production security inspection and rollback/restore rehearsal remain Not Run.
 The proposed 80% target is not claimed. Human owner/reviewer sign-off is pending;
 HISTORY.md is not populated with an invented human handoff.
 Hosted CI and final merge URLs will be reported from actual GitHub results.
+
+
+## Hosted Firefox fixture correction
+
+Initial integration push/PR CI passed backend, frontend, security, Compose,
+Chromium and Edge. Firefox rejected attendance as STALE_SAMPLE; its subsequent
+worker restart also lost cached test sessions and hit the login throttle.
+A local isolated probe of pinned Firefox 142.0.1 / build 1495 measured the
+emulated sample age as -86398.428 seconds (about one day in the future).
+The Firefox browser fixture now supplies a fresh timestamp when delivering that
+synthetic position. Production timestamp handling and server freshness checks
+are unchanged. A focused backend regression asserts future samples still fail.
+The original failing CI run is 43921175330; corrected hosted results are checked
+before merging to main.

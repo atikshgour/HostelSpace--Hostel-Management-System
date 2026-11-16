@@ -379,7 +379,17 @@ test("student leave submission and Warden to Chief escalation", async ({
 test("one-time geolocation attendance and deviation snapshot totals", async ({
   page,
   context,
+  browserName,
 }) => {
+  // The pinned Firefox binary dates emulated positions one day in the future.
+  // Correct only this synthetic fixture; app timestamps and server policy stay intact.
+  if (browserName === 'firefox') {
+    await page.addInitScript(() => {
+      const original = navigator.geolocation.getCurrentPosition.bind(navigator.geolocation);
+      navigator.geolocation.getCurrentPosition = (success, error, options) =>
+        original(position => success({coords: position.coords, timestamp: Date.now()}), error, options);
+    });
+  }
   await login(page, "warden");
   const title = "E2E attendance " + Date.now();
   await api(page, "/api/attendance/sessions/", "POST", {

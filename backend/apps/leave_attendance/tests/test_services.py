@@ -108,6 +108,11 @@ class ServiceTests(TestCase):
         self.assertEqual(check_sample(self.session, outside, now), (False, "OUTSIDE_RADIUS"))
         self.assertAlmostEqual(distance_m(0, 0, 0, 1), 111195, delta=5)
 
+    def test_future_location_sample_outside_tolerance_is_rejected(self):
+        now = timezone.now()
+        future = {**self.sample, "sampled_at": now + timedelta(seconds=6)}
+        self.assertEqual(check_sample(self.session, future, now), (False, "STALE_SAMPLE"))
+
     def test_deviation_snapshot_and_deactivation_history(self):
         row = services.record_deviation(self.warden, self.student.pk, self.rule, "Observed")
         self.rule.weightage = Decimal("99")
