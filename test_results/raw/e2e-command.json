@@ -1,0 +1,15 @@
+{
+  "phase": "e2e",
+  "cwd": "frontend",
+  "command": [
+    "npx.cmd",
+    "playwright",
+    "test",
+    "--project=chromium",
+    "--reporter=list,json,html",
+    "--output=../test_results/raw/browser-output"
+  ],
+  "started_at": "2026-11-16T18:18:00.588822+00:00",
+  "finished_at": "2026-11-16T18:19:09.661561+00:00",
+  "exit_code": 0
+}

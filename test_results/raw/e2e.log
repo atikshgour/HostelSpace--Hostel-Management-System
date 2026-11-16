@@ -1,0 +1,28 @@
+
+Running 13 tests using 1 worker
+
+  ok  1 [chromium] › e2e\performance.spec.js:2:1 › low-volume local health-response smoke check (291ms)
+  ok  2 [chromium] › e2e\privacy.spec.js:10:5 › attendance never requests location before the student clicks (1.2s)
+  ok  3 [chromium] › e2e\privacy.spec.js:31:5 › student deviation view has no write controls (735ms)
+  ok  4 [chromium] › e2e\student-services.spec.js:67:1 › TC-FR07-01: assigned complaint progresses with retained history (10.5s)
+  ok  5 [chromium] › e2e\student-services.spec.js:116:1 › TC-FR08-01: Mess Staff allocates, students read only their own current records (7.7s)
+  ok  6 [chromium] › e2e\student-services.spec.js:158:1 › TC-FR09-01: simulated payment persists Paid and a retained attempt (3.4s)
+  ok  7 [chromium] › e2e\student-services.spec.js:179:1 › session, profile persistence and accessible mobile navigation (2.8s)
+  ok  8 [chromium] › e2e\student-services.spec.js:212:1 › published announcements, rules and study-room status (3.9s)
+  ok  9 [chromium] › e2e\student-services.spec.js:229:1 › TC-FR11-01: Director creates assigned accounts; Warden cannot manage accounts (7.9s)
+  ok 10 [chromium] › e2e\student-services.spec.js:285:1 › automatic laundry groups, configurable return time, ready and collection (6.6s)
+  ok 11 [chromium] › e2e\student-services.spec.js:339:1 › student leave submission and Warden to Chief escalation (6.7s)
+  ok 12 [chromium] › e2e\student-services.spec.js:379:1 › one-time geolocation attendance and deviation snapshot totals (3.5s)
+  ok 13 [chromium] › e2e\student-services.spec.js:437:1 › TC-FR02-01: Content Staff publication appears on resident dashboard (4.6s)
+
+  13 passed (1.1m)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m
+
+(node:48916) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:48916) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

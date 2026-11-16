@@ -1,0 +1,10 @@
+{
+  "python": "3.13.7",
+  "django": "5.2.18",
+  "node": "v22.20.0",
+  "postgresql": "15.19",
+  "source_commit": "9a364dd1873b7ff50683c6a7bd9101ffce0bf1a4",
+  "database_scope": "new isolated synthetic local database; pytest-created disposable test database",
+  "database_reset": false,
+  "production_changes": false
+}

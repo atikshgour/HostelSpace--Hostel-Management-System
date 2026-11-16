@@ -1,0 +1,567 @@
+{
+  "config": {
+    "configFile": "D:\\HostelSpace--Hostel-Management-System\\frontend\\playwright.config.mjs",
+    "rootDir": "D:/HostelSpace--Hostel-Management-System/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ],
+      [
+        "html"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "D:/HostelSpace--Hostel-Management-System/test_results/raw/browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "D:/HostelSpace--Hostel-Management-System/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.js"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "D:/HostelSpace--Hostel-Management-System/test_results/raw/browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "D:/HostelSpace--Hostel-Management-System/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.js"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "D:/HostelSpace--Hostel-Management-System/test_results/raw/browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "msedge",
+        "name": "msedge",
+        "testDir": "D:/HostelSpace--Hostel-Management-System/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.js"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "performance.spec.js",
+      "file": "performance.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "low-volume local health-response smoke check",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 291,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:07.939Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0395ec5c307b4a8c0388-6e0fb770423633231e1e",
+          "file": "performance.spec.js",
+          "line": 2,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "privacy.spec.js",
+      "file": "privacy.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "attendance never requests location before the student clicks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1238,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:08.291Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c619730685664b99d052-ad4c85d1c8a0eea0984a",
+          "file": "privacy.spec.js",
+          "line": 10,
+          "column": 5
+        },
+        {
+          "title": "student deviation view has no write controls",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 735,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:10.516Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c619730685664b99d052-7a05fbf6858cdd7f00ca",
+          "file": "privacy.spec.js",
+          "line": 31,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "student-services.spec.js",
+      "file": "student-services.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "TC-FR07-01: assigned complaint progresses with retained history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10466,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:11.309Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-3f5ef9498083f0280c71",
+          "file": "student-services.spec.js",
+          "line": 67,
+          "column": 1
+        },
+        {
+          "title": "TC-FR08-01: Mess Staff allocates, students read only their own current records",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7672,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:21.799Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-ecd52095b55fbbbaf935",
+          "file": "student-services.spec.js",
+          "line": 116,
+          "column": 1
+        },
+        {
+          "title": "TC-FR09-01: simulated payment persists Paid and a retained attempt",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3366,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:29.493Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-cf95ae45b8ce3248738c",
+          "file": "student-services.spec.js",
+          "line": 158,
+          "column": 1
+        },
+        {
+          "title": "session, profile persistence and accessible mobile navigation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2795,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:32.880Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-2b0cacc364f8cb805757",
+          "file": "student-services.spec.js",
+          "line": 179,
+          "column": 1
+        },
+        {
+          "title": "published announcements, rules and study-room status",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3872,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:35.699Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-f50edd3fc8a4bd7d0512",
+          "file": "student-services.spec.js",
+          "line": 212,
+          "column": 1
+        },
+        {
+          "title": "TC-FR11-01: Director creates assigned accounts; Warden cannot manage accounts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7941,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:39.601Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-19fd3af08cf88d652f33",
+          "file": "student-services.spec.js",
+          "line": 229,
+          "column": 1
+        },
+        {
+          "title": "automatic laundry groups, configurable return time, ready and collection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6642,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:47.570Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-58216fb01c4264c4bf55",
+          "file": "student-services.spec.js",
+          "line": 285,
+          "column": 1
+        },
+        {
+          "title": "student leave submission and Warden to Chief escalation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6729,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:18:54.235Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-171a33b2af0d25ca77e6",
+          "file": "student-services.spec.js",
+          "line": 339,
+          "column": 1
+        },
+        {
+          "title": "one-time geolocation attendance and deviation snapshot totals",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3500,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:19:00.986Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-fab922057b41be06384a",
+          "file": "student-services.spec.js",
+          "line": 379,
+          "column": 1
+        },
+        {
+          "title": "TC-FR02-01: Content Staff publication appears on resident dashboard",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4631,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-16T18:19:04.510Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a46d2cbe1f326688c83-ce8b1eda817c52a7e9ee",
+          "file": "student-services.spec.js",
+          "line": 437,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-16T18:18:05.620Z",
+    "duration": 63929.86400000001,
+    "expected": 13,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

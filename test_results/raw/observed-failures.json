@@ -1,0 +1,20 @@
+[
+  {
+    "name": "test_P13_duplicate_payment_callbacks_and_submissions",
+    "class": "tests.test_priority_acceptance.PriorityAcceptanceTests",
+    "message": "AssertionError: 2 != 1 : Repeated pending initiation created separate PaymentAttempt rows",
+    "detail": "tests\\test_priority_acceptance.py:230: in test_P13_duplicate_payment_callbacks_and_submissions\n    self.assertEqual(\nE   AssertionError: 2 != 1 : Repeated pending initiation created separate PaymentAttempt rows"
+  },
+  {
+    "name": "test_P14_deviation_total_and_duplicate_prevention",
+    "class": "tests.test_priority_acceptance.PriorityAcceptanceTests",
+    "message": "AssertionError: 2 != 1 : Identical repeated deviation submission created a second record",
+    "detail": "tests\\test_priority_acceptance.py:255: in test_P14_deviation_total_and_duplicate_prevention\n    self.assertEqual(\nE   AssertionError: 2 != 1 : Identical repeated deviation submission created a second record"
+  },
+  {
+    "name": "test_direct_socket_timeout_is_validation_error",
+    "class": "tests.test_priority_unit",
+    "message": "TimeoutError: Synthetic direct socket timeout",
+    "detail": "tests\\test_priority_unit.py:124: in test_direct_socket_timeout_is_validation_error\n    provider_request(\"orders\", {\"amount\": 100, \"currency\": \"INR\"})\napps\\student_services\\payments.py:35: in provider_request\n    with urlopen(request, timeout=15) as response:  # nosec B310\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nC:\\Users\\atiks\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\unittest\\mock.py:1169: in __call__\n    return self._mock_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nC:\\Users\\atiks\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\unittest\\mock.py:1173: in _mock_call\n    return self._execute_mock_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nC:\\Users\\atiks\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\unittest\\mock.py:1228: in _execute_mock_call\n    raise effect\nE   TimeoutError: Synthetic direct socket timeout"
+  }
+]

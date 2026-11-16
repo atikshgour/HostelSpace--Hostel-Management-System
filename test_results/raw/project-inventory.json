@@ -1,0 +1,473 @@
+{
+  "apps": [
+    "apps.accounts",
+    "apps.student_services",
+    "apps.information",
+    "apps.leave_attendance",
+    "apps.facilities",
+    "apps.director_dashboard"
+  ],
+  "models": {
+    "accounts.User": [
+      "id",
+      "password",
+      "last_login",
+      "is_superuser",
+      "username",
+      "first_name",
+      "last_name",
+      "email",
+      "is_staff",
+      "is_active",
+      "date_joined",
+      "managed_by",
+      "role",
+      "chief_warden"
+    ],
+    "accounts.StudentProfile": [
+      "id",
+      "user",
+      "srn",
+      "hostel",
+      "room",
+      "phone",
+      "assigned_warden"
+    ],
+    "accounts.SiteSetting": [
+      "id",
+      "key",
+      "value",
+      "updated_by",
+      "updated_at"
+    ],
+    "accounts.AuditEvent": [
+      "id",
+      "actor",
+      "action",
+      "object_key",
+      "details",
+      "occurred_at"
+    ],
+    "student_services.Complaint": [
+      "id",
+      "student",
+      "room_snapshot",
+      "category",
+      "description",
+      "status",
+      "assigned_to",
+      "created_at"
+    ],
+    "student_services.ComplaintTransition": [
+      "id",
+      "complaint",
+      "actor",
+      "from_status",
+      "to_status",
+      "remarks",
+      "occurred_at"
+    ],
+    "student_services.MessAllocation": [
+      "id",
+      "option",
+      "student",
+      "mess_name",
+      "assigned_by",
+      "updated_at"
+    ],
+    "student_services.Coupon": [
+      "id",
+      "student",
+      "code",
+      "valid_from",
+      "valid_to",
+      "active",
+      "created_by"
+    ],
+    "student_services.FeeDue": [
+      "id",
+      "student",
+      "title",
+      "amount",
+      "currency",
+      "due_date",
+      "status"
+    ],
+    "student_services.PaymentAttempt": [
+      "id",
+      "fee",
+      "order_id",
+      "provider_reference",
+      "provider",
+      "amount",
+      "currency",
+      "status",
+      "created_at",
+      "verified_at"
+    ],
+    "student_services.MessOption": [
+      "id",
+      "name",
+      "diet",
+      "description",
+      "capacity",
+      "breakfast",
+      "lunch",
+      "dinner",
+      "timings",
+      "active"
+    ],
+    "student_services.MessChoiceEvent": [
+      "id",
+      "student",
+      "actor",
+      "old_mess",
+      "new_mess",
+      "occurred_at"
+    ],
+    "information.Content": [
+      "id",
+      "kind",
+      "title",
+      "body",
+      "active",
+      "starts_at",
+      "ends_at",
+      "updated_by",
+      "updated_at"
+    ],
+    "information.Rule": [
+      "id",
+      "title",
+      "body",
+      "weightage",
+      "active"
+    ],
+    "leave_attendance.LeaveRequest": [
+      "id",
+      "student",
+      "assigned_warden",
+      "start_date",
+      "end_date",
+      "reason",
+      "status",
+      "created_at"
+    ],
+    "leave_attendance.LeaveTransition": [
+      "id",
+      "leave",
+      "actor",
+      "from_status",
+      "to_status",
+      "remarks",
+      "occurred_at"
+    ],
+    "leave_attendance.AttendanceSession": [
+      "id",
+      "title",
+      "warden",
+      "opens_at",
+      "closes_at",
+      "centre_latitude",
+      "centre_longitude",
+      "radius_m",
+      "max_accuracy_m",
+      "max_sample_age_seconds",
+      "created_at"
+    ],
+    "leave_attendance.Attendance": [
+      "id",
+      "session",
+      "student",
+      "result",
+      "reason_code",
+      "submitted_at"
+    ],
+    "leave_attendance.Deviation": [
+      "id",
+      "student",
+      "rule",
+      "rule_title_snapshot",
+      "weightage_snapshot",
+      "remarks",
+      "recorded_by",
+      "recorded_at",
+      "active",
+      "deactivated_by",
+      "deactivated_at",
+      "deactivation_reason"
+    ],
+    "facilities.StudyRoom": [
+      "id",
+      "status",
+      "timings",
+      "message",
+      "updated_by",
+      "updated_at"
+    ],
+    "facilities.LaundryAllocation": [
+      "id",
+      "student",
+      "weekday",
+      "assigned_by",
+      "updated_at"
+    ],
+    "facilities.LaundryRecord": [
+      "id",
+      "student",
+      "item_details",
+      "item_count",
+      "allocation_snapshot",
+      "group_number",
+      "expected_return_date",
+      "ready_at",
+      "status",
+      "received_by",
+      "received_at",
+      "collected_by",
+      "collected_at"
+    ],
+    "facilities.LaundryPolicy": [
+      "id",
+      "turnaround_days",
+      "updated_by",
+      "updated_at"
+    ]
+  },
+  "routes": [
+    {
+      "path": "/health/",
+      "view": "config.health.health"
+    },
+    {
+      "path": "/api/health/",
+      "view": "config.health.health"
+    },
+    {
+      "path": "/api/auth/csrf/",
+      "view": "apps.accounts.views.Csrf"
+    },
+    {
+      "path": "/api/auth/login/",
+      "view": "apps.accounts.views.Login"
+    },
+    {
+      "path": "/api/auth/logout/",
+      "view": "apps.accounts.views.Logout"
+    },
+    {
+      "path": "/api/auth/me/",
+      "view": "apps.accounts.views.Me"
+    },
+    {
+      "path": "/api/auth/profile/",
+      "view": "apps.accounts.views.Profile"
+    },
+    {
+      "path": "/api/mess/options/",
+      "view": "apps.student_services.views.MessOptions"
+    },
+    {
+      "path": "/api/mess/options/<int:pk>/",
+      "view": "apps.student_services.views.MessOptionDetail"
+    },
+    {
+      "path": "/api/mess/select/",
+      "view": "apps.student_services.views.MessSelect"
+    },
+    {
+      "path": "/api/mess/history/",
+      "view": "apps.student_services.views.MessHistory"
+    },
+    {
+      "path": "/api/complaints/",
+      "view": "apps.student_services.views.Complaints"
+    },
+    {
+      "path": "/api/complaints/<int:pk>/",
+      "view": "apps.student_services.views.ComplaintDetail"
+    },
+    {
+      "path": "/api/complaints/<int:pk>/assign/",
+      "view": "apps.student_services.views.ComplaintAssign"
+    },
+    {
+      "path": "/api/complaints/<int:pk>/progress/",
+      "view": "apps.student_services.views.ComplaintProgress"
+    },
+    {
+      "path": "/api/mess/",
+      "view": "apps.student_services.views.Mess"
+    },
+    {
+      "path": "/api/mess/coupons/",
+      "view": "apps.student_services.views.Coupons"
+    },
+    {
+      "path": "/api/mess/coupons/<int:pk>/",
+      "view": "apps.student_services.views.CouponDetail"
+    },
+    {
+      "path": "/api/fees/",
+      "view": "apps.student_services.views.Fees"
+    },
+    {
+      "path": "/api/payments/attempts/",
+      "view": "apps.student_services.views.Attempts"
+    },
+    {
+      "path": "/api/payments/initiate/",
+      "view": "apps.student_services.views.Initiate"
+    },
+    {
+      "path": "/api/payments/verify/",
+      "view": "apps.student_services.views.Verify"
+    },
+    {
+      "path": "/api/payments/simulate/",
+      "view": "apps.student_services.views.Simulate"
+    },
+    {
+      "path": "/api/information/",
+      "view": "apps.information.views.ContentList"
+    },
+    {
+      "path": "/api/information/<int:pk>/",
+      "view": "apps.information.views.ContentDetail"
+    },
+    {
+      "path": "/api/rules/",
+      "view": "apps.information.views.Rules"
+    },
+    {
+      "path": "/api/rules/<int:pk>/",
+      "view": "apps.information.views.RuleDetail"
+    },
+    {
+      "path": "/api/leaves/",
+      "view": "apps.leave_attendance.views.Leaves"
+    },
+    {
+      "path": "/api/leaves/<uuid:pk>/",
+      "view": "apps.leave_attendance.views.LeaveDetail"
+    },
+    {
+      "path": "/api/leaves/<uuid:pk>/decision/",
+      "view": "apps.leave_attendance.views.LeaveDecision"
+    },
+    {
+      "path": "/api/attendance/sessions/",
+      "view": "apps.leave_attendance.views.Sessions"
+    },
+    {
+      "path": "/api/attendance/submit/",
+      "view": "apps.leave_attendance.views.AttendanceSubmit"
+    },
+    {
+      "path": "/api/attendance/history/",
+      "view": "apps.leave_attendance.views.AttendanceHistory"
+    },
+    {
+      "path": "/api/deviations/",
+      "view": "apps.leave_attendance.views.Deviations"
+    },
+    {
+      "path": "/api/deviations/total/",
+      "view": "apps.leave_attendance.views.DeviationTotals"
+    },
+    {
+      "path": "/api/deviations/<uuid:pk>/deactivate/",
+      "view": "apps.leave_attendance.views.DeviationDeactivate"
+    },
+    {
+      "path": "/api/arin/students/",
+      "view": "apps.leave_attendance.views.StudentChoices"
+    },
+    {
+      "path": "/api/arin/rules/",
+      "view": "apps.leave_attendance.views.RuleChoices"
+    },
+    {
+      "path": "/api/laundry/policy/",
+      "view": "apps.facilities.views.Policy"
+    },
+    {
+      "path": "/api/laundry/records/<int:pk>/ready/",
+      "view": "apps.facilities.views.Ready"
+    },
+    {
+      "path": "/api/study-room/",
+      "view": "apps.facilities.views.Study"
+    },
+    {
+      "path": "/api/laundry/allocations/",
+      "view": "apps.facilities.views.Allocations"
+    },
+    {
+      "path": "/api/laundry/records/",
+      "view": "apps.facilities.views.Records"
+    },
+    {
+      "path": "/api/laundry/records/<int:pk>/collect/",
+      "view": "apps.facilities.views.Collect"
+    },
+    {
+      "path": "/api/overview/",
+      "view": "apps.director_dashboard.overview.Overview"
+    },
+    {
+      "path": "/api/director/users/",
+      "view": "apps.director_dashboard.views.Users"
+    },
+    {
+      "path": "/api/director/users/<int:pk>/",
+      "view": "apps.director_dashboard.views.UserDetail"
+    },
+    {
+      "path": "/api/director/settings/",
+      "view": "apps.director_dashboard.views.Settings"
+    },
+    {
+      "path": "/api/director/summary/",
+      "view": "apps.director_dashboard.views.Summary"
+    },
+    {
+      "path": "/api/choices/users/",
+      "view": "apps.director_dashboard.views.Choices"
+    }
+  ],
+  "frontend_routes": [
+    "page.js",
+    "(portal)/attendance/page.js",
+    "(portal)/complaints/page.js",
+    "(portal)/dashboard/page.js",
+    "(portal)/deviations/page.js",
+    "(portal)/director/page.js",
+    "(portal)/fees/page.js",
+    "(portal)/information/page.js",
+    "(portal)/laundry/page.js",
+    "(portal)/leave/page.js",
+    "(portal)/mess/page.js",
+    "(portal)/profile/page.js",
+    "(portal)/study-room/page.js",
+    "(portal)/study-room/manage/page.js",
+    "(portal)/mess/manage/page.js",
+    "(portal)/leave/review/page.js",
+    "(portal)/leave/[id]/page.js",
+    "(portal)/laundry/handover/page.js",
+    "(portal)/laundry/manage/page.js",
+    "(portal)/information/manage/page.js",
+    "(portal)/fees/result/page.js",
+    "(portal)/director/settings/page.js",
+    "(portal)/director/users/page.js",
+    "(portal)/deviations/manage/page.js",
+    "(portal)/complaints/manage/page.js",
+    "(portal)/complaints/[id]/page.js",
+    "(portal)/attendance/manage/page.js",
+    "(auth)/login/page.js"
+  ],
+  "workflows": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/release.yml"
+  ]
+}

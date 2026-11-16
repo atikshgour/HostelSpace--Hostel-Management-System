@@ -130,3 +130,23 @@ The exact source-folder paths/hashes and merged PR heads are preserved in the
 cover every functional domain, with PDF permission differences explicitly tested.
 Coverage, initial failures, reruns and unexecuted STP acceptance are recorded;
 this entry does not mark manual, provider, release or recovery acceptance complete.
+
+
+## Initial automated test reports - 2026-11-16 (execution snapshot)
+
+User-requested priority cases P01-P14 and supporting units/components were executed
+against existing interfaces. [System report](../../test_results/system_test_report.md),
+[unit report](../../test_results/unit_test_report.md), and
+[coverage analysis](../../test_results/code_branch_coverage_analysis.md) contain
+actual command/output references. Backend: 143 Passed, 3 Failed; components:
+21 Passed; Chromium: 13 Passed. Original 116 backend regressions remain Passed.
+P12 is Failed for direct socket timeout normalization despite its passing wrapped-
+timeout API flow. P13/P14 are Failed against requested identical-submission replay
+prevention; duplicate success callbacks and initial deviation calculations pass.
+Replay identity for legitimate distinct events/retries needs owner policy review.
+Python line coverage: 80.96%; branches: 51.76% (measured with branch=true).
+At test execution time no product behavior, operational history or published CI
+was changed; no commit, push, production migration, deployment or live payment
+was performed. Publication of this test package was authorized on 2026-11-17;
+existing failures remain open and are not skipped or marked expected-failure.
+Independent review and manual/provider/release acceptance remain pending.

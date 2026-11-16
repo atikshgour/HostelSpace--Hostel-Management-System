@@ -1,0 +1,12 @@
+{
+  "phase": "lint",
+  "cwd": "frontend",
+  "command": [
+    "npm.cmd",
+    "run",
+    "lint"
+  ],
+  "started_at": "2026-11-16T18:22:58.140540+00:00",
+  "finished_at": "2026-11-16T18:23:12.523006+00:00",
+  "exit_code": 0
+}

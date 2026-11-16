@@ -1,0 +1,12 @@
+{
+  "phase": "build",
+  "cwd": "frontend",
+  "command": [
+    "npm.cmd",
+    "run",
+    "build"
+  ],
+  "started_at": "2026-11-16T18:19:56.331961+00:00",
+  "finished_at": "2026-11-16T18:20:10.136025+00:00",
+  "exit_code": 0
+}

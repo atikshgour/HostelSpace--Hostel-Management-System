@@ -3,6 +3,13 @@
 DJANGO_SETTINGS_MODULE = "config.settings.ci"
 testpaths = ["tests", "apps"]
 addopts = "--strict-markers"
+markers = [
+  "unit: isolated logic, serializer or service-level tests",
+  "integration: API, ORM and database integration tests",
+  "system: application workflow tests",
+  "security: authorization, ownership and protected inputs",
+  "reliability: retries, duplicate prevention and concurrency",
+]
 [tool.ruff]
 target-version = "py313"
 [tool.ruff.lint]

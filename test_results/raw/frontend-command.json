@@ -1,0 +1,18 @@
+{
+  "phase": "frontend",
+  "cwd": "frontend",
+  "command": [
+    "npm.cmd",
+    "run",
+    "test:ci",
+    "--",
+    "--config=jest.coverage.config.mjs",
+    "--runInBand",
+    "--coverageDirectory=../test_results/coverage/frontend",
+    "--json",
+    "--outputFile=../test_results/raw/frontend-results.json"
+  ],
+  "started_at": "2026-11-16T18:16:09.214282+00:00",
+  "finished_at": "2026-11-16T18:16:33.521708+00:00",
+  "exit_code": 0
+}

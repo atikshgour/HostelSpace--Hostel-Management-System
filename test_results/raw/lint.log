@@ -1,0 +1,5 @@
+
+> hostelspace-frontend@0.1.0 lint
+> eslint src e2e *.mjs jest.setup.js --max-warnings=0
+
+

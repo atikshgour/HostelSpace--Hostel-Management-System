@@ -99,3 +99,13 @@ test-results/
 /backend.zip
 .local-secret
 security-results/
+
+# Published initial test evidence (requested explicitly).
+!/test_results/coverage/
+!/test_results/coverage/**
+!/test_results/raw/*.log
+# Tool cache metadata is reproducible, not report evidence.
+/test_results/coverage/backend-html/.gitignore
+/test_results/coverage/backend-html/status.json
+/test_results/raw/browser-output/.last-run.json
+/test_results/coverage/frontend/lcov-report/
