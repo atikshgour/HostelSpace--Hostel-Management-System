@@ -87,4 +87,11 @@ class Deviation(models.Model):
     deactivation_reason = models.TextField(max_length=2000, blank=True)
     class Meta:
         ordering = ['-recorded_at', '-id']
-        constraints = [models.CheckConstraint(condition=Q(weightage_snapshot__gte=0), name='arin_nonnegative_weightage')]
+        constraints = [
+            models.CheckConstraint(condition=Q(weightage_snapshot__gte=0), name='arin_nonnegative_weightage'),
+            models.UniqueConstraint(
+                fields=['student', 'rule', 'remarks'],
+                condition=Q(active=True),
+                name='arin_unique_active_deviation_replay',
+            ),
+        ]
