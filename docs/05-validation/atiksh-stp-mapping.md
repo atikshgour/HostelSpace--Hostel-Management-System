@@ -1,6 +1,6 @@
 # Atiksh test mapping to the supplied SRS/SAD/STP
 
-Source: `SRS_SAD_STP_ SE_Deliverable_2_3_4.pdf`, SRS FR table (PDF p4),
+Source: `deliverables/SRS_SAD_STP_ SE_Deliverable_2_3_4.pdf`, SRS FR table (PDF p4),
 SAD architecture (p12/p15), STP functional cases (p30), security/nonfunctional
 cases (p31), traceability and reporting (p32). Original IDs are retained.
 This is an implementation mapping, not team/faculty acceptance or a release sign-off.
