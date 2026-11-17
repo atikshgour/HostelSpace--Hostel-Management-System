@@ -10,7 +10,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from django.conf import settings
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -87,9 +87,23 @@ def initiate(user, fee_id):
         raise ValidationError(
             "Payment checkout is disabled. Configure the sandbox provider."
         )
-    return PaymentAttempt.objects.create(
-        fee=fee, order_id=order, provider=mode, amount=fee.amount, currency=fee.currency
-    )
+    try:
+        return PaymentAttempt.objects.create(
+            fee=fee,
+            order_id=order,
+            provider=mode,
+            amount=fee.amount,
+            currency=fee.currency,
+        )
+    except IntegrityError:
+        # A concurrent request may win the pending-attempt constraint after the
+        # initial lookup. Return that canonical attempt instead of leaking a 500.
+        existing = PaymentAttempt.objects.filter(
+            fee=fee, provider=mode, status="Pending"
+        ).first()
+        if existing:
+            return existing
+        raise
 
 
 @transaction.atomic

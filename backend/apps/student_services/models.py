@@ -148,7 +148,12 @@ class PaymentAttempt(models.Model):
                 fields=["fee"],
                 condition=Q(status="Success"),
                 name="one_successful_attempt_per_fee",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["fee", "provider"],
+                condition=Q(status="Pending"),
+                name="one_pending_attempt_per_fee_provider",
+            ),
         ]
 
 

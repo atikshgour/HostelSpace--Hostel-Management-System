@@ -90,6 +90,14 @@ class PaymentTests(DomainCase):
         self.assertEqual(self.fee.status, "Unpaid")
         self.assertEqual(PaymentAttempt.objects.get(pk=a["id"]).status, "Pending")
 
+    def test_repeated_pending_start_reuses_one_attempt(self):
+        first = self.start().json()
+        second = self.start().json()
+        self.assertEqual(first["id"], second["id"])
+        self.assertEqual(
+            PaymentAttempt.objects.filter(fee=self.fee, status="Pending").count(), 1
+        )
+
     @override_settings(
         PAYMENT_MODE="razorpay",
         RAZORPAY_KEY_ID="rzp_test_unit",
