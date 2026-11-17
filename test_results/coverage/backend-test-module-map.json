@@ -5,7 +5,9 @@
   "apps/accounts/apps.py": [],
   "apps/accounts/management/__init__.py": [],
   "apps/accounts/management/commands/__init__.py": [],
-  "apps/accounts/management/commands/seed_demo.py": [],
+  "apps/accounts/management/commands/seed_demo.py": [
+    "tests/test_branch_workflows.py::test_seed_commands_require_local_mode_and_preserve_existing_passwords"
+  ],
   "apps/accounts/models.py": [],
   "apps/accounts/permissions.py": [
     "apps/accounts/tests/test_api.py::AuthenticationTests::test_anonymous_apis_require_login",
@@ -84,6 +86,14 @@
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_only_mess_staff_publish_catalogue",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_staff_allocation_retry_and_history",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_students_and_unrelated_staff_cannot_write",
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_director_creates_converts_and_rejects_conflicting_users",
+    "tests/test_branch_workflows.py::StaffBranches::test_director_rejects_unsafe_account_transitions",
+    "tests/test_branch_workflows.py::StaffBranches::test_mess_option_edits_capacity_and_coupon_reassignment",
+    "tests/test_branch_workflows.py::StaffBranches::test_resolved_complaint_cannot_be_reassigned_or_reopened",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_content_edits_and_empty_study_fallback",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_lists_and_overview_scopes",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_boundary_rejections_do_not_create_accepted_attendance",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P01_valid_login",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P02_invalid_login",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P03_student_denied_staff_and_admin_actions",
@@ -176,7 +186,13 @@
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_only_mess_staff_publish_catalogue",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_staff_allocation_retry_and_history",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_students_and_unrelated_staff_cannot_write",
-    "tests/test_health.py::test_health_checks_postgresql",
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_director_creates_converts_and_rejects_conflicting_users",
+    "tests/test_branch_workflows.py::StaffBranches::test_mess_option_edits_capacity_and_coupon_reassignment",
+    "tests/test_branch_workflows.py::StaffBranches::test_resolved_complaint_cannot_be_reassigned_or_reopened",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_content_edits_and_empty_study_fallback",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_lists_and_overview_scopes",
+    "tests/test_branch_workflows.py::test_serializers_reject_nonobjects_and_invalid_windows",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P01_valid_login",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P02_invalid_login",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P03_student_denied_staff_and_admin_actions",
@@ -196,10 +212,12 @@
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_director_creates_student_with_assignment",
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_invalid_assignment_rejected",
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_password_validation_and_duplicate_username",
+    "tests/test_branch_workflows.py::StaffBranches::test_assignment_validation_and_identity_without_warden",
+    "tests/test_branch_workflows.py::StaffBranches::test_director_creates_converts_and_rejects_conflicting_users",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P01_valid_login"
   ],
   "apps/accounts/urls.py": [
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments"
   ],
   "apps/accounts/views.py": [
     "apps/accounts/tests/test_api.py::AuthenticationTests::test_deactivation_revokes_existing_session",
@@ -211,7 +229,7 @@
     "apps/accounts/tests/test_api.py::ProfileTests::test_phone_update_persists",
     "apps/accounts/tests/test_api.py::ProfileTests::test_protected_profile_fields_rejected",
     "apps/accounts/tests/test_api.py::ProfileTests::test_staff_cannot_edit_student_profile",
-    "tests/test_health.py::test_health_checks_postgresql",
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P01_valid_login",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P02_invalid_login"
   ],
@@ -221,12 +239,13 @@
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_service_staff_overview_does_not_expose_fee_or_leave_counts",
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_warden_and_chief_overview_excludes_other_domains",
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_warden_overview_scopes_active_students",
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_lists_and_overview_scopes"
   ],
   "apps/director_dashboard/permissions.py": [],
   "apps/director_dashboard/queries.py": [],
   "apps/director_dashboard/serializers.py": [
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments"
   ],
   "apps/director_dashboard/services.py": [
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_cannot_deactivate_self_or_assigned_warden",
@@ -234,10 +253,11 @@
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_director_creates_student_with_assignment",
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_invalid_assignment_rejected",
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_password_validation_and_duplicate_username",
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_director_creates_converts_and_rejects_conflicting_users",
+    "tests/test_branch_workflows.py::StaffBranches::test_director_rejects_unsafe_account_transitions"
   ],
   "apps/director_dashboard/urls.py": [
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments"
   ],
   "apps/director_dashboard/views.py": [
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_cannot_create_privileged_roles_or_spoof_assignments",
@@ -252,7 +272,8 @@
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_student_cannot_manage_accounts_or_reports",
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_warden_cannot_create_operational_accounts",
     "apps/director_dashboard/tests/test_api.py::DirectorTests::test_warden_cannot_list_or_edit_accounts",
-    "tests/test_health.py::test_health_checks_postgresql",
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_director_creates_converts_and_rejects_conflicting_users",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P03_student_denied_staff_and_admin_actions"
   ],
   "apps/facilities/__init__.py": [],
@@ -268,7 +289,7 @@
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_receive_without_manual_allocation",
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_selected_turnaround_and_invalid_bounds",
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_student_cannot_transition_or_read_other_batches",
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments"
   ],
   "apps/facilities/services.py": [
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_cannot_collect_before_ready",
@@ -278,10 +299,11 @@
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_receive_without_manual_allocation",
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_selected_turnaround_and_invalid_bounds",
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_student_cannot_transition_or_read_other_batches",
-    "apps/facilities/tests/test_api.py::FacilitiesTests::test_student_schedule_is_owned_and_warden_is_denied"
+    "apps/facilities/tests/test_api.py::FacilitiesTests::test_student_schedule_is_owned_and_warden_is_denied",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_lists_and_overview_scopes"
   ],
   "apps/facilities/urls.py": [
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments"
   ],
   "apps/facilities/views.py": [
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_authorized_director_updates_study",
@@ -297,7 +319,9 @@
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_student_cannot_transition_or_read_other_batches",
     "apps/facilities/tests/test_api.py::FacilitiesTests::test_student_schedule_is_owned_and_warden_is_denied",
     "apps/facilities/tests/test_api.py::PdfPermissionTests::test_warden_has_no_laundry_or_study_management_permission",
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_content_edits_and_empty_study_fallback",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_lists_and_overview_scopes"
   ],
   "apps/information/__init__.py": [],
   "apps/information/admin.py": [],
@@ -308,11 +332,12 @@
   "apps/information/serializers.py": [
     "apps/information/tests/test_api.py::InformationTests::test_authorized_staff_create_and_edit",
     "apps/information/tests/test_api.py::InformationTests::test_invalid_notice_dates_rejected",
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_content_edits_and_empty_study_fallback"
   ],
   "apps/information/services.py": [],
   "apps/information/urls.py": [
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments"
   ],
   "apps/information/views.py": [
     "apps/information/tests/test_api.py::InformationTests::test_authorized_staff_create_and_edit",
@@ -323,13 +348,18 @@
     "apps/information/tests/test_api.py::InformationTests::test_student_cannot_publish",
     "apps/information/tests/test_api.py::InformationTests::test_student_reads_only_active_current_notices",
     "apps/information/tests/test_api.py::InformationTests::test_warden_cannot_publish_or_rewrite_rules",
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_content_edits_and_empty_study_fallback"
   ],
   "apps/leave_attendance/__init__.py": [],
-  "apps/leave_attendance/access.py": [],
+  "apps/leave_attendance/access.py": [
+    "tests/test_branch_workflows.py::WorkflowScopes::test_active_and_legacy_scope_adapters_agree"
+  ],
   "apps/leave_attendance/admin.py": [],
   "apps/leave_attendance/apps.py": [],
-  "apps/leave_attendance/errors.py": [],
+  "apps/leave_attendance/errors.py": [
+    "tests/test_branch_workflows.py::test_error_envelope_handles_unknown_and_list_errors[apps.leave_attendance.errors]"
+  ],
   "apps/leave_attendance/location.py": [
     "apps/leave_attendance/tests/test_api.py::ApiTests::test_attendance_submission_does_not_echo_coordinates",
     "apps/leave_attendance/tests/test_concurrency.py::ConcurrentTests::test_concurrent_attendance_accepts_once",
@@ -337,6 +367,7 @@
     "apps/leave_attendance/tests/test_services.py::ServiceTests::test_future_location_sample_outside_tolerance_is_rejected",
     "apps/leave_attendance/tests/test_services.py::ServiceTests::test_location_boundaries",
     "apps/leave_attendance/tests/test_services.py::ServiceTests::test_one_accepted_attendance_and_rejected_retry",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_boundary_rejections_do_not_create_accepted_attendance",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P07_valid_attendance",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P08_outside_boundary_rejected",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P09_repeated_attendance_prevented",
@@ -372,6 +403,9 @@
     "apps/leave_attendance/tests/test_services.py::ServiceTests::test_one_accepted_attendance_and_rejected_retry",
     "apps/leave_attendance/tests/test_services.py::ServiceTests::test_only_student_submits",
     "apps/leave_attendance/tests/test_services.py::ServiceTests::test_warden_cannot_finalize_escalated_request",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_active_and_legacy_scope_adapters_agree",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_boundary_rejections_do_not_create_accepted_attendance",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_service_validation_and_missing_staff_filter",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P03_student_denied_staff_and_admin_actions",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P04_valid_leave",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P05_invalid_leave",
@@ -393,6 +427,8 @@
     "apps/leave_attendance/tests/test_api.py::ApiTests::test_pagination_is_bounded",
     "apps/leave_attendance/tests/test_api.py::ApiTests::test_protected_fields_and_bad_dates_are_rejected",
     "apps/leave_attendance/tests/test_api.py::ApiTests::test_unknown_and_malformed_identifiers",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_boundary_rejections_do_not_create_accepted_attendance",
+    "tests/test_branch_workflows.py::test_serializers_reject_nonobjects_and_invalid_windows",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P04_valid_leave",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P05_invalid_leave",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P06_warden_approves_and_rejects",
@@ -425,6 +461,8 @@
     "apps/leave_attendance/tests/test_services.py::ServiceTests::test_one_accepted_attendance_and_rejected_retry",
     "apps/leave_attendance/tests/test_services.py::ServiceTests::test_only_student_submits",
     "apps/leave_attendance/tests/test_services.py::ServiceTests::test_warden_cannot_finalize_escalated_request",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_active_and_legacy_scope_adapters_agree",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_service_validation_and_missing_staff_filter",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P04_valid_leave",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P06_warden_approves_and_rejects",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P07_valid_attendance",
@@ -433,7 +471,7 @@
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P14_deviation_total_and_duplicate_prevention"
   ],
   "apps/leave_attendance/urls.py": [
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments"
   ],
   "apps/leave_attendance/views.py": [
     "apps/leave_attendance/tests/test_api.py::ApiTests::test_anonymous_and_nonworkflow_roles_are_denied",
@@ -448,7 +486,9 @@
     "apps/leave_attendance/tests/test_api.py::ApiTests::test_pagination_is_bounded",
     "apps/leave_attendance/tests/test_api.py::ApiTests::test_protected_fields_and_bad_dates_are_rejected",
     "apps/leave_attendance/tests/test_api.py::ApiTests::test_unknown_and_malformed_identifiers",
-    "tests/test_health.py::test_health_checks_postgresql",
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_boundary_rejections_do_not_create_accepted_attendance",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_service_validation_and_missing_staff_filter",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P03_student_denied_staff_and_admin_actions",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P04_valid_leave",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P05_invalid_leave",
@@ -463,7 +503,9 @@
   "apps/student_services/apps.py": [],
   "apps/student_services/management/__init__.py": [],
   "apps/student_services/management/commands/__init__.py": [],
-  "apps/student_services/management/commands/seed_service_demo.py": [],
+  "apps/student_services/management/commands/seed_service_demo.py": [
+    "tests/test_branch_workflows.py::test_seed_commands_require_local_mode_and_preserve_existing_passwords"
+  ],
   "apps/student_services/models.py": [
     "apps/student_services/tests/test_api.py::ComplaintTests::test_full_progress_and_history_no_revert",
     "apps/student_services/tests/test_api.py::ComplaintTests::test_only_director_assigns_active_maintenance",
@@ -477,6 +519,9 @@
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_change_preserves_history_and_releases_capacity",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_enrolled_name_and_capacity_are_protected",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_staff_allocation_retry_and_history",
+    "tests/test_branch_workflows.py::StaffBranches::test_mess_option_edits_capacity_and_coupon_reassignment",
+    "tests/test_branch_workflows.py::StaffBranches::test_resolved_complaint_cannot_be_reassigned_or_reopened",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_boundary_rejections_do_not_create_accepted_attendance",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P10_complaint_creation_and_ownership",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P11_unauthorized_complaint_update"
   ],
@@ -494,6 +539,9 @@
     "apps/student_services/tests/test_payments.py::PaymentTests::test_unverified_attempt_stays_pending",
     "apps/student_services/tests/test_stp.py::STPPaymentRaceTests::test_TC_FR09_01_two_attempts_cannot_both_pay_one_fee",
     "apps/student_services/tests/test_stp.py::STPPaymentRaceTests::test_TC_NFR03_01_concurrent_success_callbacks_are_idempotent",
+    "tests/test_branch_workflows.py::ProviderBranches::test_disabled_checkout_and_missing_test_credentials",
+    "tests/test_branch_workflows.py::ProviderBranches::test_malformed_provider_orders_and_captured_payloads",
+    "tests/test_branch_workflows.py::ProviderBranches::test_provider_json_transport_and_reference_mismatch",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P12_payment_success_failure_timeout_retry",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P13_duplicate_payment_callbacks_and_submissions",
     "tests/test_priority_unit.py::test_direct_socket_timeout_is_validation_error",
@@ -516,7 +564,9 @@
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_enrolled_name_and_capacity_are_protected",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_only_mess_staff_publish_catalogue",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_staff_allocation_retry_and_history",
-    "tests/test_health.py::test_health_checks_postgresql",
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_mess_option_edits_capacity_and_coupon_reassignment",
+    "tests/test_branch_workflows.py::StaffBranches::test_resolved_complaint_cannot_be_reassigned_or_reopened",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P10_complaint_creation_and_ownership",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P11_unauthorized_complaint_update"
   ],
@@ -533,11 +583,14 @@
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_change_preserves_history_and_releases_capacity",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_enrolled_name_and_capacity_are_protected",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_staff_allocation_retry_and_history",
+    "tests/test_branch_workflows.py::StaffBranches::test_mess_option_edits_capacity_and_coupon_reassignment",
+    "tests/test_branch_workflows.py::StaffBranches::test_resolved_complaint_cannot_be_reassigned_or_reopened",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_boundary_rejections_do_not_create_accepted_attendance",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P10_complaint_creation_and_ownership",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P11_unauthorized_complaint_update"
   ],
   "apps/student_services/urls.py": [
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments"
   ],
   "apps/student_services/views.py": [
     "apps/student_services/tests/test_api.py::ComplaintTests::test_full_progress_and_history_no_revert",
@@ -572,7 +625,10 @@
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_only_mess_staff_publish_catalogue",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_staff_allocation_retry_and_history",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_students_and_unrelated_staff_cannot_write",
-    "tests/test_health.py::test_health_checks_postgresql",
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_mess_option_edits_capacity_and_coupon_reassignment",
+    "tests/test_branch_workflows.py::StaffBranches::test_resolved_complaint_cannot_be_reassigned_or_reopened",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_lists_and_overview_scopes",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P10_complaint_creation_and_ownership",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P11_unauthorized_complaint_update",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P12_payment_success_failure_timeout_retry",
@@ -642,6 +698,13 @@
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_only_mess_staff_publish_catalogue",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_staff_allocation_retry_and_history",
     "apps/student_services/tests/test_stp.py::STPMessPermissionTests::test_TC_FR08_01_students_and_unrelated_staff_cannot_write",
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
+    "tests/test_branch_workflows.py::StaffBranches::test_mess_option_edits_capacity_and_coupon_reassignment",
+    "tests/test_branch_workflows.py::StaffBranches::test_resolved_complaint_cannot_be_reassigned_or_reopened",
+    "tests/test_branch_workflows.py::StaffBranches::test_staff_lists_and_overview_scopes",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_boundary_rejections_do_not_create_accepted_attendance",
+    "tests/test_branch_workflows.py::WorkflowScopes::test_service_validation_and_missing_staff_filter",
+    "tests/test_branch_workflows.py::test_error_envelope_handles_unknown_and_list_errors[config.exceptions]",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P02_invalid_login",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P03_student_denied_staff_and_admin_actions",
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P05_invalid_leave",
@@ -652,17 +715,32 @@
     "tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P13_duplicate_payment_callbacks_and_submissions"
   ],
   "config/health.py": [
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments",
     "tests/test_health.py::test_database_failure_is_unavailable_without_details",
     "tests/test_health.py::test_health_checks_postgresql"
   ],
   "config/logging.py": [],
   "config/settings/__init__.py": [],
-  "config/settings/base.py": [],
+  "config/settings/base.py": [
+    "tests/test_branch_workflows.py::test_database_settings_validate_urls_without_connecting[-1-sqlite3]",
+    "tests/test_branch_workflows.py::test_database_settings_validate_urls_without_connecting[https://localhost/db-0-None]",
+    "tests/test_branch_workflows.py::test_database_settings_validate_urls_without_connecting[postgresql://localhost/db?sslmode=wrong-0-None]",
+    "tests/test_branch_workflows.py::test_database_settings_validate_urls_without_connecting[postgresql://test@localhost/test-0-postgresql]"
+  ],
   "config/settings/ci.py": [],
-  "config/settings/local.py": [],
-  "config/settings/production.py": [],
+  "config/settings/local.py": [
+    "tests/test_branch_workflows.py::test_local_settings_create_or_reuse_only_a_local_key[False]",
+    "tests/test_branch_workflows.py::test_local_settings_create_or_reuse_only_a_local_key[True]"
+  ],
+  "config/settings/production.py": [
+    "tests/test_branch_workflows.py::test_production_settings_reject_insecure_configuration[-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-origins0-require-hostnames]",
+    "tests/test_branch_workflows.py::test_production_settings_reject_insecure_configuration[example.invalid-short-origins1-require-secret]",
+    "tests/test_branch_workflows.py::test_production_settings_reject_insecure_configuration[example.invalid-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-origins2-require-HTTPS]",
+    "tests/test_branch_workflows.py::test_production_settings_reject_insecure_configuration[example.invalid-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-origins3-prefer-encrypted]",
+    "tests/test_branch_workflows.py::test_production_settings_reject_insecure_configuration[example.invalid-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-origins4-require-None]"
+  ],
   "config/urls.py": [
-    "tests/test_health.py::test_health_checks_postgresql"
+    "tests/test_branch_workflows.py::StaffBranches::test_choice_directories_enforce_roles_and_assignments"
   ],
   "config/wsgi.py": []
 }

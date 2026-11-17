@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -116,21 +116,16 @@
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
 <a name='L53'></a><a href='#L53'>53</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -149,15 +144,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -168,16 +168,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use client";
-import { api } from <span class="cstat-no" title="statement not covered" >"@/lib/api";</span>
+import { api } from "@/lib/api";
 import {
   useResource,
   ErrorMessage,
   ResourceForm,
-} from <span class="cstat-no" title="statement not covered" >"@/components/ui/AppShell";</span>
-import Card from <span class="cstat-no" title="statement not covered" >"@/components/ui/Card";</span>
-import PageHeader from <span class="cstat-no" title="statement not covered" >"@/components/ui/PageHeader";</span>
-export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >SettingsForm() {</span></span>
-  const { data, error, refresh } = <span class="cstat-no" title="statement not covered" >useResource(["/api/director/settings/"]);</span>
+} from "@/components/ui/AppShell";
+import Card from "@/components/ui/Card";
+import PageHeader from "@/components/ui/PageHeader";
+export default function SettingsForm() {
+  const { data, error, refresh } = useResource(["/api/director/settings/"]);
   return (
     &lt;&gt;
       &lt;PageHeader
@@ -200,16 +200,16 @@ export default function <span class="cstat-no" title="statement not covered" ><s
               },
               { name: "value", label: "Value" },
             ]}
-            onSave={<span class="fstat-no" title="function not covered" >async (b</span>ody) =&gt; {
-<span class="cstat-no" title="statement not covered" >              await api("/api/director/settings/", { method: "POST", body });</span>
-<span class="cstat-no" title="statement not covered" >              refresh();</span>
+            onSave={async (body) =&gt; {
+              await api("/api/director/settings/", { method: "POST", body });
+              refresh();
             }}
           /&gt;
         &lt;/Card&gt;
         &lt;Card&gt;
           &lt;h2&gt;Current values&lt;/h2&gt;
-          {(data?.[0] || []).map(<span class="fstat-no" title="function not covered" >(x</span>) =&gt; (
-<span class="cstat-no" title="statement not covered" >            &lt;div key={x.key} c</span>lassName="hs-list-item"&gt;
+          {(data?.[0] || []).map((x) =&gt; (
+            &lt;div key={x.key} className="hs-list-item"&gt;
               &lt;h3&gt;{x.key.replaceAll("_", " ")}&lt;/h3&gt;
               &lt;p&gt;{x.value}&lt;/p&gt;
             &lt;/div&gt;
@@ -226,7 +226,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-11-16T18:16:33.198Z
+                at 2026-11-17T06:50:35.917Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

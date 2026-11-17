@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">12.5% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/16</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/15</span>
+                <span class='fraction'>15/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.66% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -141,19 +141,14 @@
 <a name='L76'></a><a href='#L76'>76</a>
 <a name='L77'></a><a href='#L77'>77</a>
 <a name='L78'></a><a href='#L78'>78</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">280x</span>
+<span class="cline-any cline-yes">280x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">378x</span>
+<span class="cline-any cline-yes">255x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -203,29 +198,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1794x</span>
+<span class="cline-any cline-yes">1794x</span>
+<span class="cline-any cline-yes">1585x</span>
+<span class="cline-any cline-yes">219x</span>
+<span class="cline-any cline-yes">1366x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">537x</span>
+<span class="cline-any cline-yes">829x</span>
+<span class="cline-any cline-yes">774x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* Owner: Anvi Srinivas | US-17,US-01 | Dev sprint 1 | SRS sprint 1 | Reviewer: Arin Singh (pending) */
-export const <span class="cstat-no" title="statement not covered" >roleLabel = <span class="fstat-no" title="function not covered" >(</span>r</span>ole = <span class="branch-0 cbranch-no" title="branch not covered" >"")</span> =&gt;
-<span class="cstat-no" title="statement not covered" >  role === "DIRECTOR"</span>
+export const roleLabel = (role = "") =&gt;
+  role === "DIRECTOR"
     ? "Admin"
     : role
         .toLowerCase()
         .replaceAll("_", " ")
-        .replace(/\b\w/g, <span class="fstat-no" title="function not covered" >(c</span>) =&gt; <span class="cstat-no" title="statement not covered" >c.toUpperCase());</span>
-export const <span class="cstat-no" title="statement not covered" >menus = {</span>
+        .replace(/\b\w/g, (c) =&gt; c.toUpperCase());
+export const menus = {
   STUDENT: [
     ["Dashboard", "/dashboard"],
     ["My profile", "/profile"],
@@ -280,19 +280,19 @@ export const <span class="cstat-no" title="statement not covered" >menus = {</sp
   ],
 };
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >navGroup(u</span></span>rl) {
-<span class="cstat-no" title="statement not covered" >  if (url === "/dashboard") <span class="cstat-no" title="statement not covered" >return "Overview";</span></span>
-<span class="cstat-no" title="statement not covered" >  if (["/profile", "/director/users", "/director/settings"].includes(url))</span>
-<span class="cstat-no" title="statement not covered" >    return "People &amp; account";</span>
-<span class="cstat-no" title="statement not covered" >  if (</span>
+export function navGroup(url) {
+  if (url === "/dashboard") return "Overview";
+  if (["/profile", "/director/users", "/director/settings"].includes(url))
+    return "People &amp; account";
+  if (
     url.includes("leave") ||
     url.includes("attendance") ||
     url.includes("deviations") ||
     url.includes("complaints")
   )
-<span class="cstat-no" title="statement not covered" >    return "Requests &amp; records";</span>
-<span class="cstat-no" title="statement not covered" >  if (url.startsWith("/director")) <span class="cstat-no" title="statement not covered" >return "Administration";</span></span>
-<span class="cstat-no" title="statement not covered" >  return "Hostel services";</span>
+    return "Requests &amp; records";
+  if (url.startsWith("/director")) return "Administration";
+  return "Hostel services";
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -301,7 +301,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-11-16T18:16:33.198Z
+                at 2026-11-17T06:50:35.917Z
             </div>
         <script src="../prettify.js"></script>
         <script>

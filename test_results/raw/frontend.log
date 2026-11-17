@@ -2,93 +2,93 @@
 > hostelspace-frontend@0.1.0 test:ci
 > jest --ci --coverage --config=jest.coverage.config.mjs --runInBand --coverageDirectory=../test_results/coverage/frontend --json --outputFile=../test_results/raw/frontend-results.json
 
------------------------------|---------|----------|---------|---------|------------------------------------------
-File                         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                        
------------------------------|---------|----------|---------|---------|------------------------------------------
-All files                    |   45.42 |    38.31 |   36.72 |   48.13 |                                          
- app                         |       0 |      100 |       0 |       0 |                                          
-  layout.js                  |       0 |      100 |       0 |       0 | 1-6                                      
-  not-found.js               |       0 |      100 |       0 |       0 | 1-2                                      
-  page.js                    |       0 |      100 |       0 |       0 | 1-3                                      
- app/health                  |     100 |      100 |     100 |     100 |                                          
-  route.js                   |     100 |      100 |     100 |     100 |                                          
- components/ui               |   47.59 |    40.62 |   45.45 |      49 |                                          
-  AppShell.jsx               |   41.04 |    40.17 |   32.43 |   41.66 | 17,34,62-63,77,147-343                   
-  Button.jsx                 |     100 |      100 |     100 |     100 |                                          
-  Card.jsx                   |     100 |      100 |     100 |     100 |                                          
-  ConfirmDialog.jsx          |       0 |      100 |       0 |       0 | 3-4                                      
-  DataTable.jsx              |     100 |      100 |     100 |     100 |                                          
-  Dialog.jsx                 |   82.35 |    66.66 |      80 |    87.5 | 23-24                                    
-  EmptyState.jsx             |       0 |        0 |       0 |       0 | 2                                        
-  FormField.jsx              |     100 |    66.66 |     100 |     100 | 7                                        
-  HistoryTimeline.jsx        |   33.33 |        0 |       0 |   33.33 | 3-7                                      
-  PageHeader.jsx             |     100 |      100 |     100 |     100 |                                          
-  StatusBadge.jsx            |     100 |      100 |     100 |     100 |                                          
- features/attendance         |      57 |    57.14 |   62.96 |   57.44 |                                          
-  AttendanceHistory.jsx      |   55.38 |    47.36 |   66.66 |   53.96 | 58-162,170-173,181,197,224,272           
-  AttendanceSessionForm.jsx  |       0 |      100 |     100 |       0 | 2                                        
-  AttendanceSubmit.jsx       |       0 |      100 |     100 |       0 | 2                                        
-  api.js                     |   65.78 |    65.21 |   55.55 |   68.96 | 2-11,13,22,44                            
- features/complaints         |   55.76 |    31.14 |   33.33 |    61.7 |                                          
-  ComplaintForm.jsx          |       0 |      100 |     100 |       0 | 2                                        
-  ComplaintList.jsx          |    65.9 |    31.14 |   33.33 |    65.9 | 20,49-95,119-156,180-203,217-237         
-  ComplaintManagePanel.jsx   |       0 |      100 |     100 |       0 | 2                                        
-  api.js                     |       0 |      100 |     100 |       0 | 2                                        
- features/deviations         |   44.14 |    45.31 |   36.36 |   45.74 |                                          
-  DeviationForm.jsx          |       0 |      100 |     100 |       0 | 2                                        
-  DeviationPanel.jsx         |   44.61 |       50 |   36.36 |   44.26 | 60-140,162,168-171,203                   
-  api.js                     |   45.45 |    39.28 |   36.36 |      50 | 2-11,13,16-26,42,53,55                   
- features/director           |    17.1 |     5.97 |      12 |    17.8 |                                          
-  DirectorPanel.jsx          |   92.85 |    66.66 |      75 |   92.85 | 42                                       
-  SettingsForm.jsx           |       0 |        0 |       0 |       0 | 2-43                                     
-  UserManagement.jsx         |       0 |        0 |       0 |       0 | 2-232                                    
-  api.js                     |       0 |      100 |     100 |       0 | 1                                        
- features/fees               |   40.84 |    58.82 |   33.33 |   46.03 |                                          
-  FeesPanel.jsx              |   46.03 |    58.82 |   33.33 |   48.33 | 18-24,52-87,93-147,183                   
-  PaymentHistory.jsx         |       0 |      100 |     100 |       0 | 1                                        
-  PaymentResult.jsx          |       0 |      100 |     100 |       0 | 1                                        
-  api.js                     |       0 |      100 |     100 |       0 | 1                                        
- features/information        |      28 |    26.78 |      40 |   30.43 |                                          
-  ContentEditor.jsx          |       0 |        0 |       0 |       0 | 2-174                                    
-  InformationTabs.jsx        |     100 |    93.75 |     100 |     100 | 51                                       
-  api.js                     |       0 |      100 |     100 |       0 | 1                                        
- features/laundry            |   42.46 |    42.52 |   10.52 |   46.96 |                                          
-  LaundryAllocationForm.jsx  |       0 |      100 |     100 |       0 | 1                                        
-  LaundryCollectionPanel.jsx |       0 |      100 |     100 |       0 | 1                                        
-  LaundryHandoverForm.jsx    |       0 |      100 |     100 |       0 | 1                                        
-  LaundryPanel.jsx           |    49.2 |    42.52 |   10.52 |      50 | 42-68,73-209,229-351                     
-  api.js                     |       0 |      100 |     100 |       0 | 1                                        
- features/leave              |   41.47 |    32.43 |   33.33 |   43.22 |                                          
-  LeaveForm.jsx              |       0 |      100 |     100 |       0 | 2                                        
-  LeaveHistory.jsx           |       0 |      100 |     100 |       0 | 2                                        
-  LeaveList.jsx              |    63.8 |     44.3 |   46.87 |   65.65 | 20,36,69-125,167,188,197,243-255,275-355 
-  LeaveReviewPanel.jsx       |       0 |      100 |     100 |       0 | 2                                        
-  LeaveWorkspace.jsx         |       0 |        0 |       0 |       0 | 3-188                                    
-  api.js                     |   60.52 |    59.09 |   44.44 |   64.28 | 2-11,13,22,43,47                         
- features/login              |   83.33 |      100 |     100 |   95.23 |                                          
-  LoginForm.jsx              |     100 |      100 |     100 |     100 |                                          
-  api.js                     |       0 |      100 |     100 |       0 | 2                                        
- features/mess               |   51.66 |    47.89 |   22.22 |   56.36 |                                          
-  MessManageForm.jsx         |       0 |      100 |     100 |       0 | 1                                        
-  MessPanel.jsx              |    57.4 |    47.89 |   22.22 |   58.49 | 71-83,158-200,232-337                    
-  api.js                     |       0 |      100 |     100 |       0 | 2                                        
- features/profile            |   71.42 |       75 |     100 |    90.9 |                                          
-  ProfilePanel.jsx           |     100 |       75 |     100 |     100 | 31                                       
-  api.js                     |       0 |      100 |     100 |       0 | 1                                        
- features/study-room         |   44.44 |    42.85 |      40 |      50 |                                          
-  StudyRoomCard.jsx          |     100 |       60 |     100 |     100 | 28-30                                    
-  StudyRoomEditor.jsx        |       0 |        0 |       0 |       0 | 2-36                                     
-  api.js                     |       0 |      100 |     100 |       0 | 1                                        
- lib                         |   64.15 |       40 |   55.55 |   72.09 |                                          
-  api.js                     |   83.87 |    62.96 |      75 |   92.59 | 2,11                                     
-  format.js                  |     100 |    33.33 |     100 |     100 | 3-4                                      
-  roles.js                   |    12.5 |        0 |       0 |   16.66 | 3-8,64-76                                
------------------------------|---------|----------|---------|---------|------------------------------------------
+-----------------------------|---------|----------|---------|---------|-------------------
+File                         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-----------------------------|---------|----------|---------|---------|-------------------
+All files                    |   92.81 |    97.45 |    97.7 |   96.46 |                   
+ app                         |       0 |      100 |       0 |       0 |                   
+  layout.js                  |       0 |      100 |       0 |       0 | 1-6               
+  not-found.js               |       0 |      100 |       0 |       0 | 1-2               
+  page.js                    |       0 |      100 |       0 |       0 | 1-3               
+ app/health                  |     100 |      100 |     100 |     100 |                   
+  route.js                   |     100 |      100 |     100 |     100 |                   
+ components/ui               |     100 |    97.65 |     100 |     100 |                   
+  AppShell.jsx               |     100 |    97.43 |     100 |     100 | 171,200,272       
+  Button.jsx                 |     100 |      100 |     100 |     100 |                   
+  Card.jsx                   |     100 |      100 |     100 |     100 |                   
+  ConfirmDialog.jsx          |     100 |      100 |     100 |     100 |                   
+  DataTable.jsx              |     100 |      100 |     100 |     100 |                   
+  Dialog.jsx                 |     100 |      100 |     100 |     100 |                   
+  EmptyState.jsx             |     100 |      100 |     100 |     100 |                   
+  FormField.jsx              |     100 |      100 |     100 |     100 |                   
+  HistoryTimeline.jsx        |     100 |      100 |     100 |     100 |                   
+  PageHeader.jsx             |     100 |      100 |     100 |     100 |                   
+  StatusBadge.jsx            |     100 |      100 |     100 |     100 |                   
+ features/attendance         |   96.26 |      100 |     100 |   97.87 |                   
+  AttendanceHistory.jsx      |     100 |      100 |     100 |     100 |                   
+  AttendanceSessionForm.jsx  |       0 |      100 |     100 |       0 | 2                 
+  AttendanceSubmit.jsx       |       0 |      100 |     100 |       0 | 2                 
+  api.js                     |     100 |      100 |     100 |     100 |                   
+ features/complaints         |   80.76 |    85.24 |   94.44 |   89.36 |                   
+  ComplaintForm.jsx          |       0 |      100 |     100 |       0 | 2                 
+  ComplaintList.jsx          |   95.45 |    85.24 |   94.44 |   95.45 | 20,237            
+  ComplaintManagePanel.jsx   |       0 |      100 |     100 |       0 | 2                 
+  api.js                     |       0 |      100 |     100 |       0 | 2                 
+ features/deviations         |   97.29 |      100 |     100 |   97.87 |                   
+  DeviationForm.jsx          |       0 |      100 |     100 |       0 | 2                 
+  DeviationPanel.jsx         |   98.46 |      100 |     100 |   98.36 | 68                
+  api.js                     |     100 |      100 |     100 |     100 |                   
+ features/director           |   94.73 |      100 |     100 |   98.63 |                   
+  DirectorPanel.jsx          |     100 |      100 |     100 |     100 |                   
+  SettingsForm.jsx           |     100 |      100 |     100 |     100 |                   
+  UserManagement.jsx         |     100 |      100 |     100 |     100 |                   
+  api.js                     |       0 |      100 |     100 |       0 | 1                 
+ features/fees               |   88.73 |      100 |     100 |   95.23 |                   
+  FeesPanel.jsx              |     100 |      100 |     100 |     100 |                   
+  PaymentHistory.jsx         |       0 |      100 |     100 |       0 | 1                 
+  PaymentResult.jsx          |       0 |      100 |     100 |       0 | 1                 
+  api.js                     |       0 |      100 |     100 |       0 | 1                 
+ features/information        |      92 |    98.21 |     100 |   97.82 |                   
+  ContentEditor.jsx          |     100 |      100 |     100 |     100 |                   
+  InformationTabs.jsx        |     100 |    93.75 |     100 |     100 | 51                
+  api.js                     |       0 |      100 |     100 |       0 | 1                 
+ features/laundry            |    86.3 |     97.7 |     100 |   93.93 |                   
+  LaundryAllocationForm.jsx  |       0 |      100 |     100 |       0 | 1                 
+  LaundryCollectionPanel.jsx |       0 |      100 |     100 |       0 | 1                 
+  LaundryHandoverForm.jsx    |       0 |      100 |     100 |       0 | 1                 
+  LaundryPanel.jsx           |     100 |     97.7 |     100 |     100 | 301,319           
+  api.js                     |       0 |      100 |     100 |       0 | 1                 
+ features/leave              |   95.39 |    98.64 |   94.73 |   97.91 |                   
+  LeaveForm.jsx              |       0 |      100 |     100 |       0 | 2                 
+  LeaveHistory.jsx           |       0 |      100 |     100 |       0 | 2                 
+  LeaveList.jsx              |   98.09 |    98.73 |   96.87 |   98.98 | 355               
+  LeaveReviewPanel.jsx       |       0 |      100 |     100 |       0 | 2                 
+  LeaveWorkspace.jsx         |   97.05 |    97.87 |    87.5 |     100 | 152               
+  api.js                     |     100 |      100 |     100 |     100 |                   
+ features/login              |   83.33 |      100 |     100 |   95.23 |                   
+  LoginForm.jsx              |     100 |      100 |     100 |     100 |                   
+  api.js                     |       0 |      100 |     100 |       0 | 2                 
+ features/mess               |      90 |      100 |     100 |   96.36 |                   
+  MessManageForm.jsx         |       0 |      100 |     100 |       0 | 1                 
+  MessPanel.jsx              |     100 |      100 |     100 |     100 |                   
+  api.js                     |       0 |      100 |     100 |       0 | 2                 
+ features/profile            |   71.42 |       75 |     100 |    90.9 |                   
+  ProfilePanel.jsx           |     100 |       75 |     100 |     100 | 31                
+  api.js                     |       0 |      100 |     100 |       0 | 1                 
+ features/study-room         |   85.18 |    71.42 |     100 |   95.83 |                   
+  StudyRoomCard.jsx          |     100 |       60 |     100 |     100 | 28-30             
+  StudyRoomEditor.jsx        |     100 |      100 |     100 |     100 |                   
+  api.js                     |       0 |      100 |     100 |       0 | 1                 
+ lib                         |     100 |    95.55 |     100 |     100 |                   
+  api.js                     |     100 |    92.59 |     100 |     100 | 44-50             
+  format.js                  |     100 |      100 |     100 |     100 |                   
+  roles.js                   |     100 |      100 |     100 |     100 |                   
+-----------------------------|---------|----------|---------|---------|-------------------
 
 
-Test Suites: 15 passed, 15 total
-Tests:       21 passed, 21 total
+Test Suites: 21 passed, 21 total
+Tests:       105 passed, 105 total
 Snapshots:   0 total
-Time:        21.72 s
+Time:        31.984 s
 Ran all test suites.
 Test results written to: ..\test_results\raw\frontend-results.json

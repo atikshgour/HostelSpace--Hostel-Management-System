@@ -2,9 +2,10 @@
   "python": "3.13.7",
   "django": "5.2.18",
   "node": "v22.20.0",
-  "postgresql": "15.19",
-  "source_commit": "9a364dd1873b7ff50683c6a7bd9101ffce0bf1a4",
-  "database_scope": "new isolated synthetic local database; pytest-created disposable test database",
+  "postgresql": 150019,
+  "source_commit": "7b7d4c436c88b03f12ac5d07039f031000ca99ae",
+  "working_tree_changes": true,
+  "database_scope": "new isolated hostelspace_coverage_20261117 and pytest disposable test database",
   "database_reset": false,
   "production_changes": false
 }

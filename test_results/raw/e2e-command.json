@@ -9,7 +9,9 @@
     "--reporter=list,json,html",
     "--output=../test_results/raw/browser-output"
   ],
-  "started_at": "2026-11-16T18:18:00.588822+00:00",
-  "finished_at": "2026-11-16T18:19:09.661561+00:00",
+  "started_at": "2026-11-17T06:52:53.802596+00:00",
+  "finished_at": "2026-11-17T06:54:18.989855+00:00",
+  "source_commit": "7b7d4c436c88b03f12ac5d07039f031000ca99ae",
+  "working_tree_changes": true,
   "exit_code": 0
 }

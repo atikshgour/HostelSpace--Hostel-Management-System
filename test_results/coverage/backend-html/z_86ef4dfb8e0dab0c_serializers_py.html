@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for apps\leave_attendance\serializers.py: 90%</title>
+    <title>Coverage for apps\leave_attendance\serializers.py: 96%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_0853b3de.css" type="text/css">
     <script src="coverage_html_cb_c74880ea.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>apps<span class="sep">\</span>leave_attendance<span class="sep">\</span>serializers.py</b>:
-            <span class="pc_cov">90%</span>
+            <span class="pc_cov">96%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -56,8 +56,8 @@
         </aside>
         <h2>
             <span class="text">93 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">86<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">7<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">91<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">2<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
             <button type="button" class="par run show_par button_toggle_par" value="par" data-shortcut="p" title="Toggle lines partially run">2<span class="text"> partial</span></button>
         </h2>
@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="z_86ef4dfb8e0dab0c_services_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-11-16 23:46 +0530
+            created at 2026-11-17 12:17 +0530
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -102,8 +102,8 @@
     <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="key">class</span> <span class="nam">StrictInput</span><span class="op">(</span><span class="nam">serializers</span><span class="op">.</span><span class="nam">Serializer</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">    <span class="key">def</span> <span class="nam">to_internal_value</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">data</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="par run show_par"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t">        <span class="key">if</span> <span class="key">not</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">data</span><span class="op">,</span> <span class="nam">Mapping</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">21&#x202F;&#x219B;&#x202F;22</span><span class="annotate long">line 21 didn't jump to line 22 because the condition on line 21 was never true</span></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">            <span class="key">raise</span> <span class="nam">serializers</span><span class="op">.</span><span class="nam">ValidationError</span><span class="op">(</span><span class="op">{</span><span class="str">&#x27;non_field_errors&#x27;</span><span class="op">:</span> <span class="op">[</span><span class="str">&#x27;Expected an object.&#x27;</span><span class="op">]</span><span class="op">}</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t">        <span class="key">if</span> <span class="key">not</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">data</span><span class="op">,</span> <span class="nam">Mapping</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">            <span class="key">raise</span> <span class="nam">serializers</span><span class="op">.</span><span class="nam">ValidationError</span><span class="op">(</span><span class="op">{</span><span class="str">&#x27;non_field_errors&#x27;</span><span class="op">:</span> <span class="op">[</span><span class="str">&#x27;Expected an object.&#x27;</span><span class="op">]</span><span class="op">}</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">        <span class="nam">unknown</span> <span class="op">=</span> <span class="nam">set</span><span class="op">(</span><span class="nam">data</span><span class="op">)</span> <span class="op">-</span> <span class="nam">set</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">fields</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">        <span class="key">if</span> <span class="nam">unknown</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">            <span class="key">raise</span> <span class="nam">PermissionDenied</span><span class="op">(</span><span class="str">&#x27;Protected or unsupported input fields were supplied.&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -156,8 +156,8 @@
     <p class="run"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">    <span class="nam">max_accuracy_m</span> <span class="op">=</span> <span class="nam">FiniteFloat</span><span class="op">(</span><span class="nam">min_value</span><span class="op">=</span><span class="num">0.01</span><span class="op">,</span> <span class="nam">max_value</span><span class="op">=</span><span class="num">100000</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">    <span class="nam">max_sample_age_seconds</span> <span class="op">=</span> <span class="nam">serializers</span><span class="op">.</span><span class="nam">IntegerField</span><span class="op">(</span><span class="nam">min_value</span><span class="op">=</span><span class="num">1</span><span class="op">,</span> <span class="nam">max_value</span><span class="op">=</span><span class="num">300</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">    <span class="key">def</span> <span class="nam">validate</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">data</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">        <span class="key">if</span> <span class="nam">data</span><span class="op">[</span><span class="str">&#x27;closes_at&#x27;</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="nam">data</span><span class="op">[</span><span class="str">&#x27;opens_at&#x27;</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">            <span class="key">raise</span> <span class="nam">serializers</span><span class="op">.</span><span class="nam">ValidationError</span><span class="op">(</span><span class="op">{</span><span class="str">&#x27;closes_at&#x27;</span><span class="op">:</span> <span class="str">&#x27;Must be later than opening time.&#x27;</span><span class="op">}</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="par run show_par"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">        <span class="key">if</span> <span class="nam">data</span><span class="op">[</span><span class="str">&#x27;closes_at&#x27;</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="nam">data</span><span class="op">[</span><span class="str">&#x27;opens_at&#x27;</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">75&#x202F;&#x219B;&#x202F;77</span><span class="annotate long">line 75 didn't jump to line 77 because the condition on line 75 was always true</span></span></p>
+    <p class="run"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">            <span class="key">raise</span> <span class="nam">serializers</span><span class="op">.</span><span class="nam">ValidationError</span><span class="op">(</span><span class="op">{</span><span class="str">&#x27;closes_at&#x27;</span><span class="op">:</span> <span class="str">&#x27;Must be later than opening time.&#x27;</span><span class="op">}</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">        <span class="key">return</span> <span class="nam">data</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t"><span class="key">class</span> <span class="nam">SessionOutput</span><span class="op">(</span><span class="nam">serializers</span><span class="op">.</span><span class="nam">ModelSerializer</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -189,8 +189,8 @@
     <p class="run"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">        <span class="nam">model</span> <span class="op">=</span> <span class="nam">apps</span><span class="op">.</span><span class="nam">get_model</span><span class="op">(</span><span class="nam">getattr</span><span class="op">(</span><span class="nam">settings</span><span class="op">,</span> <span class="str">&#x27;HOSTELSPACE_RULE_MODEL&#x27;</span><span class="op">,</span> <span class="str">&#x27;information.Rule&#x27;</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t106" href="#t106">106</a></span><span class="t">        <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t107" href="#t107">107</a></span><span class="t">            <span class="key">return</span> <span class="nam">model</span><span class="op">.</span><span class="nam">objects</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="nam">pk</span><span class="op">=</span><span class="nam">value</span><span class="op">,</span> <span class="nam">active</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t108" href="#t108">108</a></span><span class="t">        <span class="key">except</span> <span class="op">(</span><span class="nam">model</span><span class="op">.</span><span class="nam">DoesNotExist</span><span class="op">,</span> <span class="nam">ValueError</span><span class="op">,</span> <span class="nam">TypeError</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t109" href="#t109">109</a></span><span class="t">            <span class="key">raise</span> <span class="nam">serializers</span><span class="op">.</span><span class="nam">ValidationError</span><span class="op">(</span><span class="str">&#x27;Select an active rule.&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t108" href="#t108">108</a></span><span class="t">        <span class="key">except</span> <span class="op">(</span><span class="nam">model</span><span class="op">.</span><span class="nam">DoesNotExist</span><span class="op">,</span> <span class="nam">ValueError</span><span class="op">,</span> <span class="nam">TypeError</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t109" href="#t109">109</a></span><span class="t">            <span class="key">raise</span> <span class="nam">serializers</span><span class="op">.</span><span class="nam">ValidationError</span><span class="op">(</span><span class="str">&#x27;Select an active rule.&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t110" href="#t110">110</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t"><span class="key">class</span> <span class="nam">DeactivateInput</span><span class="op">(</span><span class="nam">StrictInput</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t">    <span class="nam">reason</span> <span class="op">=</span> <span class="nam">serializers</span><span class="op">.</span><span class="nam">CharField</span><span class="op">(</span><span class="nam">max_length</span><span class="op">=</span><span class="num">2000</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -208,7 +208,7 @@
             <a class="nav" href="z_86ef4dfb8e0dab0c_services_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-11-16 23:46 +0530
+            created at 2026-11-17 12:17 +0530
         </p>
     </div>
 </footer>

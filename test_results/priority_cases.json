@@ -9,7 +9,7 @@
     "api_test": "test_P01_valid_login",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P02",
@@ -21,7 +21,7 @@
     "api_test": "test_P02_invalid_login",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P03",
@@ -33,7 +33,7 @@
     "api_test": "test_P03_student_denied_staff_and_admin_actions",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P04",
@@ -45,7 +45,7 @@
     "api_test": "test_P04_valid_leave",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P05",
@@ -57,7 +57,7 @@
     "api_test": "test_P05_invalid_leave",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P06",
@@ -69,7 +69,7 @@
     "api_test": "test_P06_warden_approves_and_rejects",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P07",
@@ -81,7 +81,7 @@
     "api_test": "test_P07_valid_attendance",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P08",
@@ -93,7 +93,7 @@
     "api_test": "test_P08_outside_boundary_rejected",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P09",
@@ -105,7 +105,7 @@
     "api_test": "test_P09_repeated_attendance_prevented",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P10",
@@ -117,7 +117,7 @@
     "api_test": "test_P10_complaint_creation_and_ownership",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P11",
@@ -129,7 +129,7 @@
     "api_test": "test_P11_unauthorized_complaint_update",
     "api_status": "Passed",
     "status": "Passed",
-    "actual": "Assertions passed; details in backend JUnit and source test."
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P12",
@@ -141,7 +141,7 @@
     "api_test": "test_P12_payment_success_failure_timeout_retry",
     "api_status": "Passed",
     "status": "Failed",
-    "actual": "Workflow passes wrapped URLError timeout, failure and successful retry. Direct socket TimeoutError escapes normalization (supporting unit test Failed).",
+    "actual": "Wrapped-timeout API workflow passes; direct socket TimeoutError escapes normalization.",
     "additional_test": "test_direct_socket_timeout_is_validation_error"
   },
   {
@@ -154,7 +154,7 @@
     "api_test": "test_P13_duplicate_payment_callbacks_and_submissions",
     "api_status": "Failed",
     "status": "Failed",
-    "actual": "Identical Pending initiation creates 2 attempts. Repeated success callbacks still produce exactly 1 Success; initiation after Paid returns 400. Replay invariant Failed."
+    "actual": "AssertionError: 2 != 1 : Repeated pending initiation created separate PaymentAttempt rows"
   },
   {
     "id": "P14",
@@ -166,6 +166,6 @@
     "api_test": "test_P14_deviation_total_and_duplicate_prevention",
     "api_status": "Failed",
     "status": "Failed",
-    "actual": "Initial total equals rule weight. Identical repeated submission creates 2 active rows and doubles the total. Replay invariant Failed."
+    "actual": "AssertionError: 2 != 1 : Identical repeated deviation submission created a second record"
   }
 ]

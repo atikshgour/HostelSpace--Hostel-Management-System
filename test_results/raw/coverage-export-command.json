@@ -1,0 +1,18 @@
+{
+  "phase": "coverage-export",
+  "cwd": "backend",
+  "command": [
+    "D:\\HostelSpace--Hostel-Management-System\\.venv\\Scripts\\python.exe",
+    "-m",
+    "coverage",
+    "json",
+    "--show-contexts",
+    "-o",
+    "../test_results/coverage.json"
+  ],
+  "started_at": "2026-11-17T06:53:58.562272+00:00",
+  "finished_at": "2026-11-17T06:54:01.726171+00:00",
+  "source_commit": "7b7d4c436c88b03f12ac5d07039f031000ca99ae",
+  "working_tree_changes": true,
+  "exit_code": 0
+}

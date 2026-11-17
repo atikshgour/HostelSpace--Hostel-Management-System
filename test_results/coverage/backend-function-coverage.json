@@ -2,51 +2,14 @@
   {
     "file": "apps/accounts/management/commands/seed_demo.py",
     "function": "Command.handle",
-    "body_hit": false,
-    "missing_lines": [
-      24,
-      25,
-      26,
-      29,
-      30,
-      32,
-      41,
-      42,
-      43,
-      46,
-      47,
-      48,
-      49,
-      50,
-      51,
-      52,
-      53,
-      62,
-      70,
-      78,
-      86,
-      93,
-      102,
-      105,
-      109,
-      121,
-      132,
-      133,
-      142,
-      150
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/accounts/management/commands/seed_demo.py",
     "function": "Command.handle.user",
-    "body_hit": false,
-    "missing_lines": [
-      33,
-      36,
-      37,
-      38,
-      39
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/accounts/permissions.py",
@@ -64,18 +27,13 @@
     "file": "apps/accounts/serializers.py",
     "function": "StrictSerializer.to_internal_value",
     "body_hit": true,
-    "missing_lines": [
-      14
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/accounts/serializers.py",
     "function": "StrictModelSerializer.to_internal_value",
     "body_hit": true,
-    "missing_lines": [
-      26,
-      29
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/accounts/serializers.py",
@@ -150,45 +108,21 @@
   {
     "file": "apps/accounts/views.py",
     "function": "UserChoices.get",
-    "body_hit": false,
-    "missing_lines": [
-      86,
-      88,
-      89,
-      90,
-      91,
-      94,
-      95,
-      96,
-      97,
-      98,
-      99
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/director_dashboard/overview.py",
     "function": "Overview.get",
     "body_hit": true,
-    "missing_lines": [
-      20,
-      54,
-      55
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/director_dashboard/services.py",
     "function": "save_user",
     "body_hit": true,
     "missing_lines": [
-      19,
-      24,
-      25,
-      28,
-      29,
-      35,
-      36,
-      48,
-      54
+      48
     ]
   },
   {
@@ -212,9 +146,7 @@
     "file": "apps/director_dashboard/views.py",
     "function": "UserDetail.patch",
     "body_hit": true,
-    "missing_lines": [
-      54
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/director_dashboard/views.py",
@@ -240,11 +172,7 @@
     "file": "apps/director_dashboard/views.py",
     "function": "Choices.get",
     "body_hit": true,
-    "missing_lines": [
-      122,
-      124,
-      135
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/facilities/serializers.py",
@@ -287,11 +215,8 @@
   {
     "file": "apps/facilities/views.py",
     "function": "Study.get",
-    "body_hit": false,
-    "missing_lines": [
-      15,
-      16
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/facilities/views.py",
@@ -382,11 +307,8 @@
   {
     "file": "apps/information/views.py",
     "function": "Rules.get",
-    "body_hit": false,
-    "missing_lines": [
-      50,
-      55
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/information/views.py",
@@ -406,113 +328,56 @@
   {
     "file": "apps/leave_attendance/access.py",
     "function": "role",
-    "body_hit": false,
-    "missing_lines": [
-      14
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/access.py",
     "function": "require",
-    "body_hit": false,
-    "missing_lines": [
-      17,
-      18
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/access.py",
     "function": "students_for",
-    "body_hit": false,
-    "missing_lines": [
-      21,
-      22,
-      23,
-      24,
-      25,
-      26
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/access.py",
     "function": "assigned_warden",
-    "body_hit": false,
-    "missing_lines": [
-      29,
-      30,
-      31,
-      32,
-      33
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/access.py",
     "function": "leave_scope",
-    "body_hit": false,
-    "missing_lines": [
-      36,
-      37,
-      38,
-      39,
-      40,
-      41,
-      42,
-      43
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/access.py",
     "function": "personal_scope",
-    "body_hit": false,
-    "missing_lines": [
-      46,
-      47,
-      48,
-      49,
-      50
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/access.py",
     "function": "session_scope",
-    "body_hit": false,
-    "missing_lines": [
-      53,
-      54,
-      55,
-      56,
-      57,
-      58,
-      59,
-      60
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/access.py",
     "function": "student_key",
-    "body_hit": false,
-    "missing_lines": [
-      65,
-      66,
-      67,
-      68,
-      69
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/errors.py",
     "function": "api_exception_handler",
-    "body_hit": false,
-    "missing_lines": [
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      12,
-      13
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/location.py",
@@ -524,17 +389,13 @@
     "file": "apps/leave_attendance/location.py",
     "function": "check_sample",
     "body_hit": true,
-    "missing_lines": [
-      13
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/permissions.py",
     "function": "role",
     "body_hit": true,
-    "missing_lines": [
-      19
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/permissions.py",
@@ -546,48 +407,31 @@
     "file": "apps/leave_attendance/permissions.py",
     "function": "students_for",
     "body_hit": true,
-    "missing_lines": [
-      30,
-      31,
-      32
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/permissions.py",
     "function": "assigned_warden",
     "body_hit": true,
-    "missing_lines": [
-      38
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/permissions.py",
     "function": "leave_scope",
     "body_hit": true,
-    "missing_lines": [
-      50
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/permissions.py",
     "function": "personal_scope",
     "body_hit": true,
-    "missing_lines": [
-      54,
-      57
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/permissions.py",
     "function": "session_scope",
     "body_hit": true,
-    "missing_lines": [
-      63,
-      64,
-      65,
-      66,
-      67
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/permissions.py",
@@ -621,9 +465,7 @@
     "file": "apps/leave_attendance/serializers.py",
     "function": "StrictInput.to_internal_value",
     "body_hit": true,
-    "missing_lines": [
-      22
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/serializers.py",
@@ -660,10 +502,8 @@
   {
     "file": "apps/leave_attendance/serializers.py",
     "function": "SessionInput.validate",
-    "body_hit": false,
+    "body_hit": true,
     "missing_lines": [
-      75,
-      76,
       77
     ]
   },
@@ -677,26 +517,20 @@
     "file": "apps/leave_attendance/serializers.py",
     "function": "DeviationInput.validate_rule",
     "body_hit": true,
-    "missing_lines": [
-      108,
-      109
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/services.py",
     "function": "submit_leave",
     "body_hit": true,
-    "missing_lines": [
-      29
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/services.py",
     "function": "decide_leave",
     "body_hit": true,
     "missing_lines": [
-      43,
-      48
+      43
     ]
   },
   {
@@ -713,9 +547,6 @@
     "function": "submit_attendance",
     "body_hit": true,
     "missing_lines": [
-      69,
-      70,
-      71,
       72
     ]
   },
@@ -723,9 +554,7 @@
     "file": "apps/leave_attendance/services.py",
     "function": "record_deviation",
     "body_hit": true,
-    "missing_lines": [
-      82
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/leave_attendance/services.py",
@@ -831,9 +660,7 @@
     "function": "DeviationTotals.get",
     "body_hit": true,
     "missing_lines": [
-      164,
-      168,
-      170
+      164
     ]
   },
   {
@@ -857,34 +684,16 @@
   {
     "file": "apps/leave_attendance/views.py",
     "function": "RuleChoices.get",
-    "body_hit": false,
-    "missing_lines": [
-      214,
-      215,
-      218
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/management/commands/seed_service_demo.py",
     "function": "Command.handle",
-    "body_hit": false,
+    "body_hit": true,
     "missing_lines": [
-      18,
-      19,
-      20,
-      21,
-      22,
-      23,
-      24,
-      25,
-      26,
       27,
-      28,
-      29,
-      30,
-      31,
-      32,
-      33
+      28
     ]
   },
   {
@@ -925,10 +734,7 @@
     "file": "apps/student_services/payments.py",
     "function": "provider_request",
     "body_hit": true,
-    "missing_lines": [
-      25,
-      36
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/payments.py",
@@ -940,10 +746,7 @@
     "file": "apps/student_services/payments.py",
     "function": "initiate",
     "body_hit": true,
-    "missing_lines": [
-      77,
-      80
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/payments.py",
@@ -951,7 +754,6 @@
     "body_hit": true,
     "missing_lines": [
       101,
-      104,
       113
     ]
   },
@@ -960,8 +762,7 @@
     "function": "verify",
     "body_hit": true,
     "missing_lines": [
-      129,
-      131
+      129
     ]
   },
   {
@@ -998,9 +799,7 @@
     "file": "apps/student_services/serializers.py",
     "function": "CouponSerializer.validate",
     "body_hit": true,
-    "missing_lines": [
-      112
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/serializers.py",
@@ -1028,25 +827,19 @@
     "file": "apps/student_services/services.py",
     "function": "submit_complaint",
     "body_hit": true,
-    "missing_lines": [
-      17
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/services.py",
     "function": "progress",
     "body_hit": true,
-    "missing_lines": [
-      36
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/services.py",
     "function": "select_mess",
     "body_hit": true,
-    "missing_lines": [
-      61
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/views.py",
@@ -1076,9 +869,7 @@
     "file": "apps/student_services/views.py",
     "function": "ComplaintAssign.post",
     "body_hit": true,
-    "missing_lines": [
-      85
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/views.py",
@@ -1098,9 +889,7 @@
     "file": "apps/student_services/views.py",
     "function": "Mess.post",
     "body_hit": true,
-    "missing_lines": [
-      120
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/views.py",
@@ -1114,39 +903,21 @@
     "file": "apps/student_services/views.py",
     "function": "Coupons.post",
     "body_hit": true,
-    "missing_lines": [
-      143,
-      144,
-      145
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/views.py",
     "function": "CouponDetail.patch",
-    "body_hit": false,
-    "missing_lines": [
-      150,
-      151,
-      152,
-      153,
-      154,
-      155,
-      156,
-      157
-    ]
+    "body_hit": true,
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/views.py",
     "function": "Fees.get",
-    "body_hit": false,
+    "body_hit": true,
     "missing_lines": [
-      162,
-      163,
-      164,
       165,
-      166,
-      167,
-      168
+      167
     ]
   },
   {
@@ -1190,10 +961,8 @@
   {
     "file": "apps/student_services/views.py",
     "function": "check_student_scope",
-    "body_hit": false,
+    "body_hit": true,
     "missing_lines": [
-      223,
-      225,
       232
     ]
   },
@@ -1220,13 +989,7 @@
     "file": "apps/student_services/views.py",
     "function": "MessOptionDetail.patch",
     "body_hit": true,
-    "missing_lines": [
-      272,
-      276,
-      279,
-      280,
-      286
-    ]
+    "missing_lines": []
   },
   {
     "file": "apps/student_services/views.py",
@@ -1237,27 +1000,17 @@
   {
     "file": "apps/student_services/views.py",
     "function": "MessHistory.get",
-    "body_hit": false,
+    "body_hit": true,
     "missing_lines": [
-      300,
-      301,
-      302,
       303,
-      304,
-      305,
-      306
+      305
     ]
   },
   {
     "file": "config/exceptions.py",
     "function": "api_exception_handler",
     "body_hit": true,
-    "missing_lines": [
-      11,
-      19,
-      20,
-      23
-    ]
+    "missing_lines": []
   },
   {
     "file": "config/health.py",

@@ -1,6 +1,6 @@
-.............FF......................................................... [ 49%]
-........................................................................ [ 98%]
-.F                                                                       [100%]
+............................FF.................................. [ 36%]
+........................................................................ [ 77%]
+......................................F                                  [100%]
 ================================== FAILURES ===================================
 _ PriorityAcceptanceTests.test_P13_duplicate_payment_callbacks_and_submissions _
 tests\test_priority_acceptance.py:230: in test_P13_duplicate_payment_callbacks_and_submissions
@@ -40,23 +40,23 @@ apps\accounts\admin.py                                               0      0   
 apps\accounts\apps.py                                                4      0      0      0   100%
 apps\accounts\management\__init__.py                                 0      0      0      0   100%
 apps\accounts\management\commands\__init__.py                        0      0      0      0   100%
-apps\accounts\management\commands\seed_demo.py                      51     51     10      0     0%   3-150
+apps\accounts\management\commands\seed_demo.py                      51      0     10      0   100%
 apps\accounts\models.py                                             38      0      0      0   100%
 apps\accounts\permissions.py                                         8      0      2      0   100%
 apps\accounts\queries.py                                             0      0      0      0   100%
-apps\accounts\serializers.py                                        37      3      8      3    87%   14, 26, 29
+apps\accounts\serializers.py                                        37      0      8      0   100%
 apps\accounts\services.py                                           11      1      4      1    87%   41
 apps\accounts\urls.py                                                3      0      0      0   100%
-apps\accounts\views.py                                              66     12      8      0    76%   73, 86-99
+apps\accounts\views.py                                              66      1      8      0    99%   73
 apps\director_dashboard\__init__.py                                  0      0      0      0   100%
 apps\director_dashboard\apps.py                                      4      0      0      0   100%
-apps\director_dashboard\overview.py                                 45      3     22      2    93%   20, 54-55
+apps\director_dashboard\overview.py                                 45      0     22      0   100%
 apps\director_dashboard\permissions.py                               0      0      0      0   100%
 apps\director_dashboard\queries.py                                   0      0      0      0   100%
 apps\director_dashboard\serializers.py                              19      0      0      0   100%
-apps\director_dashboard\services.py                                 57      9     30      6    76%   19, 24-29, 35-36, 48, 54, 67->73
+apps\director_dashboard\services.py                                 57      1     30      1    98%   48
 apps\director_dashboard\urls.py                                      4      0      0      0   100%
-apps\director_dashboard\views.py                                    60      9     10      4    79%   20-26, 54, 60, 122, 124, 126->128, 135
+apps\director_dashboard\views.py                                    60      5     10      0    90%   20-26, 60
 apps\facilities\__init__.py                                          0      0      0      0   100%
 apps\facilities\admin.py                                             0      0      0      0   100%
 apps\facilities\apps.py                                              4      0      0      0   100%
@@ -66,7 +66,7 @@ apps\facilities\queries.py                                           0      0   
 apps\facilities\serializers.py                                      30      0      0      0   100%
 apps\facilities\services.py                                         55      1      6      1    97%   73
 apps\facilities\urls.py                                              3      0      0      0   100%
-apps\facilities\views.py                                            65      7      8      4    85%   15-16, 47->49, 50, 66->68, 69, 93-96
+apps\facilities\views.py                                            65      5      8      2    90%   50, 69, 93-96
 apps\information\__init__.py                                         0      0      0      0   100%
 apps\information\admin.py                                            0      0      0      0   100%
 apps\information\apps.py                                             4      0      0      0   100%
@@ -76,48 +76,48 @@ apps\information\queries.py                                          0      0   
 apps\information\serializers.py                                     20      0      2      0   100%
 apps\information\services.py                                         0      0      0      0   100%
 apps\information\urls.py                                             3      0      0      0   100%
-apps\information\views.py                                           45      4      2      1    89%   17->24, 50-55, 60-61
+apps\information\views.py                                           45      2      2      0    96%   60-61
 apps\leave_attendance\__init__.py                                    0      0      0      0   100%
-apps\leave_attendance\access.py                                     54     54     24      0     0%   5-69
+apps\leave_attendance\access.py                                     54      0     24      0   100%
 apps\leave_attendance\admin.py                                       0      0      0      0   100%
 apps\leave_attendance\apps.py                                        4      0      0      0   100%
-apps\leave_attendance\errors.py                                     10     10      2      0     0%   1-13
-apps\leave_attendance\location.py                                   17      1      8      1    92%   13
+apps\leave_attendance\errors.py                                     10      0      2      0   100%
+apps\leave_attendance\location.py                                   17      0      8      0   100%
 apps\leave_attendance\models.py                                     74      0      0      0   100%
-apps\leave_attendance\permissions.py                                61     13     26      7    70%   19, 30-32, 38, 50, 54, 57, 63-67
+apps\leave_attendance\permissions.py                                61      0     26      0   100%
 apps\leave_attendance\queries.py                                     5      5      0      0     0%   2-9
-apps\leave_attendance\serializers.py                                93      7     16      2    90%   22, 32, 75-77, 108-109
-apps\leave_attendance\services.py                                   77     10     22      5    83%   29, 43, 44->47, 48, 55-56, 69-72, 82
+apps\leave_attendance\serializers.py                                93      2     16      2    96%   32, 77
+apps\leave_attendance\services.py                                   77      4     22      3    93%   43, 44->47, 55-56, 72
 apps\leave_attendance\urls.py                                        3      0      0      0   100%
-apps\leave_attendance\views.py                                     116     17      6      2    83%   104-105, 113, 134-135, 144-149, 164, 168-170, 214-218
+apps\leave_attendance\views.py                                     116     12      6      1    88%   104-105, 113, 134-135, 144-149, 164
 apps\student_services\__init__.py                                    0      0      0      0   100%
 apps\student_services\admin.py                                       0      0      0      0   100%
 apps\student_services\apps.py                                        4      0      0      0   100%
 apps\student_services\management\__init__.py                         0      0      0      0   100%
 apps\student_services\management\commands\__init__.py                0      0      0      0   100%
-apps\student_services\management\commands\seed_service_demo.py      28     28     10      0     0%   2-33
+apps\student_services\management\commands\seed_service_demo.py      28      2     10      1    92%   27-28
 apps\student_services\models.py                                    101      2      2      0    98%   17, 20
-apps\student_services\payments.py                                   86      9     34      8    86%   25, 36, 77, 80, 101, 104, 113, 129, 131
+apps\student_services\payments.py                                   86      3     34      3    95%   101, 113, 129
 apps\student_services\permissions.py                                 0      0      0      0   100%
 apps\student_services\queries.py                                     0      0      0      0   100%
-apps\student_services\serializers.py                                97      3      2      1    96%   112, 119, 210
-apps\student_services\services.py                                   52      3     16      3    91%   17, 36, 61
+apps\student_services\serializers.py                                97      2      2      0    98%   119, 210
+apps\student_services\services.py                                   52      0     16      0   100%
 apps\student_services\urls.py                                        3      0      0      0   100%
-apps\student_services\views.py                                     170     49     38      8    65%   85, 112->114, 115, 120, 129->136, 137, 143-145, 150-157, 162-168, 171-175, 182->184, 185, 223-232, 237-247, 272-286, 300-306
+apps\student_services\views.py                                     170     19     38      9    86%   115, 137, 154->156, 165, 167, 171-175, 185, 232, 237-247, 303, 305
 config\__init__.py                                                   0      0      0      0   100%
 config\asgi.py                                                       4      4      0      0     0%   1-6
-config\exceptions.py                                                16      4      4      2    70%   11-20, 23
+config\exceptions.py                                                16      0      4      0   100%
 config\health.py                                                    13      0      0      0   100%
 config\logging.py                                                    1      1      0      0     0%   4
 config\settings\__init__.py                                          0      0      0      0   100%
-config\settings\base.py                                             44      3      6      3    88%   44, 57, 68
+config\settings\base.py                                             44      0      6      0   100%
 config\settings\ci.py                                                7      0      0      0   100%
-config\settings\local.py                                            13     13      4      0     0%   4-21
-config\settings\production.py                                       17     17      8      0     0%   1-31
+config\settings\local.py                                            13      0      4      1    94%   11->16
+config\settings\production.py                                       17      0      8      0   100%
 config\urls.py                                                       3      0      0      0   100%
 config\wsgi.py                                                       4      4      0      0     0%   2-7
 ------------------------------------------------------------------------------------------------------------
-TOTAL                                                             1875    357    340     64    76%
+TOTAL                                                             1875     76    340     25    95%
 Coverage HTML written to dir ../test_results/coverage/backend-html
 Coverage XML written to file ../test_results/coverage.xml
 Coverage JSON written to file ../test_results/coverage.json
@@ -125,5 +125,5 @@ Coverage JSON written to file ../test_results/coverage.json
 FAILED tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P13_duplicate_payment_callbacks_and_submissions
 FAILED tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P14_deviation_total_and_duplicate_prevention
 FAILED tests/test_priority_unit.py::test_direct_socket_timeout_is_validation_error
-3 failed, 143 passed in 29.49s
+3 failed, 172 passed, 8 subtests passed in 32.14s
 

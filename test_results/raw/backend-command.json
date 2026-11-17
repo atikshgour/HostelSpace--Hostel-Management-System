@@ -17,7 +17,16 @@
     "--cov-report=json:../test_results/coverage.json",
     "--cov-report=html:../test_results/coverage/backend-html"
   ],
-  "started_at": "2026-11-16T18:15:58.902578+00:00",
-  "finished_at": "2026-11-16T18:16:32.234826+00:00",
-  "exit_code": 1
+  "started_at": "2026-11-17T06:49:25.602301+00:00",
+  "finished_at": "2026-11-17T06:50:01.960724+00:00",
+  "source_commit": "7b7d4c436c88b03f12ac5d07039f031000ca99ae",
+  "working_tree_changes": true,
+  "exit_code": 1,
+  "branch_coverage": {
+    "covered": 309,
+    "total": 340,
+    "percent": 90.88235294117646,
+    "required": "strictly above 90%",
+    "passed": true
+  }
 }

@@ -12,7 +12,16 @@
     "--json",
     "--outputFile=../test_results/raw/frontend-results.json"
   ],
-  "started_at": "2026-11-16T18:16:09.214282+00:00",
-  "finished_at": "2026-11-16T18:16:33.521708+00:00",
-  "exit_code": 0
+  "started_at": "2026-11-17T06:50:01.985933+00:00",
+  "finished_at": "2026-11-17T06:50:36.473510+00:00",
+  "source_commit": "7b7d4c436c88b03f12ac5d07039f031000ca99ae",
+  "working_tree_changes": true,
+  "exit_code": 0,
+  "branch_coverage": {
+    "covered": 842,
+    "total": 864,
+    "percent": 97.45370370370371,
+    "required": "strictly above 90%",
+    "passed": true
+  }
 }
