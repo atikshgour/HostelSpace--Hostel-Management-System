@@ -644,10 +644,59 @@
           "line": 68,
           "column": 30
         }
+      },
+      {
+        "start": {
+          "line": 117,
+          "column": 31
+        },
+        "end": {
+          "line": 117,
+          "column": null
+        }
       }
     ],
-    "untested_decisions": [],
-    "uncovered_functions": []
+    "untested_decisions": [
+      {
+        "branch": "1",
+        "arm": 1,
+        "location": {
+          "start": {
+            "line": 97,
+            "column": 81
+          },
+          "end": {
+            "line": 97,
+            "column": null
+          }
+        }
+      }
+    ],
+    "uncovered_functions": [
+      {
+        "name": "(anonymous_11)",
+        "decl": {
+          "start": {
+            "line": 117,
+            "column": 20
+          },
+          "end": {
+            "line": 117,
+            "column": 21
+          }
+        },
+        "loc": {
+          "start": {
+            "line": 117,
+            "column": 31
+          },
+          "end": {
+            "line": 117,
+            "column": null
+          }
+        }
+      }
+    ]
   },
   "frontend/src/features/deviations/api.js": {
     "uncovered_statement_locations": [],

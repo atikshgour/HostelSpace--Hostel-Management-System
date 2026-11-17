@@ -1,20 +1,20 @@
 {
   "backend": {
-    "covered": 309,
-    "total": 340,
-    "percent": 90.88235294117646,
+    "covered": 315,
+    "total": 348,
+    "percent": 90.51724137931035,
     "passed": true
   },
   "frontend": {
-    "covered": 842,
-    "total": 864,
-    "percent": 97.45370370370371,
+    "covered": 843,
+    "total": 866,
+    "percent": 97.34411085450347,
     "passed": true
   },
   "overall": {
-    "covered": 1151,
-    "total": 1204,
-    "percent": 95.59800664451828,
+    "covered": 1158,
+    "total": 1214,
+    "percent": 95.38714991762768,
     "passed": true
   }
 }

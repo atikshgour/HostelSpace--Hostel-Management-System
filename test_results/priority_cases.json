@@ -140,8 +140,8 @@
     "expected": "Unpaid until success; retained failure; normalized timeout error",
     "api_test": "test_P12_payment_success_failure_timeout_retry",
     "api_status": "Passed",
-    "status": "Failed",
-    "actual": "Wrapped-timeout API workflow passes; direct socket TimeoutError escapes normalization.",
+    "status": "Passed",
+    "actual": "Assertions passed; see JUnit and source test.",
     "additional_test": "test_direct_socket_timeout_is_validation_error"
   },
   {
@@ -152,9 +152,9 @@
     "steps": "Initiate twice while Pending; repeat success callback; initiate after Paid",
     "expected": "One pending attempt for identical replay; one successful result",
     "api_test": "test_P13_duplicate_payment_callbacks_and_submissions",
-    "api_status": "Failed",
-    "status": "Failed",
-    "actual": "AssertionError: 2 != 1 : Repeated pending initiation created separate PaymentAttempt rows"
+    "api_status": "Passed",
+    "status": "Passed",
+    "actual": "Assertions passed; see JUnit and source test."
   },
   {
     "id": "P14",
@@ -164,8 +164,8 @@
     "steps": "Record rule deviation; read total; repeat identical submission",
     "expected": "Correct weight total; no duplicate for the same replay",
     "api_test": "test_P14_deviation_total_and_duplicate_prevention",
-    "api_status": "Failed",
-    "status": "Failed",
-    "actual": "AssertionError: 2 != 1 : Identical repeated deviation submission created a second record"
+    "api_status": "Passed",
+    "status": "Passed",
+    "actual": "Assertions passed; see JUnit and source test."
   }
 ]

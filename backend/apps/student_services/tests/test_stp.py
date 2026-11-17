@@ -110,7 +110,9 @@ class STPPaymentRaceTests(TransactionTestCase):
         second = PaymentAttempt.objects.create(
             fee=fee,
             order_id="order_second",
-            provider="razorpay",
+            # Distinct provider attempts are legal under the new per-provider
+            # Pending constraint; neither may bypass one successful fee payment.
+            provider="simulation",
             amount=fee.amount,
             currency="INR",
         )

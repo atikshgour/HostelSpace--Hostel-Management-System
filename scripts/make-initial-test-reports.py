@@ -69,7 +69,8 @@ def main():
     common = f"""Generated {datetime.now(UTC).isoformat()} from recorded artifacts.
 Backend execution: {commands["backend"]["started_at"]}; frontend: {commands["frontend"]["started_at"]}.
 Source HEAD: `{commands["backend"].get("source_commit", "not recorded")}` plus uncommitted test/config/script changes.
-Local synthetic PostgreSQL only. No production data changes, live payments, commit or push.
+Local synthetic PostgreSQL only. No production data changes or live payments.
+Publication is user-authorized; command metadata identifies the tested source HEAD.
 Each command's own timestamp/exit is preserved in [commands](raw/commands.md).
 Independent human review remains pending. Coverage success does not override failing tests.
 """
@@ -179,10 +180,11 @@ claim it is an active integrated route. No implemented source was excluded for c
 
 {failure_text}
 
-The replay assertions distinguish requested retry invariants from legitimate separate
-events. Payment initiation/deviation event identity needs owner policy review.
-Duplicate successful callbacks and initial deviation calculations still pass.
-No application behavior was changed or existing assertion skipped/weakened.
+Replay tests distinguish repeated requests from separate events. The newest main fixes
+normalize direct timeouts and retain canonical Pending attempts and active deviation
+replays. Their actual results appear above. The older two-attempt payment test now uses
+distinct providers, respecting the new per-provider Pending constraint while retaining
+its service/database single-success assertions. No assertion was skipped or weakened.
 
 ## Executed backend cases
 
@@ -237,10 +239,10 @@ Firefox/Edge were not run for this update. Browser runtime is not merged into Je
 
 {failure_text}
 
-Passing branch coverage does not make these failures passing. Backend suite remains
-nonzero. Independent review, complete manual usability, agreed load acceptance,
+Coverage and test outcomes are separate; backend has {counts["Passed"]} passed and {counts["Failed"]} failed.
+Independent review, complete manual usability, agreed load acceptance,
 external provider acceptance, staging/release and recovery rehearsal remain pending.
-No commit or push was performed for this update.
+Publication is separately user-authorized and is not acceptance evidence.
 
 [Commands](raw/commands.md), [browser JSON](raw/browser-results.json),
 [browser log](raw/e2e.log), [browser HTML](raw/browser-html/index.html),
@@ -333,8 +335,8 @@ Backend remaining branches: {b["missing_branches"]}. Frontend remaining branch a
 Python instruments all apps/config with branch measurement; tests and generated
 migrations retain their existing exclusions. Frontend instruments all {len(frontend_raw)}
 implemented modules, including unimported modules at zero; only tests and instruction
-placeholders retain their existing exclusions. No production code or coverage exclusions
-were changed to reach this target. The denominator is {b['num_branches']} Python and {f['branches']['total']} frontend
+placeholders retain their existing exclusions. Coverage exclusions were not changed;
+newer main fixes were integrated and tested. The denominator is {b["num_branches"]} Python and {f["branches"]["total"]} frontend
 branch opportunities in this snapshot. Failed tests also contribute coverage.
 
 `python scripts/run-initial-tests.py coverage` runs both layers even if one fails,

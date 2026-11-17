@@ -1,18 +1,19 @@
 # Unit, API and component test report
 
-Generated 2026-11-17T06:56:42.800603+00:00 from recorded artifacts.
-Backend execution: 2026-11-17T06:49:25.602301+00:00; frontend: 2026-11-17T06:50:01.985933+00:00.
-Source HEAD: `7b7d4c436c88b03f12ac5d07039f031000ca99ae` plus uncommitted test/config/script changes.
-Local synthetic PostgreSQL only. No production data changes, live payments, commit or push.
+Generated 2026-11-17T07:11:08.486339+00:00 from recorded artifacts.
+Backend execution: 2026-11-17T07:06:55.032939+00:00; frontend: 2026-11-17T07:05:49.767215+00:00.
+Source HEAD: `f921d4cdd399803451d4d3c0e30e72d587eb074a` plus uncommitted test/config/script changes.
+Local synthetic PostgreSQL only. No production data changes or live payments.
+Publication is user-authorized; command metadata identifies the tested source HEAD.
 Each command's own timestamp/exit is preserved in [commands](raw/commands.md).
 Independent human review remains pending. Coverage success does not override failing tests.
 
 ## Recorded totals
 
-Backend: **175 executions; 172 passed, 3 failed, 0 not run**.
-Original regressions: 116, 116 passed.
+Backend: **178 executions; 178 passed, 0 failed, 0 not run**.
+Original regressions: 118, 118 passed.
 Supporting priority units: 16. Priority API workflows: 14.
-Added branch-focused Python executions: 29; 29 passed.
+Added branch-focused Python executions: 30; 30 passed.
 Jest/RTL: **105 executions; 105 passed, 0 failed** in 21 suites.
 Backend subtests are assertions within parent executions; do not count them again.
 
@@ -36,14 +37,13 @@ claim it is an active integrated route. No implemented source was excluded for c
 
 ## Observed failures
 
-- `test_P13_duplicate_payment_callbacks_and_submissions`: AssertionError: 2 != 1 : Repeated pending initiation created separate PaymentAttempt rows
-- `test_P14_deviation_total_and_duplicate_prevention`: AssertionError: 2 != 1 : Identical repeated deviation submission created a second record
-- `test_direct_socket_timeout_is_validation_error`: TimeoutError: Synthetic direct socket timeout
+None.
 
-The replay assertions distinguish requested retry invariants from legitimate separate
-events. Payment initiation/deviation event identity needs owner policy review.
-Duplicate successful callbacks and initial deviation calculations still pass.
-No application behavior was changed or existing assertion skipped/weakened.
+Replay tests distinguish repeated requests from separate events. The newest main fixes
+normalize direct timeouts and retain canonical Pending attempts and active deviation
+replays. Their actual results appear above. The older two-attempt payment test now uses
+distinct providers, respecting the new per-provider Pending constraint while retaining
+its service/database single-success assertions. No assertion was skipped or weakened.
 
 ## Executed backend cases
 
@@ -58,6 +58,7 @@ No application behavior was changed or existing assertion skipped/weakened.
 | `tests.test_branch_workflows.StaffBranches.test_staff_content_edits_and_empty_study_fallback` | Passed |
 | `tests.test_branch_workflows.StaffBranches.test_staff_lists_and_overview_scopes` | Passed |
 | `tests.test_branch_workflows.WorkflowScopes.test_active_and_legacy_scope_adapters_agree` | Passed |
+| `tests.test_branch_workflows.WorkflowScopes.test_assigned_deviation_weightage_is_snapshotted_and_replay_is_retained` | Passed |
 | `tests.test_branch_workflows.WorkflowScopes.test_boundary_rejections_do_not_create_accepted_attendance` | Passed |
 | `tests.test_branch_workflows.WorkflowScopes.test_service_validation_and_missing_staff_filter` | Passed |
 | `tests.test_branch_workflows.ProviderBranches.test_disabled_checkout_and_missing_test_credentials` | Passed |
@@ -77,8 +78,8 @@ No application behavior was changed or existing assertion skipped/weakened.
 | `tests.test_priority_acceptance.PriorityAcceptanceTests.test_P10_complaint_creation_and_ownership` | Passed |
 | `tests.test_priority_acceptance.PriorityAcceptanceTests.test_P11_unauthorized_complaint_update` | Passed |
 | `tests.test_priority_acceptance.PriorityAcceptanceTests.test_P12_payment_success_failure_timeout_retry` | Passed |
-| `tests.test_priority_acceptance.PriorityAcceptanceTests.test_P13_duplicate_payment_callbacks_and_submissions` | Failed |
-| `tests.test_priority_acceptance.PriorityAcceptanceTests.test_P14_deviation_total_and_duplicate_prevention` | Failed |
+| `tests.test_priority_acceptance.PriorityAcceptanceTests.test_P13_duplicate_payment_callbacks_and_submissions` | Passed |
+| `tests.test_priority_acceptance.PriorityAcceptanceTests.test_P14_deviation_total_and_duplicate_prevention` | Passed |
 | `apps.accounts.tests.test_api.AuthenticationTests.test_anonymous_apis_require_login` | Passed |
 | `apps.accounts.tests.test_api.AuthenticationTests.test_deactivation_revokes_existing_session` | Passed |
 | `apps.accounts.tests.test_api.AuthenticationTests.test_invalid_login_is_generic` | Passed |
@@ -135,6 +136,7 @@ No application behavior was changed or existing assertion skipped/weakened.
 | `apps.leave_attendance.tests.test_api.ApiTests.test_chief_reads_only_escalated_or_self_finalized_requests` | Passed |
 | `apps.leave_attendance.tests.test_api.ApiTests.test_choices_are_scoped_and_staff_only` | Passed |
 | `apps.leave_attendance.tests.test_api.ApiTests.test_create_leave_and_private_cache_headers` | Passed |
+| `apps.leave_attendance.tests.test_api.ApiTests.test_deviation_accepts_staff_assigned_weightage` | Passed |
 | `apps.leave_attendance.tests.test_api.ApiTests.test_deviation_permissions_and_server_owned_weight` | Passed |
 | `apps.leave_attendance.tests.test_api.ApiTests.test_deviation_snapshot_total_and_retained_deactivation` | Passed |
 | `apps.leave_attendance.tests.test_api.ApiTests.test_invalid_or_unassigned_attendance_is_rejected` | Passed |
@@ -172,6 +174,7 @@ No application behavior was changed or existing assertion skipped/weakened.
 | `apps.student_services.tests.test_payments.PaymentTests.test_payment_history_is_owner_scoped` | Passed |
 | `apps.student_services.tests.test_payments.PaymentTests.test_provider_mismatched_amount_cannot_mark_paid` | Passed |
 | `apps.student_services.tests.test_payments.PaymentTests.test_provider_success_requires_valid_signature_and_capture` | Passed |
+| `apps.student_services.tests.test_payments.PaymentTests.test_repeated_pending_start_reuses_one_attempt` | Passed |
 | `apps.student_services.tests.test_payments.PaymentTests.test_simulation_disabled_without_opt_in` | Passed |
 | `apps.student_services.tests.test_payments.PaymentTests.test_simulation_explicit_label_and_server_amount` | Passed |
 | `apps.student_services.tests.test_payments.PaymentTests.test_simulation_not_allowed_outside_local` | Passed |
@@ -223,7 +226,7 @@ No application behavior was changed or existing assertion skipped/weakened.
 | `tests.test_priority_unit.test_active_role_permission[DIRECTOR-False-True-False]` | Passed |
 | `tests.test_priority_unit.test_active_role_permission[DIRECTOR-True-False-False]` | Passed |
 | `tests.test_priority_unit.test_wrapped_provider_timeout_is_validation_error` | Passed |
-| `tests.test_priority_unit.test_direct_socket_timeout_is_validation_error` | Failed |
+| `tests.test_priority_unit.test_direct_socket_timeout_is_validation_error` | Passed |
 
 ## Executed component cases
 
@@ -307,31 +310,31 @@ No application behavior was changed or existing assertion skipped/weakened.
 - legacy CHIEF_WARDEN finalizes Escalated with retry feedback: passed
 - legacy detail refreshes after a decision and ignores late responses: passed
 - legacy empty and loading states distinguish availability: passed
-- profile protects identity and saves only the phone field: passed
 - login sends session credentials through CSRF transport: passed
 - invalid login displays backend error: passed
 - sign-in fallback never submits credentials in a URL: passed
-- TC-FR08-01: student reads assigned mess and coupons without write controls: passed
+- profile protects identity and saves only the phone field: passed
 - information tabs display real API notices and rules: passed
+- TC-FR08-01: student reads assigned mess and coupons without write controls: passed
 - frontend: incomplete login stays invalid and does not send a request: passed
 - frontend: pending sign-in disables repeat submission, then navigates on success: passed
 - frontend: transport failure is visible and permits a later retry: passed
 - study room is read-only and shows the current server status: passed
-- student submits category and description, never room or identity: passed
 - test checkout displays explicit simulation label and takes no payment credentials: passed
-- director report displays zero counts without inventing records: passed
 - student sees automatic weekday and cannot change policy or collect batches: passed
-- health returns uncached JSON: passed
+- student submits category and description, never room or identity: passed
+- director report displays zero counts without inventing records: passed
+- geolocation is requested only after the explicit submit click: passed
 - domain transport enforces origin, CSRF and JSON errors 0: passed
 - domain transport enforces origin, CSRF and JSON errors 1: passed
 - domain transport enforces origin, CSRF and JSON errors 2: passed
 - shared transport, failures and pagination keep credentials same-origin: passed
 - domain endpoint helpers encode identifiers and optional filters: passed
 - formatters and role menus handle defaults and all navigation categories: passed
-- geolocation is requested only after the explicit submit click: passed
+- health returns uncached JSON: passed
+- student receives read-only history and server-calculated active total: passed
 - shared components expose accessible labels, status and table headers: passed
 - disabled button prevents duplicate actions: passed
-- student receives read-only history and server-calculated active total: passed
 
 [JUnit](raw/backend-junit.xml), [Jest JSON](raw/frontend-results.json),
 [backend log](raw/backend.log), [frontend log](raw/frontend.log),

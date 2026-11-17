@@ -16,7 +16,7 @@ The application integrates all four team modules: authentication and information
 | Laundry | Stable automatic weekday grouping, upcoming drop-off/return dates, staff receipt, Ready and Collected states, and retained historical receipt details |
 | Leave | Student applications, assigned-Warden approval/rejection/escalation, supervising Chief decisions and retained transition history |
 | Attendance | Explicit one-time location submission, server-side time/accuracy/freshness/radius checks, derived outcomes and duplicate Accepted prevention |
-| Deviations | Authorized recording, historical rule-title/weight snapshots, active totals and retained deactivation reasons |
+| Deviations | Authorized recording, historical rule-title/assigned-weight snapshots, active totals and retained deactivation reasons |
 | Complaints | Student submission and owned tracking, Director assignment, assigned Maintenance Staff progression and audit history |
 | Mess and coupons | Staff-managed allocations/options/coupons and student-owned, read-only views |
 | Fees | Server-owned dues, payment-attempt history, test-mode order/verification, explicit local simulation and single-success database protection |
@@ -110,7 +110,7 @@ docker compose logs api frontend
 docker compose stop
 ```
 
-Compose applies migrations to its local database before starting the API. Payments are disabled by default in the supplied Compose configuration. See the payment configuration notes below before demonstrating checkout.
+Compose applies migrations to its local database before starting the API. The supplied `.env.example` sets payments to disabled; Compose uses the explicitly configured mode. See the payment configuration notes below before demonstrating checkout.
 
 ## Run without containers
 
@@ -195,24 +195,18 @@ npm run test:e2e
 
 ### Recorded results and open issues
 
-The 16 November 2026 execution snapshot, published in `c7d71bc`, recorded:
+The 17 November 2026 verification run after integrating current main recorded:
 
 | Layer | Executed | Passed | Failed |
 |---|---:|---:|---:|
-| Backend pytest | 146 | 143 | 3 |
-| Jest/RTL components | 21 | 21 | 0 |
+| Backend pytest | 178 | 178 | 0 |
+| Jest/RTL components | 105 | 105 | 0 |
 | Playwright Chromium | 13 | 13 | 0 |
-| **Total** | **180** | **177** | **3** |
+| **Total** | **296** | **296** | **0** |
 
-The existing 116 backend regressions passed. Additional priority tests expose three open failures:
+The three earlier priority failures now pass: direct payment-provider timeout normalization, Pending-payment initiation replay prevention, and active deviation replay prevention. Main includes their fixes and database constraints. The single-success payment test also retains its service/database checks using legal attempts from distinct providers.
 
-- A direct payment-provider `TimeoutError` escapes standardized error handling.
-- Identical repeated Pending payment initiation creates two attempts; duplicate successful callbacks remain idempotent.
-- Identical repeated deviation submissions create two active records and double the total.
-
-In that historical snapshot, the latter two fail the requested replay-prevention invariant. Defining retry/event identity requires owner policy review so legitimate separate attempts/events are not incorrectly blocked. These are historical failures from the 16 November snapshot. Newer main commits fix timeout handling and replay protection; consult the current regenerated test reports for the integrated result. Failures are not skipped or marked expected-failure.
-
-Measured coverage: backend **80.96% lines / 51.76% branches**; frontend **48.13% lines / 38.31% branches**. Coverage is not a pass rate. The recorded browser snapshot covers Chromium; Firefox/Edge were not rerun for that test package.
+Measured branch coverage: backend **90.52%** (315/348), frontend **97.34%** (843/866), and opportunity-weighted overall **95.39%**. Both layers independently exceed 90%. The runner rejects a lower coverage result without masking failed tests. Lint and build passed. Firefox/Edge were not rerun in this local verification; passing Chromium does not establish that hosted cross-browser CI is green.
 
 See the [unit/component report](test_results/unit_test_report.md), [system report](test_results/system_test_report.md), [coverage analysis](test_results/code_branch_coverage_analysis.md), [raw failures](test_results/raw/observed-failures.json) and [actual commands](test_results/raw/commands.md).
 

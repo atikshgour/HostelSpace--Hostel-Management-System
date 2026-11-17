@@ -1,34 +1,6 @@
-............................FF.................................. [ 36%]
-........................................................................ [ 77%]
-......................................F                                  [100%]
-================================== FAILURES ===================================
-_ PriorityAcceptanceTests.test_P13_duplicate_payment_callbacks_and_submissions _
-tests\test_priority_acceptance.py:230: in test_P13_duplicate_payment_callbacks_and_submissions
-    self.assertEqual(
-E   AssertionError: 2 != 1 : Repeated pending initiation created separate PaymentAttempt rows
----------------------------- Captured stderr call -----------------------------
-Bad Request: /api/payments/initiate/
------------------------------- Captured log call ------------------------------
-WARNING  django.request:log.py:253 Bad Request: /api/payments/initiate/
-__ PriorityAcceptanceTests.test_P14_deviation_total_and_duplicate_prevention __
-tests\test_priority_acceptance.py:255: in test_P14_deviation_total_and_duplicate_prevention
-    self.assertEqual(
-E   AssertionError: 2 != 1 : Identical repeated deviation submission created a second record
-_______________ test_direct_socket_timeout_is_validation_error ________________
-tests\test_priority_unit.py:124: in test_direct_socket_timeout_is_validation_error
-    provider_request("orders", {"amount": 100, "currency": "INR"})
-apps\student_services\payments.py:35: in provider_request
-    with urlopen(request, timeout=15) as response:  # nosec B310
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\atiks\AppData\Local\Programs\Python\Python313\Lib\unittest\mock.py:1169: in __call__
-    return self._mock_call(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\atiks\AppData\Local\Programs\Python\Python313\Lib\unittest\mock.py:1173: in _mock_call
-    return self._execute_mock_call(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-C:\Users\atiks\AppData\Local\Programs\Python\Python313\Lib\unittest\mock.py:1228: in _execute_mock_call
-    raise effect
-E   TimeoutError: Synthetic direct socket timeout
+................................................................ [ 35%]
+........................................................................ [ 76%]
+..........................................                               [100%]
 =============================== tests coverage ================================
 _______________ coverage: platform win32, python 3.13.7-final-0 _______________
 
@@ -40,7 +12,7 @@ apps\accounts\admin.py                                               0      0   
 apps\accounts\apps.py                                                4      0      0      0   100%
 apps\accounts\management\__init__.py                                 0      0      0      0   100%
 apps\accounts\management\commands\__init__.py                        0      0      0      0   100%
-apps\accounts\management\commands\seed_demo.py                      51      0     10      0   100%
+apps\accounts\management\commands\seed_demo.py                      56      0     12      0   100%
 apps\accounts\models.py                                             38      0      0      0   100%
 apps\accounts\permissions.py                                         8      0      2      0   100%
 apps\accounts\queries.py                                             0      0      0      0   100%
@@ -86,10 +58,10 @@ apps\leave_attendance\location.py                                   17      0   
 apps\leave_attendance\models.py                                     74      0      0      0   100%
 apps\leave_attendance\permissions.py                                61      0     26      0   100%
 apps\leave_attendance\queries.py                                     5      5      0      0     0%   2-9
-apps\leave_attendance\serializers.py                                93      2     16      2    96%   32, 77
-apps\leave_attendance\services.py                                   77      4     22      3    93%   43, 44->47, 55-56, 72
+apps\leave_attendance\serializers.py                                95      2     16      2    96%   33, 78
+apps\leave_attendance\services.py                                   81      4     24      3    93%   43, 44->47, 55-56, 72
 apps\leave_attendance\urls.py                                        3      0      0      0   100%
-apps\leave_attendance\views.py                                     116     12      6      1    88%   104-105, 113, 134-135, 144-149, 164
+apps\leave_attendance\views.py                                     116     12      6      1    88%   104-105, 113, 134-135, 144-149, 168
 apps\student_services\__init__.py                                    0      0      0      0   100%
 apps\student_services\admin.py                                       0      0      0      0   100%
 apps\student_services\apps.py                                        4      0      0      0   100%
@@ -97,7 +69,7 @@ apps\student_services\management\__init__.py                         0      0   
 apps\student_services\management\commands\__init__.py                0      0      0      0   100%
 apps\student_services\management\commands\seed_service_demo.py      28      2     10      1    92%   27-28
 apps\student_services\models.py                                    101      2      2      0    98%   17, 20
-apps\student_services\payments.py                                   86      3     34      3    95%   101, 113, 129
+apps\student_services\payments.py                                   95      8     38      3    90%   98-106, 122, 134, 150
 apps\student_services\permissions.py                                 0      0      0      0   100%
 apps\student_services\queries.py                                     0      0      0      0   100%
 apps\student_services\serializers.py                                97      2      2      0    98%   119, 210
@@ -117,13 +89,9 @@ config\settings\production.py                                       17      0   
 config\urls.py                                                       3      0      0      0   100%
 config\wsgi.py                                                       4      4      0      0     0%   2-7
 ------------------------------------------------------------------------------------------------------------
-TOTAL                                                             1875     76    340     25    95%
+TOTAL                                                             1895     81    348     25    95%
 Coverage HTML written to dir ../test_results/coverage/backend-html
 Coverage XML written to file ../test_results/coverage.xml
 Coverage JSON written to file ../test_results/coverage.json
-=========================== short test summary info ===========================
-FAILED tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P13_duplicate_payment_callbacks_and_submissions
-FAILED tests/test_priority_acceptance.py::PriorityAcceptanceTests::test_P14_deviation_total_and_duplicate_prevention
-FAILED tests/test_priority_unit.py::test_direct_socket_timeout_is_validation_error
-3 failed, 172 passed, 8 subtests passed in 32.14s
+178 passed, 8 subtests passed in 37.85s
 

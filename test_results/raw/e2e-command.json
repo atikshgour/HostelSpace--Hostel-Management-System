@@ -6,12 +6,13 @@
     "playwright",
     "test",
     "--project=chromium",
+    "--trace=off",
     "--reporter=list,json,html",
     "--output=../test_results/raw/browser-output"
   ],
-  "started_at": "2026-11-17T06:52:53.802596+00:00",
-  "finished_at": "2026-11-17T06:54:18.989855+00:00",
-  "source_commit": "7b7d4c436c88b03f12ac5d07039f031000ca99ae",
+  "started_at": "2026-11-17T07:09:06.490022+00:00",
+  "finished_at": "2026-11-17T07:10:24.699611+00:00",
+  "source_commit": "f921d4cdd399803451d4d3c0e30e72d587eb074a",
   "working_tree_changes": true,
   "exit_code": 0
 }

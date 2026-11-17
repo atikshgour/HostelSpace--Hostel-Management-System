@@ -3,9 +3,9 @@
   "django": "5.2.18",
   "node": "v22.20.0",
   "postgresql": 150019,
-  "source_commit": "7b7d4c436c88b03f12ac5d07039f031000ca99ae",
+  "source_commit": "f921d4cdd399803451d4d3c0e30e72d587eb074a",
   "working_tree_changes": true,
-  "database_scope": "new isolated hostelspace_coverage_20261117 and pytest disposable test database",
+  "database_scope": "isolated hostelspace_coverage_20261117 (pytest), hostelspace_publish_20261117 (browser); synthetic records only",
   "database_reset": false,
   "production_changes": false
 }

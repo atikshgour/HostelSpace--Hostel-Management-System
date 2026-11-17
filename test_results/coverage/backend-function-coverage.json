@@ -472,7 +472,7 @@
     "function": "FiniteFloat.to_internal_value",
     "body_hit": true,
     "missing_lines": [
-      32
+      33
     ]
   },
   {
@@ -504,7 +504,7 @@
     "function": "SessionInput.validate",
     "body_hit": true,
     "missing_lines": [
-      77
+      78
     ]
   },
   {
@@ -660,7 +660,7 @@
     "function": "DeviationTotals.get",
     "body_hit": true,
     "missing_lines": [
-      164
+      168
     ]
   },
   {
@@ -746,15 +746,21 @@
     "file": "apps/student_services/payments.py",
     "function": "initiate",
     "body_hit": true,
-    "missing_lines": []
+    "missing_lines": [
+      98,
+      101,
+      104,
+      105,
+      106
+    ]
   },
   {
     "file": "apps/student_services/payments.py",
     "function": "finalize",
     "body_hit": true,
     "missing_lines": [
-      101,
-      113
+      122,
+      134
     ]
   },
   {
@@ -762,7 +768,7 @@
     "function": "verify",
     "body_hit": true,
     "missing_lines": [
-      129
+      150
     ]
   },
   {

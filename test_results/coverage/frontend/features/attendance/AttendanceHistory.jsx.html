@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>65/65</span>
+                <span class='fraction'>66/66</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>63/63</span>
+                <span class='fraction'>64/64</span>
             </div>
         
             
@@ -348,7 +348,22 @@
 <a name='L283'></a><a href='#L283'>283</a>
 <a name='L284'></a><a href='#L284'>284</a>
 <a name='L285'></a><a href='#L285'>285</a>
-<a name='L286'></a><a href='#L286'>286</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -384,6 +399,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -441,6 +463,14 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -675,6 +705,13 @@ const ui = {
     background: "#fef2f2",
   },
 };
+const DEMO_WARDEN_LOCATION = {
+  latitude: 12,
+  longitude: 77,
+  radius: 100,
+  accuracy: 100,
+  sampleAge: 60,
+};
 function ErrorMessage({ error }) {
   return error ? (
     &lt;div role="alert" style={ui.error}&gt;
@@ -731,7 +768,10 @@ export function AttendanceSessionForm({ onSaved }) {
   return (
     &lt;section style={ui.card}&gt;
       &lt;h2&gt;Create attendance session&lt;/h2&gt;
-      &lt;p&gt;Use only the location policy approved by the team and faculty.&lt;/p&gt;
+      &lt;p&gt;
+        Demo location is the fixed Warden hostel point. The student must submit
+        one location sample within this radius; no background tracking is used.
+      &lt;/p&gt;
       &lt;form method="post" onSubmit={submit}&gt;
         &lt;Field label="Title" name="title" maxLength={120} required /&gt;
         &lt;div style={ui.row}&gt;
@@ -749,6 +789,7 @@ export function AttendanceSessionForm({ onSaved }) {
             step="any"
             min="-90"
             max="90"
+            defaultValue={DEMO_WARDEN_LOCATION.latitude}
             required
           /&gt;
           &lt;Field
@@ -758,6 +799,7 @@ export function AttendanceSessionForm({ onSaved }) {
             step="any"
             min="-180"
             max="180"
+            defaultValue={DEMO_WARDEN_LOCATION.longitude}
             required
           /&gt;
           &lt;Field
@@ -766,6 +808,7 @@ export function AttendanceSessionForm({ onSaved }) {
             type="number"
             step="any"
             min="0.01"
+            defaultValue={DEMO_WARDEN_LOCATION.radius}
             required
           /&gt;
           &lt;Field
@@ -774,6 +817,7 @@ export function AttendanceSessionForm({ onSaved }) {
             type="number"
             step="any"
             min="0.01"
+            defaultValue={DEMO_WARDEN_LOCATION.accuracy}
             required
           /&gt;
           &lt;Field
@@ -782,6 +826,7 @@ export function AttendanceSessionForm({ onSaved }) {
             type="number"
             min="1"
             max="300"
+            defaultValue={DEMO_WARDEN_LOCATION.sampleAge}
             required
           /&gt;
         &lt;/div&gt;
@@ -925,7 +970,7 @@ export default function AttendanceWorkspace() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-11-17T06:50:35.917Z
+                at 2026-11-17T07:06:24.286Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

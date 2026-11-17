@@ -1,9 +1,10 @@
 # System, integration and browser test report
 
-Generated 2026-11-17T06:56:42.800603+00:00 from recorded artifacts.
-Backend execution: 2026-11-17T06:49:25.602301+00:00; frontend: 2026-11-17T06:50:01.985933+00:00.
-Source HEAD: `7b7d4c436c88b03f12ac5d07039f031000ca99ae` plus uncommitted test/config/script changes.
-Local synthetic PostgreSQL only. No production data changes, live payments, commit or push.
+Generated 2026-11-17T07:11:08.486339+00:00 from recorded artifacts.
+Backend execution: 2026-11-17T07:06:55.032939+00:00; frontend: 2026-11-17T07:05:49.767215+00:00.
+Source HEAD: `f921d4cdd399803451d4d3c0e30e72d587eb074a` plus uncommitted test/config/script changes.
+Local synthetic PostgreSQL only. No production data changes or live payments.
+Publication is user-authorized; command metadata identifies the tested source HEAD.
 Each command's own timestamp/exit is preserved in [commands](raw/commands.md).
 Independent human review remains pending. Coverage success does not override failing tests.
 
@@ -22,9 +23,9 @@ Independent human review remains pending. Coverage success does not override fai
 | P09 | Repeated attendance prevented | Passed | Passed | Assertions passed; see JUnit and source test. |
 | P10 | Complaint creation and owned visibility | Passed | Passed | Assertions passed; see JUnit and source test. |
 | P11 | Unauthorized complaint update denied | Passed | Passed | Assertions passed; see JUnit and source test. |
-| P12 | Payment success/failure/timeout/retry | Passed | Failed | Wrapped-timeout API workflow passes; direct socket TimeoutError escapes normalization. |
-| P13 | Duplicate payment callbacks/submissions | Failed | Failed | AssertionError: 2 != 1 : Repeated pending initiation created separate PaymentAttempt rows |
-| P14 | Deviation totals and duplicate prevention | Failed | Failed | AssertionError: 2 != 1 : Identical repeated deviation submission created a second record |
+| P12 | Payment success/failure/timeout/retry | Passed | Passed | Assertions passed; see JUnit and source test. |
+| P13 | Duplicate payment callbacks/submissions | Passed | Passed | Assertions passed; see JUnit and source test. |
+| P14 | Deviation totals and duplicate prevention | Passed | Passed | Assertions passed; see JUnit and source test. |
 
 P12 includes the supporting direct-timeout unit. Its API test alone is not sufficient.
 ### P01 — FR-01 / TC-FR01-01
@@ -145,7 +146,7 @@ Steps: Fail simulation; mock provider timeout; retry and succeed.
 
 Expected: Unpaid until success; retained failure; normalized timeout error.
 
-Actual: Wrapped-timeout API workflow passes; direct socket TimeoutError escapes normalization.
+Actual: Assertions passed; see JUnit and source test.
 
 ### P13 — BR-06 / NFR-03 + requested replay invariant
 
@@ -155,7 +156,7 @@ Steps: Initiate twice while Pending; repeat success callback; initiate after Pai
 
 Expected: One pending attempt for identical replay; one successful result.
 
-Actual: AssertionError: 2 != 1 : Repeated pending initiation created separate PaymentAttempt rows
+Actual: Assertions passed; see JUnit and source test.
 
 ### P14 — FR-10 / TC-FR10-01 + requested replay invariant
 
@@ -165,11 +166,11 @@ Steps: Record rule deviation; read total; repeat identical submission.
 
 Expected: Correct weight total; no duplicate for the same replay.
 
-Actual: AssertionError: 2 != 1 : Identical repeated deviation submission created a second record
+Actual: Assertions passed; see JUnit and source test.
 
 ## Browser execution
 
-Chromium command started **2026-11-17T06:52:53.802596+00:00**, exit 0.
+Chromium command started **2026-11-17T07:09:06.490022+00:00**, exit 0.
 Recorded Playwright results: **13 passed, 0 failed,
 0 skipped, 0 flaky**.
 Journeys cover login/profile/navigation, information/study status, Director accounts,
@@ -181,14 +182,12 @@ Firefox/Edge were not run for this update. Browser runtime is not merged into Je
 
 ## Open defects and acceptance limits
 
-- `test_P13_duplicate_payment_callbacks_and_submissions`: AssertionError: 2 != 1 : Repeated pending initiation created separate PaymentAttempt rows
-- `test_P14_deviation_total_and_duplicate_prevention`: AssertionError: 2 != 1 : Identical repeated deviation submission created a second record
-- `test_direct_socket_timeout_is_validation_error`: TimeoutError: Synthetic direct socket timeout
+None.
 
-Passing branch coverage does not make these failures passing. Backend suite remains
-nonzero. Independent review, complete manual usability, agreed load acceptance,
+Coverage and test outcomes are separate; backend has 178 passed and 0 failed.
+Independent review, complete manual usability, agreed load acceptance,
 external provider acceptance, staging/release and recovery rehearsal remain pending.
-No commit or push was performed for this update.
+Publication is separately user-authorized and is not acceptance evidence.
 
 [Commands](raw/commands.md), [browser JSON](raw/browser-results.json),
 [browser log](raw/e2e.log), [browser HTML](raw/browser-html/index.html),

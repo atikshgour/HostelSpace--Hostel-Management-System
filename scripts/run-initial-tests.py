@@ -75,6 +75,7 @@ COMMANDS = {
             "playwright",
             "test",
             "--project=chromium",
+            "--trace=off",
             "--reporter=list,json,html",
             "--output=../test_results/raw/browser-output",
         ],

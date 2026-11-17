@@ -1,9 +1,10 @@
 # Code and branch coverage analysis
 
-Generated 2026-11-17T06:56:42.800603+00:00 from recorded artifacts.
-Backend execution: 2026-11-17T06:49:25.602301+00:00; frontend: 2026-11-17T06:50:01.985933+00:00.
-Source HEAD: `7b7d4c436c88b03f12ac5d07039f031000ca99ae` plus uncommitted test/config/script changes.
-Local synthetic PostgreSQL only. No production data changes, live payments, commit or push.
+Generated 2026-11-17T07:11:08.486339+00:00 from recorded artifacts.
+Backend execution: 2026-11-17T07:06:55.032939+00:00; frontend: 2026-11-17T07:05:49.767215+00:00.
+Source HEAD: `f921d4cdd399803451d4d3c0e30e72d587eb074a` plus uncommitted test/config/script changes.
+Local synthetic PostgreSQL only. No production data changes or live payments.
+Publication is user-authorized; command metadata identifies the tested source HEAD.
 Each command's own timestamp/exit is preserved in [commands](raw/commands.md).
 Independent human review remains pending. Coverage success does not override failing tests.
 
@@ -11,28 +12,28 @@ Independent human review remains pending. Coverage success does not override fai
 
 | Layer | Covered / total branch opportunities | Coverage | Target |
 |---|---|---|---|
-| Backend | 309 / 340 | 90.88% | Passed |
-| Frontend | 842 / 864 | 97.45% | Passed |
-| Overall | 1151 / 1204 | 95.60% | Passed |
+| Backend | 315 / 348 | 90.52% | Passed |
+| Frontend | 843 / 866 | 97.34% | Passed |
+| Overall | 1158 / 1214 | 95.39% | Passed |
 
 Overall is the opportunity-weighted ratio `(Python covered + Istanbul covered) /
 (Python total + Istanbul total)`, not an average of percentages. The tools use
 different branch models, so the separate layer gates are authoritative. Both
 must exceed 90%; one cannot compensate for the other.
 
-Backend line coverage: **95.95%**;
-frontend line coverage: **96.47%**.
-Backend combined line/branch coverage.py summary: 95.17%.
-Backend remaining branches: 31. Frontend remaining branch arms:
-22.
+Backend line coverage: **95.73%**;
+frontend line coverage: **96.39%**.
+Backend combined line/branch coverage.py summary: 94.92%.
+Backend remaining branches: 33. Frontend remaining branch arms:
+23.
 
 ## Scope and reproducibility
 
 Python instruments all apps/config with branch measurement; tests and generated
 migrations retain their existing exclusions. Frontend instruments all 61
 implemented modules, including unimported modules at zero; only tests and instruction
-placeholders retain their existing exclusions. No production code or coverage exclusions
-were changed to reach this target. The denominator is 340 Python and 864 frontend
+placeholders retain their existing exclusions. Coverage exclusions were not changed;
+newer main fixes were integrated and tested. The denominator is 348 Python and 866 frontend
 branch opportunities in this snapshot. Failed tests also contribute coverage.
 
 `python scripts/run-initial-tests.py coverage` runs both layers even if one fails,
@@ -81,14 +82,14 @@ Mocked provider and configuration boundaries do not exercise a live service/depl
 | `apps/leave_attendance/models.py` | 100.00% | N/A |
 | `apps/leave_attendance/permissions.py` | 100.00% | 100.00% |
 | `apps/leave_attendance/queries.py` | 0.00% | N/A |
-| `apps/leave_attendance/serializers.py` | 97.85% | 87.50% |
-| `apps/leave_attendance/services.py` | 94.81% | 86.36% |
+| `apps/leave_attendance/serializers.py` | 97.89% | 87.50% |
+| `apps/leave_attendance/services.py` | 95.06% | 87.50% |
 | `apps/leave_attendance/urls.py` | 100.00% | N/A |
 | `apps/leave_attendance/views.py` | 89.66% | 50.00% |
 | `apps/student_services/apps.py` | 100.00% | N/A |
 | `apps/student_services/management/commands/seed_service_demo.py` | 92.86% | 90.00% |
 | `apps/student_services/models.py` | 98.02% | 100.00% |
-| `apps/student_services/payments.py` | 96.51% | 91.18% |
+| `apps/student_services/payments.py` | 91.58% | 86.84% |
 | `apps/student_services/serializers.py` | 97.94% | 100.00% |
 | `apps/student_services/services.py` | 100.00% | 100.00% |
 | `apps/student_services/urls.py` | 100.00% | N/A |

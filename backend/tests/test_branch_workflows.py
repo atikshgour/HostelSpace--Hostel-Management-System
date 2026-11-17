@@ -270,6 +270,27 @@ class StaffBranches(DomainCase):
 
 
 class WorkflowScopes(DomainCase):
+    def test_assigned_deviation_weightage_is_snapshotted_and_replay_is_retained(self):
+        row = services.record_deviation(
+            self.warden,
+            self.student.pk,
+            self.rule,
+            "Synthetic override",
+            weightage=Decimal("3.50"),
+        )
+        self.assertEqual(row.weightage_snapshot, Decimal("3.50"))
+        repeated = services.record_deviation(
+            self.warden,
+            self.student.pk,
+            self.rule,
+            "Synthetic override",
+            weightage=Decimal("4.50"),
+        )
+        self.assertEqual(repeated.pk, row.pk)
+        row.refresh_from_db()
+        self.assertEqual(row.weightage_snapshot, Decimal("3.50"))
+        self.assertEqual(self.rule.weightage, Decimal("2.50"))
+
     def test_active_and_legacy_scope_adapters_agree(self):
         leave = services.submit_leave(self.student, self.leave_data)
         for module in (permissions, access):
@@ -535,6 +556,12 @@ def test_seed_commands_require_local_mode_and_preserve_existing_passwords():
         call_command("seed_demo", stdout=output)
         call_command("seed_service_demo", stdout=output)
         call_command("seed_service_demo", stdout=output)
+        demo_leave = LeaveRequest.objects.get(student__username="student2")
+        demo_leave.status = "Approved"
+        demo_leave.save(update_fields=["status"])
+        call_command("seed_demo", stdout=output)
+        demo_leave.refresh_from_db()
+        assert demo_leave.status == "Approved"
         student.refresh_from_db()
         assert student.password == original
         assert StudentProfile.objects.count() == 2

@@ -17,15 +17,15 @@
     "--cov-report=json:../test_results/coverage.json",
     "--cov-report=html:../test_results/coverage/backend-html"
   ],
-  "started_at": "2026-11-17T06:49:25.602301+00:00",
-  "finished_at": "2026-11-17T06:50:01.960724+00:00",
-  "source_commit": "7b7d4c436c88b03f12ac5d07039f031000ca99ae",
+  "started_at": "2026-11-17T07:06:55.032939+00:00",
+  "finished_at": "2026-11-17T07:07:37.064978+00:00",
+  "source_commit": "f921d4cdd399803451d4d3c0e30e72d587eb074a",
   "working_tree_changes": true,
-  "exit_code": 1,
+  "exit_code": 0,
   "branch_coverage": {
-    "covered": 309,
-    "total": 340,
-    "percent": 90.88235294117646,
+    "covered": 315,
+    "total": 348,
+    "percent": 90.51724137931035,
     "required": "strictly above 90%",
     "passed": true
   }
