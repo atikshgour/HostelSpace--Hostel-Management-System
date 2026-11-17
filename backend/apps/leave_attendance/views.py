@@ -152,7 +152,11 @@ class Deviations(ProtectedView):
         access.require(request.user, access.WARDEN, access.CHIEF)
         data = self.validated(DeviationInput, request)
         record = services.record_deviation(
-            request.user, data["student"], data["rule"], data["remarks"]
+            request.user,
+            data["student"],
+            data["rule"],
+            data["remarks"],
+            data.get("weightage"),
         )
         return Response(DeviationOutput(record).data, status=201)
 

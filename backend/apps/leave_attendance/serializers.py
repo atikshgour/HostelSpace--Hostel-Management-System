@@ -1,6 +1,7 @@
 """Arin | US-18 Sprint 4. Strict allowlists; all actor/status/snapshot fields server-owned."""
 import math
 from collections.abc import Mapping
+from decimal import Decimal
 
 from django.apps import apps
 from django.conf import settings
@@ -97,6 +98,13 @@ class AttendanceOutput(serializers.ModelSerializer):
 class DeviationInput(StrictInput):
     student = serializers.CharField(max_length=100)
     rule = serializers.CharField(max_length=100)
+    weightage = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        min_value=Decimal('0'),
+        max_value=Decimal('99999999.99'),
+        required=False,
+    )
     remarks = serializers.CharField(max_length=2000)
     def validate_student(self, value):
         from .permissions import student_key
