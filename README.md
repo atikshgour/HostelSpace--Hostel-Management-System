@@ -1,340 +1,248 @@
 # HostelSpace
 
-> Team integration (2026-11-16): all four feature branches are combined with the
-> completed local folder under the canonical Django and `frontend/src/app` paths.
-> PDF permissions take precedence over broader source-folder permissions. Start
-> with [integrated setup and CI](docs/07-maintenance/ci-setup.md) and
-> [integration evidence](evidence/team-integration-2026-11-16.md). Earlier dated
-> implementation notes below are historical; independent human review is pending.
+<!-- Owner: Anvi Srinivas | US-17 | Development/SRS sprint 1 | Reviewer: Arin Singh (pending) -->
 
-> Atiksh integration (2026-11-16, review pending): the supplied project folder's
-> complaints/mess/fees implementation and required shared auth/UI dependencies
-> are integrated on the Atiksh branch. Permissions follow the supplied SRS/SAD/STP:
-> Director complaint assignment, Mess Staff updates, student-owned reads.
-> Other owners' feature modules remain their responsibility. See
-> [current setup/merge boundaries](docs/07-maintenance/ci-setup.md),
-> [PDF case mapping](docs/05-validation/atiksh-stp-mapping.md), and
-> [actual execution evidence](evidence/atiksh-integration-2026-11-16.md).
-> Use a fresh disposable local database; this replaces the earlier migration
-> baseline and does not upgrade existing data. Earlier dated notes below describe
-> earlier implementations and are retained as history.
+HostelSpace is a browser-based hostel management system built by **Team 11** for **UE24CS341A — Software Engineering**, PES University, Bangalore. It brings student services and staff workflows into one role-based portal using Next.js, Django REST Framework and PostgreSQL.
 
-> US-16 implementation (Atiksh, 2026-10-31): student fee listing and Razorpay
-> test-mode order/verification are wired at `/fees`, with server-side matching
-> and retained attempt results. See [fee API contract](backend/apps/student_services/FEES_API.md)
-> and [actual checks](evidence/us16-validation.md). Sandbox checkout, PostgreSQL
-> concurrency verification and independent review remain pending.
+The application integrates all four team modules: authentication and information, leave and attendance, study-room and laundry services, and complaints, mess and fees. It includes working frontend screens, backend APIs, generated database migrations, synthetic demo data and automated tests. Payment demonstrations use explicit local simulation or a Razorpay TEST integration; no live payment acceptance or production release is claimed.
 
-> US-15 update (Atiksh, 2026-10-29): student mess allocation/valid coupon viewing
-> and Mess Staff-only management are implemented at `/mess` and `/mess/manage`.
-> See the [mess API contract](backend/apps/student_services/MESS_API.md) and
-> [actual verification](evidence/us15-validation.md). Independent review and the
-> separate US-01 sign-in flow remain pending.
+## Implemented features
 
-> US-14 update (Atiksh, 2026-10-29): Director complaint assignment and authorized
-> progress updates are implemented, including `/complaints/manage`, retained
-> assignment/status history and a generated additive migration. See the
-> [module contract](backend/apps/student_services/README.md) and
-> [verification evidence](evidence/us14-validation.md). Independent review and
-> the separate US-01 sign-in flow remain pending.
-
-> US-13 backend update (Atiksh, 2026-10-27): complaint submission and owned-record
-> tracking are implemented, with the user-approved minimal User/Profile dependency.
-> See the [API/setup contract](backend/apps/student_services/README.md) and
-> [actual PostgreSQL test results](evidence/us13-backend-validation.md).
-
-> US-20 update (Atiksh, 2026-10-27): the minimal frontend/API foundation,
-> PostgreSQL 16 Compose stack and PR CI are now implemented. Feature modules below
-> remain starter placeholders. See [local setup and CI](docs/07-maintenance/ci-setup.md)
-> and [actual verification results](evidence/ci-local-validation.md).
-> Remote CI and main branch protection still need verification; no deployment is included.
-
-## Hostel Management System
-
-HostelSpace is a browser-based hostel management system developed for the **UE24CS341A - Software Engineering** course at **PES University, Bangalore**.
-
-HostelSpace is a simple web-based hostel management system for students and hostel staff. At present, many hostel activities are handled through notice boards, paper forms, registers, messages, and repeated visits to the hostel office.
-Information is spread across different places, so students may need to ask several people before they receive an update. Staff also have to check different records to answer common questions.
-
-HostelSpace brings these activities into one portal. A student can sign in, view hostel notices and rules, check whether the study room is open, see the assigned laundry day, track clothes given and collected, apply for leave, submit attendance, raise a maintenance complaint, view mess details, pay hostel fees, and check deviation-weightage records. Students will see only their own records and the services available to them.
-
-Hostel staff will use the same system according to their roles. Wardens will process leave, attendance, and discipline records. The Chief Warden will supervise the wardens and handle important cases. The Hostel Director will have overall control of hostel information and authorized users. Laundry, mess, and maintenance staff will update only the records related to their work. The project keeps every feature direct and limited so that the team can build, test, and explain the complete system within the course schedule.
-
-## Project Information
-
-| Item | Details |
+| Feature | Current behavior |
 |---|---|
-| Project Name | HostelSpace |
-| Project | Hostel Management System |
-| Course | UE24CS341A - Software Engineering |
-| University | PES University, Bangalore |
-| Department | Computer Science and Engineering |
-| Team | Team 11 |
-| Methodology | Agile |
-| Version | 1.0 |
-| Development | Git and GitHub |
-| Project Planning | Jira |
+| Authentication and profiles | Session-based sign-in/out, role-specific dashboards, active-account checks and student profile viewing with phone-only edits |
+| Hostel information | Notices, contacts, information and rules, with authorized publishing and current-content visibility |
+| Study room | Open/Closed status, timings and messages; Director/Content Staff updates |
+| Laundry | Stable automatic weekday grouping, upcoming drop-off/return dates, staff receipt, Ready and Collected states, and retained historical receipt details |
+| Leave | Student applications, assigned-Warden approval/rejection/escalation, supervising Chief decisions and retained transition history |
+| Attendance | Explicit one-time location submission, server-side time/accuracy/freshness/radius checks, derived outcomes and duplicate Accepted prevention |
+| Deviations | Authorized recording, historical rule-title/weight snapshots, active totals and retained deactivation reasons |
+| Complaints | Student submission and owned tracking, Director assignment, assigned Maintenance Staff progression and audit history |
+| Mess and coupons | Staff-managed allocations/options/coupons and student-owned, read-only views |
+| Fees | Server-owned dues, payment-attempt history, test-mode order/verification, explicit local simulation and single-success database protection |
+| Director operations | Authorized account/assignment management, settings and backend-derived reports/overview |
 
-## Team Members
+Students access their own personal records. Staff access depends on role and assignment, enforced by Django even for direct API requests. Historical leave/complaint transitions, laundry receipts, deviation weights and payment attempts are retained.
 
-| Name | USN | Primary Responsibilities |
-|---|---|---|
-| Anvi Srinivas | PES1UG24CS076 | Student profile, notices, information, contacts, and hostel rules |
-| Arin Singh | PES1UG24CS079 | Leave, location-verified attendance, and deviation records |
-| Aryan Singh | PES1UG24CS086 | Study-room status, laundry allocation, handover, and collection |
-| Atiksh Gour | PES1UG24CS096 | Maintenance complaints, mess and coupons, and hostel fee payment |
+Study-room booking, student selection of laundry days, continuous location tracking, full accounting, inventory, biometrics and native mobile applications are outside the project scope.
 
-## Project Scope
+## Roles and ownership
 
-HostelSpace covers the following first-version functionality:
+| Role | Main permissions |
+|---|---|
+| Student | Read personal services, submit leave/attendance/complaints and initiate own test fee payments |
+| Warden | Assigned-student leave, attendance sessions and deviation workflows |
+| Chief Warden | Supervised escalations and scoped attendance/deviation oversight |
+| Hostel Director | Accounts, settings, reports, content/study status, complaint assignment and authorized oversight |
+| Content Staff | Publish hostel information/rules and update study-room status |
+| Laundry Staff | Laundry receipt, readiness, collection and policy management |
+| Maintenance Staff | Progress assigned complaints |
+| Mess Staff | Manage mess allocations/options and coupons |
 
-- Role-based sign-in and student profile access
-- Hostel notices, contacts, information, and rules
-- Study-room open or closed status
-- Assigned laundry-day tracking
-- Laundry handover and collection tracking
-- Leave management
-- Location-verified attendance submission
-- Maintenance complaints
-- Mess allocation and coupons
-- Hostel fee payment records
-- Deviation-weightage records
-- Authorized staff updates and Hostel Director reports
+The [role matrix](docs/04-design/role-permissions.md) details record-level access. Warden/Chief access does not extend to fee, complaint or laundry counters. Students cannot self-select mess allocations or manually change laundry days.
 
-Students can view hostel notices and rules, check the study-room status, see their assigned laundry day, track clothes, apply for leave, submit attendance, raise maintenance complaints, view mess details, pay hostel fees, and review their deviation-weightage records. Students see only their own records and the services available to them.
+| Team member | USN | Accountable modules | Shared responsibilities |
+|---|---|---|---|
+| Anvi Srinivas | PES1UG24CS076 | US-01–04: auth/profile, information and Director | US-17 architecture; US-21 usability/handoff |
+| Arin Singh | PES1UG24CS079 | US-05–08: leave, attendance and deviations | US-18 schema/contracts; US-22 validation |
+| Aryan Singh | PES1UG24CS086 | US-09–12: study room and laundry | US-19 Docker/demo setup; US-23 integration |
+| Atiksh Gour | PES1UG24CS096 | US-13–16: complaints, mess and fees | US-20 CI; US-24 recovery/maintenance |
 
-### Out of Scope
+## Stack and architecture
 
-The first version does not include:
-
-- Study-room booking
-- Student selection of laundry days
-- Continuous location tracking
-- Full hostel accounting
-- Biometric devices
-- Inventory management
-- Native mobile application
-
-## User Roles
-
-The system supports the following user classes:
-
-- **Student** - Uses student services and views personal records
-- **Warden** - Reviews leave, views attendance, and records deviations
-- **Chief Warden** - Supervises wardens and handles escalated matters
-- **Hostel Director** - Controls authorized users, information, settings, and reports
-- **Maintenance Staff** - Updates assigned maintenance complaints
-- **Mess Staff** - Maintains mess allocation and coupons
-- **Laundry Staff** - Maintains assigned laundry days and handover or collection records
-
-Staff members use the system according to their roles. Each staff role updates only the records related to its work, while wardens, the Chief Warden, and the Hostel Director handle progressively broader oversight and authorization responsibilities.
-
-## Technology Stack
-
-- **Frontend:** Next.js
-- **Languages:** JavaScript, HTML, CSS
-- **Database:** SQL
-- **Authentication:** Role-based authentication
-- **Version Control:** Git and GitHub
-- **Project Management:** Jira
-
-## System Architecture
-
-At a high level, HostelSpace follows this structure:
+- **Frontend:** JavaScript/JSX, Next.js App Router, React, CSS and Tailwind.
+- **Backend:** Python, Django and Django REST Framework; Django ORM for database access.
+- **Database:** PostgreSQL 16 in Compose/CI. SQLite is available only as explicit local quick mode.
+- **Authentication:** Django sessions and CSRF-protected writes, including login; no JWT/localStorage authentication.
+- **Testing:** pytest/pytest-django/pytest-cov, Jest/React Testing Library and Playwright.
+- **Delivery:** Docker Compose, GitHub Actions, Git/GitHub and pinned dependency lockfiles.
 
 ```text
-		    +------------------+
-		    |      Users       |
-		    | Student / Staff  |
-		    +--------+---------+
-			     |
-			     v
-		    +------------------+
-		    |     Browser      |
-		    +--------+---------+
-			     |
-			     v
-		    +------------------+
-		    |     Next.js      |
-		    |  Web Application |
-		    +--------+---------+
-			     |
-	      +--------------+--------------+
-	      |                             |
-	      v                             v
-      +------------------+        +------------------+
-      | Authentication & |        |    Application   |
-      | Role Management  |        |     Services     |
-      +------------------+        +--------+---------+
-					   |
-					   v
-				  +------------------+
-				  |    SQL Database  |
-				  +------------------+
+Browser / React UI
+        |
+        v
+Next.js App Router + same-origin /api routing
+        |
+        v
+Django / DRF: sessions, CSRF, permissions, validation, services
+        |
+        v
+Django ORM -> PostgreSQL
+
+Browser geolocation -> one-time attendance check in Django
+Django payment adapter -> Razorpay TEST API
+GitHub Actions -> lint / build / tests / security / container checks
 ```
-## Maintenance Complaints
 
-Students can submit maintenance complaints, and authorized staff can update their status.
+The frontend does not access SQL directly. Authenticated requests and responses use no-store/private behavior, and API errors follow `{code, message, fields}`. Raw student location samples are not retained as attendance records.
 
+## Run locally with Docker Compose
 
+Prerequisites: Git, Docker and Docker Compose v2. Run these commands from the repository root. Use a fresh local database/Compose volume for this integrated version: its migration baseline is **not an upgrade path for databases from the earlier implementation**. Preserve existing data and plan any upgrade separately.
 
-**This ZIP contains the actual proposed project tree, not only a file-task catalog.**
-Every one of the 275 planned paths exists and contains its own detailed implementation instructions.
-This is an instruction-filled starter, **not a runnable Next.js/Django application**. No feature implementation,
-passing application tests, deployment, Jira creation or faculty approval is claimed.
+1. Copy `.env.example` to `.env` if you do not already have local configuration:
 
-## Open this first
-1. Extract the ZIP. Open the `hostelspace` folder in your editor.
-2. Read `START_HERE.md`, `PROJECT_TREE.txt`, `AGENTS.md` and `docs/decisions/baseline.md`.
-3. Find your module or filter `FILE_MANIFEST.json` by owner/story; open the actual source file.
-4. Read its owner, reviewer, sprint mappings, responsibility and acceptance context.
-5. Copy the complete AI prompt from inside that file. Ask AI to implement one reviewed slice, not the entire project.
-6. Replace that file's placeholder with real code; retain a concise owner/story/sprint header where allowed.
-7. Run actual checks, request independent review and record honest results in the RTM and history.
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-## What is inside each file?
-- Full accountable owner and independent reviewer names.
-- Development Plan sprint mapping and original SRS sprint mapping.
-- US IDs and relevant requirement references.
-- File-specific responsibility and detailed implementation task.
-- Complete copy-ready prompt including relevant story dependencies and acceptance context.
-- Global CSS/shared UI, security, validation, domain-history and handoff requirements.
-- Review checklist and deliberately unfilled implementation/evidence fields.
+2. Set private, nonempty `POSTGRES_PASSWORD` and `DJANGO_SECRET_KEY` values in `.env`. Use a URL-safe database password for the Compose connection URL. Keep the default loopback bindings for local use; do not commit `.env`.
+3. Build and start the services:
 
-Instructions are comments in JS/JSX/CSS/Python/shell/configuration files, normal content in Markdown,
-and `_file_task` arrays in JSON. JSON contains no illegal comments. Configurations still require real implementation.
-**`package-lock.json` files are explicitly marked placeholders, not genuine npm lockfiles.** Replace the package
-manifest with reviewed dependencies, remove the placeholder lockfile, and generate a real lockfile with npm.
-Do not try `npm ci` until a real matching lockfile exists. No dependency versions are invented here.
+   ```powershell
+   docker compose up --build -d
+   docker compose ps
+   ```
 
-**`migrations/0001_initial.py` files are instruction placeholders, not generated Django migrations.**
-Choose the user model and implement reviewed models first. Remove only these untouched starter migration placeholders
-before running `makemigrations` against the local development configuration. Never remove a real applied migration.
-The Director app has no planned model migration unless the approved design adds actual owned models.
+4. Create synthetic demo records:
 
-`manage.py` and shell scripts stop with a clear message. GitHub workflows are manual-only readiness blockers;
-they do not deploy, receive secrets, or pretend to run real tests. Feature/test files contain instructions, not passing stubs.
-`globals.css` additionally includes a proposed reusable token/base-style foundation; the app UI is not implemented.
+   ```powershell
+   docker compose exec api python manage.py seed_demo
+   ```
 
-## Ownership
-| Owner | Feature stories | Shared stories | Primary reviewer |
-| --- | --- | --- | --- |
-| Anvi Srinivas | US-01–04: auth/profile/information/Director | US-17 architecture; US-21 usability/handoff | Arin Singh |
-| Arin Singh | US-05–08: leave/attendance/deviations | US-18 schema/contracts; US-22 validation | Aryan Singh |
-| Aryan Singh | US-09–12: study room/laundry | US-19 Docker; US-23 integration | Atiksh Gour |
-| Atiksh Gour | US-13–16: complaints/mess/fees | US-20 CI/CD; US-24 recovery | Anvi Srinivas |
+   The command privately prompts for a password of at least 12 characters. It creates new demo users and does not reset existing passwords. Seeding requires local settings with `DEBUG=True`.
+5. Open [http://localhost:3000](http://localhost:3000) and sign in. Health endpoints are [frontend /health](http://localhost:3000/health) and [Django /api/health/](http://localhost:8000/api/health/).
 
-## Build order
-1. Agree open policies and actual schedule. No historical sprint work is implied.
-2. US-17 + US-18: scaffold, one shared user model, API/role contracts and style/history foundations.
-3. US-19 + US-01 + initial US-20: PostgreSQL/Docker/demo data, auth/CSRF/proxy vertical slice and real checks.
-4. Parallel feature slices after authentication: Anvi US-02/03; Arin US-05 then 06; Aryan US-09 and 10 then 11 then 12;
-   Atiksh US-13 then 14. US-03 rules precedes US-08 deviations.
-5. US-07 after attendance policy; US-15 mess; US-16 fees after approved provider sandbox access.
-6. Complete US-04 summaries only after source services exist; continue US-21/22/23 throughout.
-7. US-24 recovery, final regression and real independent release approval.
+Demo usernames: `student`, `student2`, `warden`, `chief`, `director`, `content`, `laundry`, `maintenance` and `mess`. Use the password supplied during seeding; there is no published default password.
 
-## Sources and constraints
-The supplied SAD and Development Plan select Browser → Next.js/JavaScript/Tailwind → Django/DRF → PostgreSQL.
-Earlier direct-SQL wording in Synopsis/SRS requires recorded revision, not silent alteration.
-All FR-01–11, NFR-01–05, SEC-01–06 and BR-01–07 remain in scope. Both sprint mappings are kept in file headers.
-The supplied PDFs are source documents, not proof of approval or implementation.
+```powershell
+docker compose logs api frontend
+docker compose stop
+```
 
-Agree phone-only profile updates, authorized content/study updaters, attendance centre/radius/accuracy/time policy,
-payment sandbox/provider, test load/coverage targets, actual GitHub handles, hosting resources and official deadline.
-No public signup, booking/reservation, student laundry-day selection, continuous tracking, meal ordering/QR redemption,
-full accounting, biometrics, inventory, native app, Redis, Celery, microservices or Kubernetes.
+Compose applies migrations to its local database before starting the API. Payments are disabled by default in the supplied Compose configuration. See the payment configuration notes below before demonstrating checkout.
 
-## History has two meanings
-- **Project history:** `HISTORY.md`, `CHANGELOG.md`, prompt logs, Git/PR decisions and real commands/results.
-- **Operational history:** append-only leave/complaint transitions; original laundry handover/collection details;
-  copied historical deviation weightage; separate fee/payment attempts and verified payment references.
-Never invent old activity or keep raw attendance coordinates, credentials, session cookies or payment secrets in either history.
+## Run without containers
 
-## Where to find things
-`frontend/`: actual route/component/client/style/config paths.
-`backend/`: actual Django configuration, app/model/service/permission/test/migration paths.
-`tests/`: actual E2E, security and system-validation paths.
-`.github/`, `scripts/`, `compose.yaml`: delivery and recovery starter paths.
-`docs/`: design, architecture, validation, test summary, maintenance, report, demo and individual prompt logs.
-`evidence/`: guidance for genuine sanitized evidence, not fabricated test outputs.
-`reference/HostelSpace_Build_Guide.html`: optional searchable companion guide; not a replacement for this tree.
+Use Python 3.12, Node.js 22 and a fresh local PostgreSQL database. The recorded local tests also ran on Python 3.13.7 and PostgreSQL 15.19. Install dependencies from the checked-in lockfiles.
 
-## Validation boundary
-`STARTER_QA.json` verifies archive/file completeness and instruction presence only.
-It is not an application test, security review, CI result, database migration check or deployed release certificate.
+From the repository root, in PowerShell:
 
----
-## Detailed task for this README
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --require-hashes -r backend/requirements-dev.txt
+$env:DJANGO_SETTINGS_MODULE = 'config.settings.local'
+$env:HOSTELSPACE_SQLITE = '0'
+```
 
-# Project entry point and reproducible setup
+Set `DATABASE_URL` privately to the connection URL for your local database before continuing. For example, its format is `postgresql://USER:PASSWORD@127.0.0.1:5432/DATABASE`; URL-encode credentials when necessary. Direct Python commands read exported environment variables, not the root Compose `.env` file.
+
+```powershell
+.\.venv\Scripts\python.exe backend/manage.py migrate
+.\.venv\Scripts\python.exe backend/manage.py seed_demo
+.\.venv\Scripts\python.exe backend/manage.py runserver 127.0.0.1:8000
+```
+
+In a second terminal, from `frontend`:
+
+```powershell
+npm ci
+npm run dev
+```
+
+The frontend defaults to `http://127.0.0.1:8000` for its Django origin. Set server-only `DJANGO_API_ORIGIN` before starting/building the frontend if the API runs elsewhere. Use `npm run build` followed by `npm run start` for a local production-build frontend.
+
+### Environment and payment modes
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL`, `HOSTELSPACE_SQLITE=0` | PostgreSQL connection and explicit database selection |
+| `DJANGO_SETTINGS_MODULE` | `config.settings.local` for local use; `config.settings.ci` for automated checks |
+| `DJANGO_SECRET_KEY` | Private Django key; local settings generate a local development key when absent |
+| `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS` | Allowed backend hosts and trusted frontend origins |
+| `DJANGO_API_ORIGIN` | Server-only frontend proxy destination |
+| `HOSTELSPACE_DEMO_PASSWORD` | Optional private alternative to the seed command's password prompt; also used by browser fixtures |
+| `PAYMENT_MODE` | `disabled` by default, `simulation` for local demos or `razorpay` for TEST-provider integration |
+| `ALLOW_PAYMENT_SIMULATION=1` | Explicit simulation gate; simulation also requires `DEBUG=True` |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | Private TEST credentials; the adapter rejects non-test key IDs |
+
+For a native local simulated checkout, export `PAYMENT_MODE=simulation` and `ALLOW_PAYMENT_SIMULATION=1` in the backend terminal before starting Django. This takes no payment credentials and is labelled as simulation. Real TEST-provider acceptance requires separate credentials and verification; passing simulation/mocked tests does not demonstrate a gateway payment.
+
+Compose does not forward the payment-mode variables from `.env` to the API service automatically. A local Compose override must explicitly supply them if simulation is needed. See the [fee contract](backend/apps/student_services/FEES_API.md) and [setup guide](docs/07-maintenance/ci-setup.md).
+
+## Tests and verification
+
+Backend checks require a disposable PostgreSQL database whose user can create pytest's test database. Export the connection and `HOSTELSPACE_SQLITE=0`, then use `DJANGO_SETTINGS_MODULE=config.settings.ci` in the test terminal.
+
+From the repository root:
+
+```powershell
+.\.venv\Scripts\ruff.exe check backend
+.\.venv\Scripts\python.exe backend/manage.py check
+.\.venv\Scripts\python.exe backend/manage.py makemigrations --check --dry-run
+```
+
+From `backend`:
+
+```powershell
+..\.venv\Scripts\python.exe -m pytest --tb=short -q
+```
+
+From `frontend`:
+
+```powershell
+npm run lint
+npm run test:ci -- --runInBand
+npm run build
+```
+
+Playwright requires running Django and the built frontend, a separate synthetic local database, explicit payment simulation, and a privately exported `HOSTELSPACE_DEMO_PASSWORD` matching the seeded users. Follow the [browser setup](docs/07-maintenance/ci-setup.md), then run from `frontend`:
+
+```powershell
+npx playwright install chromium firefox msedge
+npm run test:e2e
+```
+
+### Recorded results and open issues
+
+The 16 November 2026 execution snapshot, published in `c7d71bc`, recorded:
+
+| Layer | Executed | Passed | Failed |
+|---|---:|---:|---:|
+| Backend pytest | 146 | 143 | 3 |
+| Jest/RTL components | 21 | 21 | 0 |
+| Playwright Chromium | 13 | 13 | 0 |
+| **Total** | **180** | **177** | **3** |
+
+The existing 116 backend regressions passed. Additional priority tests expose three open failures:
+
+- A direct payment-provider `TimeoutError` escapes standardized error handling.
+- Identical repeated Pending payment initiation creates two attempts; duplicate successful callbacks remain idempotent.
+- Identical repeated deviation submissions create two active records and double the total.
+
+The latter two fail the requested replay-prevention invariant. Defining retry/event identity requires owner policy review so legitimate separate attempts/events are not incorrectly blocked. The current full backend suite therefore exits nonzero; failures are not skipped or marked expected-failure.
+
+Measured coverage: backend **80.96% lines / 51.76% branches**; frontend **48.13% lines / 38.31% branches**. Coverage is not a pass rate. The recorded browser snapshot covers Chromium; Firefox/Edge were not rerun for that test package.
+
+See the [unit/component report](test_results/unit_test_report.md), [system report](test_results/system_test_report.md), [coverage analysis](test_results/code_branch_coverage_analysis.md), [raw failures](test_results/raw/observed-failures.json) and [actual commands](test_results/raw/commands.md).
+
+## CI and release status
+
+GitHub Actions configures frontend lint/Jest/build, backend checks and PostgreSQL tests, security/dependency checks, Compose health checks and Chromium/Edge/Firefox workflows. `CI required` aggregates prerequisite results. Branch protection and independent review must be configured separately; workflow YAML does not enforce them by itself.
+
+The manual release workflow builds downloadable images. Automated deployment/promotion is not implemented. Independent human sign-off, complete manual usability, agreed load acceptance, external provider acceptance and recovery rehearsal remain pending; no production readiness is inferred from passing browser journeys.
+
+## Repository and documentation
 
 ```text
-HOSTELSPACE — DETAILED FILE IMPLEMENTATION TASK
-STATUS: Instruction-filled starter; application behavior NOT IMPLEMENTED.
-TARGET FILE: README.md
-ACCOUNTABLE OWNER: Anvi Srinivas
-INDEPENDENT REVIEWER: Arin Singh
-USER STORIES: US-17
-DEVELOPMENT PLAN SPRINT(S): 1 (proposed working mapping; team approval required)
-ORIGINAL SRS SPRINT(S): 1 (preserved baseline mapping)
-REQUIREMENTS: All FRs; architecture
-FILE PURPOSE: Project entry point and reproducible setup
-
-WHAT TO IMPLEMENT IN THIS FILE
-Describe architecture, install/run/test commands, env names without secrets, demo roles, source precedence, build order and current status. Do not imply the blueprint is a working app.
-
-BEFORE STARTING
-1. Read README.md, AGENTS.md, current source documents, relevant story and contracts.
-2. Check actual repository state and Git diff; no existing implementation is implied by this starter.
-3. Resolve blocked dependencies before inventing interfaces or missing policies.
-4. Inspect frontend/src/app/globals.css and docs/ui/design-system.md for UI work.
-5. Preserve HISTORY.md, domain transition history and other owners' reviewed work.
-
-COPY-READY AI IMPLEMENTATION PROMPT
-You are assisting Team 11 with HostelSpace. Read README.md, AGENTS.md, HISTORY.md, CHANGELOG.md, current SRS/SAD/STP, docs/decisions/, docs/04-design/api-contract.md, docs/04-design/role-permissions.md and the latest relevant Git history/diff before editing. Explicitly inspect frontend/src/app/globals.css and docs/ui/design-system.md before any UI change; reuse existing tokens/components, never invent a second palette or reset shared styles. If files/history do not yet exist, report that and establish only the approved foundation; never fabricate history.
-Use Next.js App Router + JavaScript + Tailwind, Django/DRF sessions and CSRF, Django ORM and PostgreSQL. No direct Next.js SQL, NextAuth, JWT-in-localStorage or second backend. Use SQLite only in explicit local quick mode. Use the reviewed API contract (plural /api/leaves/; reconcile the older /api/leave/ example rather than creating duplicates). Server authorization is authoritative; scope queries to active roles, ownership and assignment. Match standardized JSON errors {code,message,fields}; protect login CSRF explicitly. Never cache authenticated API responses. Use synthetic records only.
-Implement only this file's responsibility for the selected story, integrating with existing code. List affected paths, dependencies and unanswered decisions first. Do not overwrite another owner's module. Keep names required by Next.js/Django unchanged. Add owner/story/sprint header comments where the format permits; for JSON, generated lockfiles and migrations use the manifest/sidecar instead of invalid comments. Do not modify generated files by hand.
-Preserve operational history: append transitions with actor, server time, old/new state and remarks; do not rewrite past laundry details, deviation weights or payment attempts. Never store raw student geolocation, passwords in plaintext, payment credentials, session cookies or secrets in logs/prompts/history. Current state must come from the backend, not fabricated UI data.
-Add or update focused pytest/API tests and Jest/RTL component tests as relevant; use Playwright for complete and async-server flows. Verify PostgreSQL constraints/concurrency where relevant. Never weaken tests or fabricate test results. Do not deploy, use live payments, delete/reset data, run production migrations, commit or push without explicit approval.
-Return changed-file diff, actual commands/results, acceptance criteria covered, remaining gaps and explanation for the named owner to demonstrate. After human review, append a truthful handoff entry to HISTORY.md and docs/prompts/<owner>/ including story, files, decisions, tests actually run and reviewer. Update the RTM with real evidence only.
-
-OWNER: Anvi Srinivas | REVIEWER: Arin Singh
-TARGET FILE: README.md
-DEVELOPMENT-PLAN SPRINT: 1
-ORIGINAL SRS SPRINT: 1
-STORY: US-17
-REQUIREMENTS: All FRs; architecture
-RESPONSIBILITY: Project entry point and reproducible setup
-FILE TASK: Describe architecture, install/run/test commands, env names without secrets, demo roles, source precedence, build order and current status. Do not imply the blueprint is a working app.
-
-US-17 — Baseline architecture and scaffold monorepo
-Dependencies: None
-Acceptance context (deliver only the part owned by this file, report remaining dependencies):
-- Working Next.js and Django/DRF skeletons with health response.
-- Architecture/deployment diagrams show browser → Next.js → Django → PostgreSQL, external payment/location and separate CI path.
-- Record stack revision and duplicate UC correction proposal without changing FR IDs.
-- All four members review and can run the skeleton.
-
-OWNER'S REVIEW / HANDOFF CHECKLIST
-[ ] This file contains a real, understood implementation rather than this instruction placeholder.
-[ ] Imports/exports, callers and reviewed API contracts agree with the integrated repository.
-[ ] Only this file's responsibility is implemented; related changes are listed for review.
-[ ] Server-side role, ownership, assignment and input validation are checked where applicable.
-[ ] Loading, empty, error and success UI states use shared CSS/components where applicable.
-[ ] Operational transitions retain actor, server time, remarks and immutable historical data.
-[ ] Focused tests exercise applicable positive, negative, boundary and retry cases.
-[ ] Commands actually run and actual outcomes are recorded; unexecuted checks remain Not Run.
-[ ] Migrations/lockfiles are generated by the actual selected tools, never fabricated.
-[ ] No secrets, raw attendance coordinates or payment credentials enter source/logs/evidence.
-[ ] Independent reviewer checks the diff; RTM and truthful handoff records are updated.
-[ ] No live payments, production data changes, deployments, commits or pushes without approval.
-
-IMPLEMENTATION HANDOFF — FILL ONLY AFTER REAL WORK
-Actual Jira key: Not created
-Implementation status: Not implemented
-Changed paths: Not recorded
-Commands and observed results: Not Run
-Unresolved decisions / limitations: Record before implementation
-PR / reviewer / evidence: Not available
+frontend/src/app/       Next.js pages, layouts and routes
+frontend/src/features/ Domain UI components and API clients
+frontend/src/lib/      Shared API, role and formatting helpers
+backend/config/        Django settings, URLs, errors and health checks
+backend/apps/          Accounts, information, leave/attendance, facilities,
+                       student services and Director modules
+frontend/e2e/          Canonical Playwright journeys and privacy/health checks
+tests/                 Browser-suite forwarding and validation material
+test_results/          Recorded reports, raw outputs and coverage
+evidence/              Dated implementation/integration evidence
+scripts/               Validation and recovery helpers
+.github/workflows/     CI and image-build workflows
+compose.yaml           Local frontend/API/PostgreSQL stack
+docs/                  Source PDFs, contracts, validation and maintenance
 ```
+
+Start with the [setup and integration guide](docs/07-maintenance/ci-setup.md), [API contract](docs/04-design/api-contract.md), [role permissions](docs/04-design/role-permissions.md), [traceability matrix](docs/05-validation/rtm.md) and [integration evidence](evidence/team-integration-2026-11-16.md). The [integration manifest](docs/07-maintenance/team-integration-manifest.json) preserves source/merge provenance.
+
+The SRS/SAD/STP and Development Plan PDFs in [docs/sources](docs/sources) preserve the original requirements and proposed sprint mappings. Integration follows the PDF permission policy where older source-folder variants disagree. All existing FR IDs are preserved; the duplicate legacy UC-02 correction remains a proposal. Some supporting documents still contain starter instructions or older notes; use their dated integration updates and actual registered code for current behavior.
+
+Files under `docs/07-maintenance/branch-imports`, `legacy-tests` and `legacy-migrations` are historical text archives, not active code. Earlier implementation details remain available in Git history and dated evidence. Before contributing, read [AGENTS.md](AGENTS.md), inspect the relevant contracts/history and preserve operational audit records. Shared UI changes must reuse the existing CSS tokens/components.
