@@ -40,6 +40,13 @@ const ui = {
     background: "#fef2f2",
   },
 };
+const DEMO_WARDEN_LOCATION = {
+  latitude: 12,
+  longitude: 77,
+  radius: 100,
+  accuracy: 100,
+  sampleAge: 60,
+};
 function ErrorMessage({ error }) {
   return error ? (
     <div role="alert" style={ui.error}>
@@ -96,7 +103,10 @@ export function AttendanceSessionForm({ onSaved }) {
   return (
     <section style={ui.card}>
       <h2>Create attendance session</h2>
-      <p>Use only the location policy approved by the team and faculty.</p>
+      <p>
+        Demo location is the fixed Warden hostel point. The student must submit
+        one location sample within this radius; no background tracking is used.
+      </p>
       <form method="post" onSubmit={submit}>
         <Field label="Title" name="title" maxLength={120} required />
         <div style={ui.row}>
@@ -114,6 +124,7 @@ export function AttendanceSessionForm({ onSaved }) {
             step="any"
             min="-90"
             max="90"
+            defaultValue={DEMO_WARDEN_LOCATION.latitude}
             required
           />
           <Field
@@ -123,6 +134,7 @@ export function AttendanceSessionForm({ onSaved }) {
             step="any"
             min="-180"
             max="180"
+            defaultValue={DEMO_WARDEN_LOCATION.longitude}
             required
           />
           <Field
@@ -131,6 +143,7 @@ export function AttendanceSessionForm({ onSaved }) {
             type="number"
             step="any"
             min="0.01"
+            defaultValue={DEMO_WARDEN_LOCATION.radius}
             required
           />
           <Field
@@ -139,6 +152,7 @@ export function AttendanceSessionForm({ onSaved }) {
             type="number"
             step="any"
             min="0.01"
+            defaultValue={DEMO_WARDEN_LOCATION.accuracy}
             required
           />
           <Field
@@ -147,6 +161,7 @@ export function AttendanceSessionForm({ onSaved }) {
             type="number"
             min="1"
             max="300"
+            defaultValue={DEMO_WARDEN_LOCATION.sampleAge}
             required
           />
         </div>

@@ -13,6 +13,7 @@ from django.utils import timezone
 from apps.accounts.models import StudentProfile, User
 from apps.facilities.models import LaundryAllocation, StudyRoom
 from apps.information.models import Content, Rule
+from apps.leave_attendance.models import LeaveRequest, LeaveTransition
 from apps.student_services.models import Coupon, FeeDue, MessAllocation, MessOption
 
 
@@ -130,6 +131,35 @@ class Command(BaseCommand):
                 },
             )
         today = timezone.localdate()
+        demo_leave, _ = LeaveRequest.objects.get_or_create(
+            student=second,
+            assigned_warden=warden,
+            start_date=today + timedelta(days=1),
+            end_date=today + timedelta(days=2),
+            defaults={
+                "reason": "Synthetic family visit for Chief Warden review.",
+                "status": LeaveRequest.Status.ESCALATED,
+            },
+        )
+        if demo_leave.status == LeaveRequest.Status.ESCALATED:
+            LeaveTransition.objects.get_or_create(
+                leave=demo_leave,
+                to_status=LeaveRequest.Status.PENDING,
+                defaults={
+                    "actor": second,
+                    "from_status": "",
+                    "remarks": "Submitted",
+                },
+            )
+            LeaveTransition.objects.get_or_create(
+                leave=demo_leave,
+                to_status=LeaveRequest.Status.ESCALATED,
+                defaults={
+                    "actor": warden,
+                    "from_status": LeaveRequest.Status.PENDING,
+                    "remarks": "Escalated for Chief Warden review.",
+                },
+            )
         Coupon.objects.get_or_create(
             code="DEMO-MEAL-001",
             defaults={

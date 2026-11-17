@@ -89,6 +89,21 @@ class ApiTests(TestCase):
         response = self.client.post("/api/deviations/", {"student": str(self.student.pk), "rule": str(self.rule.pk), "remarks": "Observed"}, format="json")
         self.assertEqual(response.status_code, 404)
 
+    def test_deviation_accepts_staff_assigned_weightage(self):
+        self.client.force_authenticate(self.warden)
+        response = self.client.post(
+            "/api/deviations/",
+            {
+                "student": str(self.student.pk),
+                "rule": str(self.rule.pk),
+                "weightage": "1.25",
+                "remarks": "Assigned amount",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["weightage_snapshot"], "1.25")
+
     def test_choices_are_scoped_and_staff_only(self):
         self.assertEqual(self.client.get("/api/arin/students/").status_code, 403)
         self.client.force_authenticate(self.warden)

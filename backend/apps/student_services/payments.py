@@ -10,7 +10,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from django.conf import settings
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -34,7 +34,7 @@ def provider_request(path, payload=None):
     try:
         with urlopen(request, timeout=15) as response:  # nosec B310
             return json.load(response)
-    except (URLError, HTTPError, ValueError):
+    except (TimeoutError, URLError, HTTPError, ValueError):
         raise ValidationError(
             "Sandbox provider unavailable. No fee status was changed."
         )
@@ -57,6 +57,13 @@ def initiate(user, fee_id):
     if fee.status == "Paid":
         raise ValidationError("This fee is already Paid.")
     mode = settings.PAYMENT_MODE
+    existing = (
+        PaymentAttempt.objects.filter(fee=fee, provider=mode, status="Pending")
+        .order_by("-created_at")
+        .first()
+    )
+    if existing:
+        return existing
     if mode == "simulation":
         local_simulation()
         order = "sim_" + secrets.token_hex(16)
@@ -80,9 +87,23 @@ def initiate(user, fee_id):
         raise ValidationError(
             "Payment checkout is disabled. Configure the sandbox provider."
         )
-    return PaymentAttempt.objects.create(
-        fee=fee, order_id=order, provider=mode, amount=fee.amount, currency=fee.currency
-    )
+    try:
+        return PaymentAttempt.objects.create(
+            fee=fee,
+            order_id=order,
+            provider=mode,
+            amount=fee.amount,
+            currency=fee.currency,
+        )
+    except IntegrityError:
+        # A concurrent request may win the pending-attempt constraint after the
+        # initial lookup. Return that canonical attempt instead of leaking a 500.
+        existing = PaymentAttempt.objects.filter(
+            fee=fee, provider=mode, status="Pending"
+        ).first()
+        if existing:
+            return existing
+        raise
 
 
 @transaction.atomic

@@ -73,14 +73,20 @@ def submit_attendance(user, session_id, sample):
     return record
 
 @transaction.atomic
-def record_deviation(user, student_id, rule, remarks):
+def record_deviation(user, student_id, rule, remarks, weightage=None):
     access.require(user, access.WARDEN, access.CHIEF)
-    student = get_object_or_404(access.students_for(user), pk=student_id)
+    student = get_object_or_404(access.students_for(user).select_for_update(), pk=student_id)
     # Refresh and lock the rule; snapshot from the server, never from submitted weightage.
     rule = rule.__class__.objects.select_for_update().get(pk=rule.pk)
-    if not rule.active or rule.weightage is None or not Decimal('0') <= rule.weightage <= Decimal('99999999.99'):
+    assigned_weightage = rule.weightage if weightage is None else weightage
+    if not rule.active or assigned_weightage is None or not Decimal('0') <= assigned_weightage <= Decimal('99999999.99'):
         raise ValidationError({'rule': 'Select an active rule with a valid nonnegative weightage.'})
-    return Deviation.objects.create(student=student, rule=rule, rule_title_snapshot=rule.title, weightage_snapshot=rule.weightage, remarks=remarks, recorded_by=user)
+    existing = Deviation.objects.filter(
+        student=student, rule=rule, remarks=remarks, active=True
+    ).first()
+    if existing:
+        return existing
+    return Deviation.objects.create(student=student, rule=rule, rule_title_snapshot=rule.title, weightage_snapshot=assigned_weightage, remarks=remarks, recorded_by=user)
 
 @transaction.atomic
 def deactivate_deviation(user, pk, reason):

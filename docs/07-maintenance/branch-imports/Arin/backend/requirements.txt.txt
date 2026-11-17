@@ -1,4 +1,0 @@
-# Shared backend runtime requirements for the reviewed HostelSpace contracts.
-Django>=5.2,<5.3
-djangorestframework>=3.16,<3.17
-psycopg[binary]>=3.2,<4

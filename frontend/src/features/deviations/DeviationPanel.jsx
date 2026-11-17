@@ -67,6 +67,7 @@ function Select({ label, value, onChange, children }) {
 }
 export function DeviationForm({ student, rules, onSaved }) {
   const [rule, setRule] = useState(""),
+    [weightage, setWeightage] = useState(""),
     [remarks, setRemarks] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(null);
@@ -75,7 +76,7 @@ export function DeviationForm({ student, rules, onSaved }) {
     setBusy(true);
     setError(null);
     try {
-      await recordDeviation({ student, rule, remarks });
+      await recordDeviation({ student, rule, weightage, remarks });
       setRemarks("");
       onSaved();
     } catch (failure) {
@@ -87,13 +88,35 @@ export function DeviationForm({ student, rules, onSaved }) {
   return (
     <form style={ui.card} onSubmit={submit}>
       <h2>Record deviation</h2>
-      <Select label="Active rule" value={rule} onChange={setRule}>
+      <Select
+        label="Active rule"
+        value={rule}
+        onChange={(value) => {
+          setRule(value);
+          setWeightage(
+            String(rules.find((item) => String(item.id) === value)?.weightage ?? ""),
+          );
+        }}
+      >
         {rules.map((item) => (
           <option key={item.id} value={item.id}>
             {item.title} · {item.weightage}
           </option>
         ))}
       </Select>
+      <label style={ui.field}>
+        <span>Assigned weightage</span>
+        <input
+          style={ui.input}
+          type="number"
+          min="0"
+          max="99999999.99"
+          step="0.01"
+          required
+          value={weightage}
+          onChange={(event) => setWeightage(event.target.value)}
+        />
+      </label>
       <label style={ui.field}>
         <span>Remarks</span>
         <textarea

@@ -158,7 +158,7 @@ The frontend defaults to `http://127.0.0.1:8000` for its Django origin. Set serv
 
 For a native local simulated checkout, export `PAYMENT_MODE=simulation` and `ALLOW_PAYMENT_SIMULATION=1` in the backend terminal before starting Django. This takes no payment credentials and is labelled as simulation. Real TEST-provider acceptance requires separate credentials and verification; passing simulation/mocked tests does not demonstrate a gateway payment.
 
-Compose does not forward the payment-mode variables from `.env` to the API service automatically. A local Compose override must explicitly supply them if simulation is needed. See the [fee contract](backend/apps/student_services/FEES_API.md) and [setup guide](docs/07-maintenance/ci-setup.md).
+Compose forwards `PAYMENT_MODE`, `ALLOW_PAYMENT_SIMULATION` and the optional private `HOSTELSPACE_DEMO_PASSWORD` from the local environment; TEST provider credentials still require explicit configuration. See the [fee contract](backend/apps/student_services/FEES_API.md) and [setup guide](docs/07-maintenance/ci-setup.md).
 
 ## Tests and verification
 
@@ -210,7 +210,7 @@ The existing 116 backend regressions passed. Additional priority tests expose th
 - Identical repeated Pending payment initiation creates two attempts; duplicate successful callbacks remain idempotent.
 - Identical repeated deviation submissions create two active records and double the total.
 
-The latter two fail the requested replay-prevention invariant. Defining retry/event identity requires owner policy review so legitimate separate attempts/events are not incorrectly blocked. The current full backend suite therefore exits nonzero; failures are not skipped or marked expected-failure.
+In that historical snapshot, the latter two fail the requested replay-prevention invariant. Defining retry/event identity requires owner policy review so legitimate separate attempts/events are not incorrectly blocked. These are historical failures from the 16 November snapshot. Newer main commits fix timeout handling and replay protection; consult the current regenerated test reports for the integrated result. Failures are not skipped or marked expected-failure.
 
 Measured coverage: backend **80.96% lines / 51.76% branches**; frontend **48.13% lines / 38.31% branches**. Coverage is not a pass rate. The recorded browser snapshot covers Chromium; Firefox/Edge were not rerun for that test package.
 
@@ -239,10 +239,14 @@ scripts/               Validation and recovery helpers
 .github/workflows/     CI and image-build workflows
 compose.yaml           Local frontend/API/PostgreSQL stack
 docs/                  Source PDFs, contracts, validation and maintenance
+deliverables/          Submitted project PDFs
+demo_video/            Recorded project demonstration
 ```
 
 Start with the [setup and integration guide](docs/07-maintenance/ci-setup.md), [API contract](docs/04-design/api-contract.md), [role permissions](docs/04-design/role-permissions.md), [traceability matrix](docs/05-validation/rtm.md) and [integration evidence](evidence/team-integration-2026-11-16.md). The [integration manifest](docs/07-maintenance/team-integration-manifest.json) preserves source/merge provenance.
 
 The SRS/SAD/STP and Development Plan PDFs in [docs/sources](docs/sources) preserve the original requirements and proposed sprint mappings. Integration follows the PDF permission policy where older source-folder variants disagree. All existing FR IDs are preserved; the duplicate legacy UC-02 correction remains a proposal. Some supporting documents still contain starter instructions or older notes; use their dated integration updates and actual registered code for current behavior.
 
-Files under `docs/07-maintenance/branch-imports`, `legacy-tests` and `legacy-migrations` are historical text archives, not active code. Earlier implementation details remain available in Git history and dated evidence. Before contributing, read [AGENTS.md](AGENTS.md), inspect the relevant contracts/history and preserve operational audit records. Shared UI changes must reuse the existing CSS tokens/components.
+Earlier implementation details and retired starter/archive documents remain available in Git history and dated evidence. Inspect the relevant contracts/history and preserve operational audit records before contributing. Shared UI changes must reuse the existing CSS tokens/components.
+
+The team shares integration, authorization review, validation, documentation and demonstration responsibilities. Submitted PDFs are in [deliverables](deliverables), and the recorded demonstration is in [demo_video](demo_video). Hosted Firefox previously had a shared login-redirect failure; local Chromium success does not establish that the hosted browser matrix is fully passing.

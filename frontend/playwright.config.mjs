@@ -7,5 +7,5 @@ export default defineConfig({
   testDir: './e2e', testMatch: '**/*.spec.js', workers: 1, retries: 0,
   timeout: 60000, reporter: [['list'], ['html', { open: 'never' }]],
   use: { baseURL: process.env.BASE_URL || 'http://127.0.0.1:3000',
-    headless: true, trace: 'off', screenshot: 'only-on-failure' },
+    headless: true, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
 });

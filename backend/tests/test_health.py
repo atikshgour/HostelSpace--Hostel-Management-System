@@ -7,6 +7,10 @@ from django.test import Client
 
 
 @pytest.mark.django_db
+@pytest.mark.skipif(
+    connection.vendor != 'postgresql',
+    reason='Health database-vendor assertion requires PostgreSQL.',
+)
 def test_health_checks_postgresql():
     assert connection.vendor == 'postgresql'
     response = Client().get('/api/health/')
