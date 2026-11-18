@@ -14,7 +14,9 @@ if not os.environ.get("DJANGO_SECRET_KEY"):
         key_file.chmod(0o600)
     os.environ["DJANGO_SECRET_KEY"] = key_file.read_text().strip()
 os.environ.setdefault(
-    "DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,"
+    "http://localhost:3001,http://127.0.0.1:3001",
 )
 from .base import *  # noqa: F403,E402
 

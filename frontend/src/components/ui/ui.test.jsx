@@ -4,6 +4,8 @@ import Button from "./Button";
 import StatusBadge from "./StatusBadge";
 import DataTable from "./DataTable";
 import FormField from "./FormField";
+import EmptyState from "./EmptyState";
+import HistoryTimeline from "./HistoryTimeline";
 test("shared components expose accessible labels, status and table headers", () => {
   render(
     <>
@@ -27,4 +29,20 @@ test("disabled button prevents duplicate actions", () => {
   );
   fireEvent.click(screen.getByText("Save"));
   expect(click).not.toHaveBeenCalled();
+});
+
+test("empty and history components render supplied and default content", () => {
+  render(
+    <>
+      <EmptyState />
+      <EmptyState>No laundry records.</EmptyState>
+      <HistoryTimeline
+        items={[{ id: 1, from_status: "", to_status: "Approved", remarks: "Reviewed", actor: "warden", occurred_at: "2026-01-01T00:00:00Z" }]}
+      />
+    </>,
+  );
+  expect(screen.getByText("No records yet.")).toBeInTheDocument();
+  expect(screen.getByText("No laundry records.")).toBeInTheDocument();
+  expect(screen.getByText(/New.*Approved/)).toBeInTheDocument();
+  expect(screen.getByText(/Reviewed/)).toBeInTheDocument();
 });
