@@ -5,7 +5,7 @@ Backend execution: 2026-11-17T07:06:55.032939+00:00; frontend: 2026-11-17T07:05:
 Source HEAD: `f921d4cdd399803451d4d3c0e30e72d587eb074a` plus uncommitted test/config/script changes.
 Local synthetic PostgreSQL only. No production data changes or live payments.
 Publication is user-authorized; command metadata identifies the tested source HEAD.
-Each command's own timestamp/exit is preserved in [commands](raw/commands.md).
+Each command's own timestamp/exit is preserved in [commands](supporting_artifacts/raw/commands.md).
 Independent human review remains pending. Coverage success does not override failing tests.
 
 ## Recorded totals
@@ -336,6 +336,6 @@ its service/database single-success assertions. No assertion was skipped or weak
 - shared components expose accessible labels, status and table headers: passed
 - disabled button prevents duplicate actions: passed
 
-[JUnit](raw/backend-junit.xml), [Jest JSON](raw/frontend-results.json),
-[backend log](raw/backend.log), [frontend log](raw/frontend.log),
-[raw failures](raw/observed-failures.json), [coverage analysis](code_branch_coverage_analysis.md).
+[JUnit](supporting_artifacts/raw/backend-junit.xml), [Jest JSON](supporting_artifacts/raw/frontend-results.json),
+[backend log](supporting_artifacts/raw/backend.log), [frontend log](supporting_artifacts/raw/frontend.log),
+[raw failures](supporting_artifacts/raw/observed-failures.json), [coverage analysis](code_branch_coverage_analysis.md).

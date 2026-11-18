@@ -5,7 +5,7 @@ Backend execution: 2026-11-17T07:06:55.032939+00:00; frontend: 2026-11-17T07:05:
 Source HEAD: `f921d4cdd399803451d4d3c0e30e72d587eb074a` plus uncommitted test/config/script changes.
 Local synthetic PostgreSQL only. No production data changes or live payments.
 Publication is user-authorized; command metadata identifies the tested source HEAD.
-Each command's own timestamp/exit is preserved in [commands](raw/commands.md).
+Each command's own timestamp/exit is preserved in [commands](supporting_artifacts/raw/commands.md).
 Independent human review remains pending. Coverage success does not override failing tests.
 
 ## Priority requirements
@@ -189,6 +189,6 @@ Independent review, complete manual usability, agreed load acceptance,
 external provider acceptance, staging/release and recovery rehearsal remain pending.
 Publication is separately user-authorized and is not acceptance evidence.
 
-[Commands](raw/commands.md), [browser JSON](raw/browser-results.json),
-[browser log](raw/e2e.log), [browser HTML](raw/browser-html/index.html),
-[JUnit](raw/backend-junit.xml), [failures](raw/observed-failures.json).
+[Commands](supporting_artifacts/raw/commands.md), [browser JSON](supporting_artifacts/raw/browser-results.json),
+[browser log](supporting_artifacts/raw/e2e.log), [browser HTML](supporting_artifacts/raw/browser-html/index.html),
+[JUnit](supporting_artifacts/raw/backend-junit.xml), [failures](supporting_artifacts/raw/observed-failures.json).
